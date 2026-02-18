@@ -1,0 +1,2 @@
+# ShopEasy
+Arquitectura de Software

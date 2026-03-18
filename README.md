@@ -10,7 +10,7 @@ ShopEasy es una aplicación web moderna diseñada para gestionar procesos de com
 - React
 - TypeScript
 - TailwindCSS
-- ESLint
+
 
 ---
 

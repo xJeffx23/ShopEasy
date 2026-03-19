@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
+import Sidebar from "@/components/layout/sidebar";
+import Topbar from "@/components/layout/topbar";
 
 export default function SistemaLayout({
     children,
@@ -8,15 +8,17 @@ export default function SistemaLayout({
     children: ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-[#f5f7fb] text-[#1f2937]">
-            <div className="flex min-h-screen">
+        <div className="h-screen overflow-hidden bg-[#f5f7fb]">
+            <div className="flex h-full">
                 <Sidebar />
 
-                <div className="flex flex-1 flex-col">
+                <div className="flex flex-1 flex-col overflow-hidden">
                     <Topbar />
 
-                    <main className="flex-1 p-6">
-                        {children}
+                    <main className="flex-1 overflow-y-auto px-6 py-5">
+                        <div className="mx-auto w-full max-w-[1280px]">
+                            {children}
+                        </div>
                     </main>
                 </div>
             </div>

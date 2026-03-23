@@ -1,24 +1,52 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Button } from "@/src/components/ui/button"
-import { Input } from "@/src/components/ui/input"
-import { Label } from "@/src/components/ui/label"
-import { Mail, Lock, Eye, EyeOff } from "lucide-react"
-import AnimatedAuthBackground from "@/src/components/login/AnimatedAuthBackground"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+
+import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+import AnimatedAuthBackground from "@/src/components/login/AnimatedAuthBackground";
+import { login } from "@/src/lib/auth/auth-service";
 
 export default function LoginView() {
-    const [mostrarContrasena, setMostrarContrasena] = useState(false)
+    const router = useRouter();
 
-    const manejarEnvio = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-    }
+    const [mostrarContrasena, setMostrarContrasena] = useState(false);
+    const [username, setUsername] = useState("admin");
+    const [password, setPassword] = useState("admin");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
+
+        try {
+            const result = await login({
+                username,
+                password,
+            });
+
+            if (!result.success) {
+                setError(result.message);
+                return;
+            }
+
+            router.push("/sistema/dashboard");
+        } catch (err) {
+            console.error("Error al iniciar sesión:", err);
+            setError("Ocurrió un error inesperado al iniciar sesión.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-
-            {/* Panel izquierdo */}
             <aside className="hidden md:flex relative flex-col justify-center items-center bg-[#243C8F] text-white px-12 overflow-hidden">
                 <AnimatedAuthBackground />
 
@@ -55,16 +83,13 @@ export default function LoginView() {
                 </motion.div>
             </aside>
 
-            {/* Panel derecho */}
             <main className="flex items-center justify-center bg-background px-6 py-12">
-
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.6 }}
                     className="w-full max-w-md space-y-8"
                 >
-
                     <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-xl bg-[#243C8F] text-white flex items-center justify-center font-semibold">
                             SE
@@ -100,14 +125,16 @@ export default function LoginView() {
                                 visible: { opacity: 1, y: 0 },
                             }}
                         >
-                            <Label htmlFor="correo">Correo</Label>
+                            <Label htmlFor="username">Usuario</Label>
                             <div className="relative mt-2">
                                 <Mail className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    id="correo"
-                                    type="email"
-                                    placeholder="tu@empresa.com"
+                                    id="username"
+                                    type="text"
+                                    placeholder="Ingresa tu usuario"
                                     className="pl-10"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
                                     required
                                 />
                             </div>
@@ -127,6 +154,8 @@ export default function LoginView() {
                                     type={mostrarContrasena ? "text" : "password"}
                                     placeholder="Ingresa tu contraseña"
                                     className="pl-10 pr-10"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
                                 <button
@@ -143,20 +172,39 @@ export default function LoginView() {
                             </div>
                         </motion.div>
 
+                        {error && (
+                            <motion.p
+                                initial={{ opacity: 0, y: 6 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-sm font-medium text-red-500"
+                            >
+                                {error}
+                            </motion.p>
+                        )}
+
                         <motion.div
                             variants={{
                                 hidden: { opacity: 0, y: 20 },
                                 visible: { opacity: 1, y: 0 },
                             }}
                         >
-                            <Button className="w-full bg-[#243C8F] hover:bg-[#1f3277]">
-                                Iniciar sesión
+                            <Button
+                                type="submit"
+                                className="w-full bg-[#243C8F] hover:bg-[#1f3277]"
+                                disabled={loading}
+                            >
+                                {loading ? "Iniciando sesión..." : "Iniciar sesión"}
                             </Button>
                         </motion.div>
                     </motion.form>
 
+                    <div className="rounded-xl border bg-muted/30 p-4 text-sm text-muted-foreground">
+                        <p className="font-medium text-foreground">Credenciales mock</p>
+                        <p>Usuario: admin</p>
+                        <p>Contraseña: admin</p>
+                    </div>
                 </motion.div>
             </main>
         </div>
-    )
+    );
 }

@@ -53,7 +53,7 @@ DROP TABLE IF EXISTS [dbo].[Provincia];
 GO
 
 -- *****************************************************
--- CAT¡LOGOS BASE
+-- CAT√ÅLOGOS BASE
 -- *****************************************************
 
 CREATE TABLE [dbo].[Catalogo_Departamento] (
@@ -145,12 +145,7 @@ CREATE TABLE [dbo].[Catalogo_Estado_Reparacion] (
 );
 GO
 
-CREATE TABLE [dbo].[Provincia] (
-    [idProvincia]       INT IDENTITY(1,1) NOT NULL,
-    [Nombre_Provincia]  NVARCHAR(45)      NOT NULL,
-    CONSTRAINT [PK_Provincia] PRIMARY KEY ([idProvincia])
-);
-GO
+
 
 -- *****************************************************
 -- EMPLEADO

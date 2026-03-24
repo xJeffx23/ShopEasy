@@ -1,3 +1,10 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { ChevronRight } from "lucide-react";
+
+import { dashboardIcons } from "@/src/lib/dashboard-icons";
+import { Button } from "@/src/components/ui/button";
 import { QuickActionItem } from "@/src/types/dashboard";
 
 interface QuickActionsProps {
@@ -12,28 +19,46 @@ function getAccentColor(accent: QuickActionItem["accent"]) {
             return "text-emerald-600";
         case "amber":
             return "text-amber-700";
+        default:
+            return "text-slate-600";
     }
 }
 
 export default function QuickActions({ actions }: QuickActionsProps) {
     return (
-        <div>
-            <h3 className="mb-4 text-[18px] font-semibold uppercase tracking-[0.08em] text-gray-500">
-                Acciones rápidas
-            </h3>
+        <div className="space-y-4">
+            <div>
+                <h3 className="text-base font-semibold text-slate-900">
+                    Acciones rápidas
+                </h3>
+                <p className="text-sm text-slate-500">
+                    Accesos directos a tareas frecuentes del sistema.
+                </p>
+            </div>
 
-            <div className="space-y-4">
-                {actions.map((action) => {
-                    const Icon = action.icon;
+            <div className="space-y-3">
+                {actions.map((action, index) => {
+                    const Icon = dashboardIcons[action.iconName];
 
                     return (
-                        <button
+                        <motion.div
                             key={action.id}
-                            className="flex h-14 w-full items-center gap-3 rounded-xl border border-gray-200 bg-white px-5 text-[18px] font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2, delay: index * 0.04 }}
                         >
-                            <Icon size={18} className={getAccentColor(action.accent)} />
-                            {action.label}
-                        </button>
+                            <Button
+                                variant="outline"
+                                className="h-12 w-full justify-between rounded-xl border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                                <span className="flex items-center gap-3">
+                                    <Icon className={`h-4 w-4 ${getAccentColor(action.accent)}`} />
+                                    <span>{action.label}</span>
+                                </span>
+
+                                <ChevronRight className="h-4 w-4 text-slate-400" />
+                            </Button>
+                        </motion.div>
                     );
                 })}
             </div>

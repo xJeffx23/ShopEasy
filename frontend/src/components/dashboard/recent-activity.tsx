@@ -1,3 +1,5 @@
+import { Button } from "@/src/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { ActivityItem } from "@/src/types/dashboard";
 
 interface RecentActivityProps {
@@ -13,65 +15,79 @@ function getTypeBadge(color: ActivityItem["typeColor"]) {
         case "amber":
             return "bg-amber-100 text-amber-700";
         default:
-            return "bg-gray-100 text-gray-600";
+            return "bg-slate-100 text-slate-600";
     }
 }
 
 export default function RecentActivity({ items }: RecentActivityProps) {
     return (
-        <div>
-            <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-[34px] font-semibold text-gray-900">
-                    Actividad reciente
-                </h2>
-                <button className="text-[18px] font-semibold text-blue-600 transition hover:text-blue-700">
-                    Ver todo
-                </button>
-            </div>
-
-            <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                <div className="grid grid-cols-[1.6fr_1fr_1fr_0.8fr] px-8 py-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-gray-400">
-                    <span>Paciente / Evento</span>
-                    <span>Tipo</span>
-                    <span>Habitación</span>
-                    <span>Tiempo</span>
+        <div className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+                <div>
+                    <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+                        Actividad reciente
+                    </h2>
+                    <p className="text-sm text-slate-500">
+                        Últimos movimientos registrados en el sistema.
+                    </p>
                 </div>
 
-                {items.map((item) => (
-                    <div
-                        key={item.id}
-                        className="grid grid-cols-[1.6fr_1fr_1fr_0.8fr] items-center border-t border-gray-100 px-8 py-6"
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
-                                {item.initials}
+                <Button variant="ghost" className="text-sm font-medium text-blue-600 hover:text-blue-700">
+                    Ver todo
+                </Button>
+            </div>
+
+            <Card className="overflow-hidden rounded-2xl border border-slate-200/80 shadow-sm">
+                <CardHeader className="border-b border-slate-100 px-6 py-4">
+                    <CardTitle className="text-sm font-medium text-slate-700">
+                        Resumen de actividad
+                    </CardTitle>
+                </CardHeader>
+
+                <CardContent className="p-0">
+                    <div className="grid grid-cols-[1.6fr_1fr_1fr_0.8fr] px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+                        <span>Paciente / Evento</span>
+                        <span>Tipo</span>
+                        <span>Habitación</span>
+                        <span>Tiempo</span>
+                    </div>
+
+                    {items.map((item) => (
+                        <div
+                            key={item.id}
+                            className="grid grid-cols-[1.6fr_1fr_1fr_0.8fr] items-center border-t border-slate-100 px-6 py-5"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
+                                    {item.initials}
+                                </div>
+
+                                <div className="min-w-0">
+                                    <p className="truncate text-sm font-semibold text-slate-900 md:text-base">
+                                        {item.patientName}
+                                    </p>
+                                    <p className="truncate text-sm text-slate-500">
+                                        {item.eventDescription}
+                                    </p>
+                                </div>
                             </div>
 
                             <div>
-                                <p className="text-[20px] font-semibold text-gray-900">
-                                    {item.patientName}
-                                </p>
-                                <p className="text-[15px] text-gray-400">
-                                    {item.eventDescription}
-                                </p>
+                                <span
+                                    className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold ${getTypeBadge(
+                                        item.typeColor
+                                    )}`}
+                                >
+                                    {item.type}
+                                </span>
                             </div>
-                        </div>
 
-                        <div>
-                            <span
-                                className={`rounded-full px-3 py-1 text-[11px] font-semibold ${getTypeBadge(
-                                    item.typeColor
-                                )}`}
-                            >
-                                {item.type}
-                            </span>
+                            <div className="text-sm text-slate-600 md:text-base">{item.room}</div>
+                            <div className="text-sm text-slate-400">{item.timeAgo}</div>
                         </div>
-
-                        <div className="text-[20px] text-gray-600">{item.room}</div>
-                        <div className="text-[16px] text-gray-400">{item.timeAgo}</div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </CardContent>
+            </Card>
         </div>
     );
 }

@@ -1,6 +1,17 @@
 "use client";
 
+import { motion } from "framer-motion";
+import { TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+
+import { Badge } from "@/src/components/ui/badge";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/src/components/ui/card";
 import {
     ChartContainer,
     ChartTooltip,
@@ -15,16 +26,16 @@ interface CapacityTrendProps {
 }
 
 const capacityData = [
-    { mes: "Lun", ocupacion: 68 },
-    { mes: "Mar", ocupacion: 72 },
-    { mes: "Mié", ocupacion: 70 },
-    { mes: "Jue", ocupacion: 76 },
-    { mes: "Vie", ocupacion: 82 },
-    { mes: "Dom", ocupacion: 79 },
+    { day: "Lun", occupancy: 68 },
+    { day: "Mar", occupancy: 72 },
+    { day: "Mié", occupancy: 70 },
+    { day: "Jue", occupancy: 76 },
+    { day: "Vie", occupancy: 82 },
+    { day: "Dom", occupancy: 79 },
 ];
 
 const chartConfig = {
-    ocupacion: {
+    occupancy: {
         label: "Ocupación",
         color: "#2563eb",
     },
@@ -34,87 +45,104 @@ export default function CapacityTrend({ trend }: CapacityTrendProps) {
     const currentOccupancy = trend?.occupancyRate ?? 82;
 
     return (
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-            <div className="mb-5">
-                <h3 className="text-[18px] font-semibold uppercase tracking-[0.08em] text-gray-500">
-                    Tendencia de capacidad
-                </h3>
-                <p className="mt-2 text-sm text-gray-500">
-                    Evolución reciente de la ocupación del centro.
-                </p>
-            </div>
+        <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+        >
+            <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+                <CardHeader className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-1">
+                            <CardTitle className="text-base font-semibold text-slate-900">
+                                Tendencia de capacidad
+                            </CardTitle>
+                            <CardDescription className="text-sm text-slate-500">
+                                Evolución reciente de la ocupación del centro.
+                            </CardDescription>
+                        </div>
 
-            <div className="mb-4">
-                <div className="flex items-end justify-between">
-                    <div>
-                        <p className="text-sm text-gray-500">Ocupación actual</p>
-                        <p className="text-[30px] font-semibold leading-none text-gray-900">
-                            {currentOccupancy}%
-                        </p>
+                        <Badge
+                            variant="secondary"
+                            className="rounded-full bg-blue-50 text-blue-700 hover:bg-blue-50"
+                        >
+                            <TrendingUp className="mr-1 h-3.5 w-3.5" />
+                            Estable
+                        </Badge>
                     </div>
 
-                    <div className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                        Estable
+                    <div className="flex items-end justify-between">
+                        <div>
+                            <p className="text-sm text-slate-500">Ocupación actual</p>
+                            <p className="text-3xl font-semibold tracking-tight text-slate-900">
+                                {currentOccupancy}%
+                            </p>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </CardHeader>
 
-            <ChartContainer config={chartConfig} className="h-[220px] w-full">
-                <AreaChart
-                    accessibilityLayer
-                    data={capacityData}
-                    margin={{
-                        left: 4,
-                        right: 4,
-                        top: 8,
-                        bottom: 0,
-                    }}
-                >
-                    <defs>
-                        <linearGradient id="fillOcupacion" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="var(--color-ocupacion)" stopOpacity={0.28} />
-                            <stop offset="95%" stopColor="var(--color-ocupacion)" stopOpacity={0.04} />
-                        </linearGradient>
-                    </defs>
+                <CardContent className="pt-0">
+                    <ChartContainer config={chartConfig} className="h-[220px] w-full">
+                        <AreaChart
+                            accessibilityLayer
+                            data={capacityData}
+                            margin={{ left: 4, right: 4, top: 8, bottom: 0 }}
+                        >
+                            <defs>
+                                <linearGradient id="fillOccupancy" x1="0" y1="0" x2="0" y2="1">
+                                    <stop
+                                        offset="5%"
+                                        stopColor="var(--color-occupancy)"
+                                        stopOpacity={0.28}
+                                    />
+                                    <stop
+                                        offset="95%"
+                                        stopColor="var(--color-occupancy)"
+                                        stopOpacity={0.04}
+                                    />
+                                </linearGradient>
+                            </defs>
 
-                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                            <CartesianGrid vertical={false} strokeDasharray="3 3" />
 
-                    <XAxis
-                        dataKey="mes"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={10}
-                    />
+                            <XAxis
+                                dataKey="day"
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={10}
+                            />
 
-                    <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent indicator="dot" />}
-                    />
+                            <ChartTooltip
+                                cursor={false}
+                                content={<ChartTooltipContent indicator="dot" />}
+                            />
 
-                    <Area
-                        dataKey="ocupacion"
-                        type="monotone"
-                        fill="url(#fillOcupacion)"
-                        stroke="var(--color-ocupacion)"
-                        strokeWidth={2.5}
-                        dot={{
-                            r: 4,
-                            fill: "var(--color-ocupacion)",
-                            strokeWidth: 0,
-                        }}
-                        activeDot={{
-                            r: 5,
-                            fill: "var(--color-ocupacion)",
-                            strokeWidth: 0,
-                        }}
-                    />
-                </AreaChart>
-            </ChartContainer>
+                            <Area
+                                dataKey="occupancy"
+                                type="monotone"
+                                fill="url(#fillOccupancy)"
+                                stroke="var(--color-occupancy)"
+                                strokeWidth={2.5}
+                                dot={{
+                                    r: 4,
+                                    fill: "var(--color-occupancy)",
+                                    strokeWidth: 0,
+                                }}
+                                activeDot={{
+                                    r: 5,
+                                    fill: "var(--color-occupancy)",
+                                    strokeWidth: 0,
+                                }}
+                            />
+                        </AreaChart>
+                    </ChartContainer>
 
-            <div className="mt-4 flex items-center justify-between text-xs text-gray-400">
-                <span>Inicio de semana</span>
-                <span>Cierre semanal</span>
-            </div>
-        </div>
+                    <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
+                        <span>Inicio de semana</span>
+                        <span>Cierre semanal</span>
+                    </div>
+                </CardContent>
+            </Card>
+        </motion.div>
     );
 }

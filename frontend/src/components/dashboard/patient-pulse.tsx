@@ -1,3 +1,7 @@
+import { Activity } from "lucide-react";
+
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { DashboardPulse } from "@/src/types/dashboard";
 
 interface PatientPulseProps {
@@ -6,42 +10,50 @@ interface PatientPulseProps {
 
 export default function PatientPulse({ pulse }: PatientPulseProps) {
     return (
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-            <div className="mb-5 flex items-start justify-between">
-                <h3 className="text-[18px] font-semibold uppercase tracking-[0.08em] text-gray-500">
+        <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+            <CardHeader className="flex flex-row items-start justify-between space-y-0">
+                <CardTitle className="text-base font-semibold text-slate-900">
                     Estado de pacientes
-                </h3>
-                <span className="mt-1 h-3 w-3 rounded-full bg-emerald-500" />
-            </div>
+                </CardTitle>
 
-            <div className="flex items-end gap-2">
-                <span className="text-[58px] font-semibold leading-none text-blue-600">
-                    {pulse.pendingCount}
-                </span>
-                <span className="pb-2 text-[18px] text-gray-500">{pulse.label}</span>
-            </div>
+                <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                    <Activity className="h-3.5 w-3.5" />
+                    Activo
+                </div>
+            </CardHeader>
 
-            <p className="mt-5 text-[16px] leading-7 text-gray-500">
-                {pulse.description}
-            </p>
-
-            <div className="mt-6 flex items-center">
-                <div className="flex -space-x-2">
-                    {pulse.members.map((member) => (
-                        <div
-                            key={member.id}
-                            className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-white text-xs font-semibold text-gray-700 ${member.bgClass}`}
-                            title={member.name}
-                        >
-                            {member.initials}
-                        </div>
-                    ))}
+            <CardContent>
+                <div className="flex items-end gap-2">
+                    <span className="text-5xl font-semibold leading-none tracking-tight text-blue-600">
+                        {pulse.pendingCount}
+                    </span>
+                    <span className="pb-1 text-base text-slate-500">{pulse.label}</span>
                 </div>
 
-                <div className="ml-3 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">
-                    +{pulse.extraCount}
+                <p className="mt-4 text-sm leading-6 text-slate-500">
+                    {pulse.description}
+                </p>
+
+                <div className="mt-6 flex items-center">
+                    <div className="flex -space-x-2">
+                        {pulse.members.map((member) => (
+                            <Avatar
+                                key={member.id}
+                                className="h-9 w-9 border-2 border-white"
+                                title={member.name}
+                            >
+                                <AvatarFallback className={`text-xs font-semibold text-slate-700 ${member.bgClass}`}>
+                                    {member.initials}
+                                </AvatarFallback>
+                            </Avatar>
+                        ))}
+                    </div>
+
+                    <div className="ml-3 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
+                        +{pulse.extraCount}
+                    </div>
                 </div>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 }

@@ -1,5 +1,5 @@
-import { DashboardStat } from "@/src/types/dashboard";
 import StatCard from "@/src/components/dashboard/stat-card";
+import { DashboardStat } from "@/src/types/dashboard";
 
 interface StatsGridProps {
     stats: DashboardStat[];
@@ -7,7 +7,7 @@ interface StatsGridProps {
 
 export default function StatsGrid({ stats }: StatsGridProps) {
     return (
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {stats.map((stat) => (
                 <StatCard key={stat.id} stat={stat} />
             ))}

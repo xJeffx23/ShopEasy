@@ -1,3 +1,5 @@
+import { dashboardIcons } from "@/src/lib/dashboard-icons";
+import { Card, CardContent } from "@/src/components/ui/card";
 import { DashboardStat, StatAccent } from "@/src/types/dashboard";
 
 interface StatCardProps {
@@ -26,36 +28,43 @@ function getAccentStyles(accent: StatAccent) {
                 iconWrap: "bg-amber-50 text-amber-700",
                 badge: "bg-amber-100 text-amber-700",
             };
+        default:
+            return {
+                iconWrap: "bg-slate-100 text-slate-600",
+                badge: "bg-slate-100 text-slate-600",
+            };
     }
 }
 
 export default function StatCard({ stat }: StatCardProps) {
-    const Icon = stat.icon;
+    const Icon = dashboardIcons[stat.iconName];
     const styles = getAccentStyles(stat.accent);
 
     return (
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-            <div className="flex items-start justify-between">
-                <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-lg ${styles.iconWrap}`}
-                >
-                    <Icon size={18} />
+        <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
+            <CardContent className="p-5">
+                <div className="flex items-start justify-between">
+                    <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-xl ${styles.iconWrap}`}
+                    >
+                        <Icon className="h-4 w-4" />
+                    </div>
+
+                    <span
+                        className={`rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wide ${styles.badge}`}
+                    >
+                        {stat.badge}
+                    </span>
                 </div>
 
-                <span
-                    className={`rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wide ${styles.badge}`}
-                >
-                    {stat.badge}
-                </span>
-            </div>
-
-            <div className="mt-6">
-                <p className="text-[13px] text-gray-500">{stat.label}</p>
-                <p className="mt-2 text-[26px] font-semibold leading-none text-gray-900">
-                    {stat.value}
-                </p>
-                <p className="mt-3 text-[16px] text-gray-600">{stat.description}</p>
-            </div>
-        </div>
+                <div className="mt-5 space-y-2">
+                    <p className="text-sm text-slate-500">{stat.label}</p>
+                    <p className="text-2xl font-semibold tracking-tight text-slate-900">
+                        {stat.value}
+                    </p>
+                    <p className="text-sm text-slate-600">{stat.description}</p>
+                </div>
+            </CardContent>
+        </Card>
     );
 }

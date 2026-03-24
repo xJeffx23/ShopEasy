@@ -1,12 +1,3 @@
-import {
-    BedDouble,
-    BriefcaseMedical,
-    CalendarPlus,
-    FileText,
-    HeartPulse,
-    UserPlus,
-    Users,
-} from "lucide-react";
 import { DashboardData } from "@/src/types/dashboard";
 
 export const dashboardMock: DashboardData = {
@@ -21,7 +12,7 @@ export const dashboardMock: DashboardData = {
             description: "Pacientes registrados",
             badge: "TOTAL",
             accent: "blue",
-            icon: Users,
+            iconName: "users",
         },
         {
             id: "in-house-care",
@@ -30,7 +21,7 @@ export const dashboardMock: DashboardData = {
             description: "En cuidado interno",
             badge: "ACTIVO",
             accent: "green",
-            icon: HeartPulse,
+            iconName: "heartPulse",
         },
         {
             id: "occupied-rooms",
@@ -39,7 +30,7 @@ export const dashboardMock: DashboardData = {
             description: "De 110 habitaciones",
             badge: "OCUPADO",
             accent: "indigo",
-            icon: BedDouble,
+            iconName: "bedDouble",
         },
         {
             id: "available-checkin",
@@ -48,7 +39,7 @@ export const dashboardMock: DashboardData = {
             description: "Listas para ingreso",
             badge: "DISPONIBLE",
             accent: "amber",
-            icon: BriefcaseMedical,
+            iconName: "briefcaseMedical",
         },
     ],
     recentActivity: [
@@ -97,19 +88,19 @@ export const dashboardMock: DashboardData = {
         {
             id: "new-patient",
             label: "Agregar paciente",
-            icon: UserPlus,
+            iconName: "userPlus",
             accent: "blue",
         },
         {
             id: "new-reservation",
             label: "Nueva reservación",
-            icon: CalendarPlus,
+            iconName: "calendarPlus",
             accent: "green",
         },
         {
             id: "view-reports",
             label: "Ver reportes",
-            icon: FileText,
+            iconName: "fileText",
             accent: "amber",
         },
     ],

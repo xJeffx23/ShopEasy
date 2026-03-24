@@ -1,4 +1,11 @@
-import { LucideIcon } from "lucide-react";
+export type DashboardIconName =
+    | "users"
+    | "heartPulse"
+    | "bedDouble"
+    | "briefcaseMedical"
+    | "userPlus"
+    | "calendarPlus"
+    | "fileText";
 
 export type StatAccent = "blue" | "green" | "indigo" | "amber";
 
@@ -9,7 +16,7 @@ export interface DashboardStat {
     description: string;
     badge: string;
     accent: StatAccent;
-    icon: LucideIcon;
+    iconName: DashboardIconName;
 }
 
 export interface ActivityItem {
@@ -26,7 +33,7 @@ export interface ActivityItem {
 export interface QuickActionItem {
     id: string;
     label: string;
-    icon: LucideIcon;
+    iconName: DashboardIconName;
     accent: "blue" | "green" | "amber";
 }
 

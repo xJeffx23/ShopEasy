@@ -15,14 +15,14 @@ export default function DashboardView() {
 
             <StatsGrid stats={data.stats} />
 
-            <div className="grid grid-cols-[2fr_0.95fr] gap-6">
+            <div className="grid gap-6 xl:grid-cols-[1.6fr_0.95fr]">
                 <RecentActivity items={data.recentActivity} />
 
-                <div className="space-y-6">
+                <aside className="space-y-6">
                     <PatientPulse pulse={data.pulse} />
                     <QuickActions actions={data.quickActions} />
                     <CapacityTrend trend={{ occupancyRate: 82 }} />
-                </div>
+                </aside>
             </div>
         </section>
     );

@@ -5,12 +5,10 @@ export type EmployeeStatus =
     | "inactivo";
 
 export type EmployeeDepartment =
-    | "Enfermería"
-    | "Médico"
-    | "Administración"
-    | "Mantenimiento"
-    | "Nutrición"
-    | "Seguridad";
+    | "Administrativo"
+    | "Gerencia"
+    | "DTI"
+    | "Financiero";
 
 export interface EmployeeItem {
     id: string;

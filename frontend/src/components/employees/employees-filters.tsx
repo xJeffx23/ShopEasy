@@ -13,12 +13,10 @@ interface EmployeesFiltersProps {
 
 const departmentOptions = [
     { label: "Todos los departamentos", value: "all" },
-    { label: "Enfermería", value: "Enfermería" },
-    { label: "Médico", value: "Médico" },
-    { label: "Administración", value: "Administración" },
-    { label: "Mantenimiento", value: "Mantenimiento" },
-    { label: "Nutrición", value: "Nutrición" },
-    { label: "Seguridad", value: "Seguridad" },
+    { label: "Administrativo", value: "Administrativo" },
+    { label: "Gerencia", value: "Gerencia" },
+    { label: "DTI", value: "DTI" },
+    { label: "Financiero", value: "Financiero" },
 ];
 
 const roleOptions = [

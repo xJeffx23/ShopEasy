@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Save, UserPlus, X } from "lucide-react";
+import { CreditCard, Mail, Save, UserPlus, X } from "lucide-react";
 
+import FilterCombobox from "@/src/components/ui/filter-combobox";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -17,12 +18,13 @@ import {
 import type { EmployeeItem, EmployeeStatus } from "@/src/types/employee";
 
 type EmployeeDepartment =
-    | "Enfermería"
-    | "Médico"
-    | "Administración"
-    | "Mantenimiento"
-    | "Nutrición"
-    | "Seguridad";
+    | "Administrativo"
+    | "Gerencia"
+    | "DTI"
+    | "Financiero";
+
+type DepartmentSelectValue = EmployeeDepartment | "all";
+type StatusSelectValue = EmployeeStatus | "all";
 
 interface AddEmployeeDialogProps {
     open: boolean;
@@ -33,26 +35,46 @@ interface AddEmployeeDialogProps {
 
 interface EmployeeFormValues {
     fullName: string;
+    idNumber: string;
     email: string;
-    department: EmployeeDepartment | "";
+    department: DepartmentSelectValue;
     role: string;
-    status: EmployeeStatus;
+    status: StatusSelectValue;
 }
 
 interface FormErrors {
     fullName?: string;
+    idNumber?: string;
     email?: string;
     department?: string;
     role?: string;
+    status?: string;
 }
 
 const initialFormValues: EmployeeFormValues = {
     fullName: "",
+    idNumber: "",
     email: "",
-    department: "",
+    department: "all",
     role: "",
     status: "activo",
 };
+
+const departmentOptions = [
+    { label: "Seleccionar departamento", value: "all" },
+    { label: "Administrativo", value: "Administrativo" },
+    { label: "Gerencia", value: "Gerencia" },
+    { label: "DTI", value: "DTI" },
+    { label: "Financiero", value: "Financiero" },
+];
+
+const statusOptions = [
+    { label: "Seleccionar estado", value: "all" },
+    { label: "Activo", value: "activo" },
+    { label: "De permiso", value: "de permiso" },
+    { label: "En capacitación", value: "en capacitación" },
+    { label: "Inactivo", value: "inactivo" },
+];
 
 function getInitials(fullName: string) {
     return fullName
@@ -74,6 +96,10 @@ function formatToday() {
 
 function buildEmployeeCode(nextEmployeeNumber: number) {
     return `EMP-${String(nextEmployeeNumber).padStart(3, "0")}`;
+}
+
+function normalizeIdNumber(value: string) {
+    return value.replace(/[^\d-]/g, "");
 }
 
 export default function AddEmployeeDialog({
@@ -120,13 +146,19 @@ export default function AddEmployeeDialog({
             nextErrors.fullName = "Ingresa el nombre completo.";
         }
 
+        if (!formValues.idNumber.trim()) {
+            nextErrors.idNumber = "Ingresa la cédula del empleado.";
+        } else if (formValues.idNumber.trim().length < 9) {
+            nextErrors.idNumber = "Ingresa una cédula válida.";
+        }
+
         if (!formValues.email.trim()) {
             nextErrors.email = "Ingresa el correo electrónico.";
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email)) {
             nextErrors.email = "Ingresa un correo válido.";
         }
 
-        if (!formValues.department) {
+        if (formValues.department === "all") {
             nextErrors.department = "Selecciona un departamento.";
         }
 
@@ -134,8 +166,11 @@ export default function AddEmployeeDialog({
             nextErrors.role = "Ingresa el cargo del empleado.";
         }
 
-        setErrors(nextErrors);
+        if (formValues.status === "all") {
+            nextErrors.status = "Selecciona un estado inicial.";
+        }
 
+        setErrors(nextErrors);
         return Object.keys(nextErrors).length === 0;
     }
 
@@ -150,12 +185,13 @@ export default function AddEmployeeDialog({
             email: formValues.email.trim().toLowerCase(),
             department: formValues.department as EmployeeDepartment,
             role: formValues.role.trim(),
-            status: formValues.status,
+            status: formValues.status as EmployeeStatus,
             employeeCode: generatedCode,
             hireDate: formatToday(),
             initials: getInitials(formValues.fullName),
             avatarUrl: "",
-        };
+            idNumber: formValues.idNumber.trim(),
+        } as EmployeeItem;
 
         onSubmit(newEmployee);
         onOpenChange(false);
@@ -163,8 +199,8 @@ export default function AddEmployeeDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="rounded-2xl border-slate-200 sm:max-w-[640px]">
-                <DialogHeader className="space-y-2">
+            <DialogContent className="rounded-2xl border border-gray-100 bg-white p-0 shadow-[0_10px_30px_rgba(16,24,40,0.08)] sm:max-w-[640px]">
+                <DialogHeader className="border-b border-gray-100 px-6 py-5">
                     <DialogTitle className="flex items-center gap-2 text-xl font-semibold text-slate-900">
                         <UserPlus className="h-5 w-5 text-blue-600" />
                         Agregar empleado
@@ -180,7 +216,7 @@ export default function AddEmployeeDialog({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.18 }}
                     onSubmit={handleSubmit}
-                    className="space-y-5"
+                    className="space-y-5 px-6 py-5"
                 >
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
@@ -190,12 +226,37 @@ export default function AddEmployeeDialog({
                                 value={formValues.fullName}
                                 onChange={(e) => updateField("fullName", e.target.value)}
                                 placeholder="Ej. Laura González Mora"
+                                className="h-12 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-100"
                             />
                             {errors.fullName && (
                                 <p className="text-xs text-red-600">{errors.fullName}</p>
                             )}
                         </div>
 
+                        <div className="space-y-2">
+                            <Label htmlFor="idNumber">Cédula</Label>
+                            <div className="relative">
+                                <CreditCard className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                <Input
+                                    id="idNumber"
+                                    value={formValues.idNumber}
+                                    onChange={(e) =>
+                                        updateField(
+                                            "idNumber",
+                                            normalizeIdNumber(e.target.value)
+                                        )
+                                    }
+                                    placeholder="Ej. 1-2345-6789"
+                                    className="h-12 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                                />
+                            </div>
+                            {errors.idNumber && (
+                                <p className="text-xs text-red-600">{errors.idNumber}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Label htmlFor="email">Correo electrónico</Label>
                             <div className="relative">
@@ -206,39 +267,11 @@ export default function AddEmployeeDialog({
                                     value={formValues.email}
                                     onChange={(e) => updateField("email", e.target.value)}
                                     placeholder="empleado@patitos.com"
-                                    className="pl-9"
+                                    className="h-12 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-100"
                                 />
                             </div>
                             {errors.email && (
                                 <p className="text-xs text-red-600">{errors.email}</p>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                            <Label htmlFor="department">Departamento</Label>
-                            <select
-                                id="department"
-                                value={formValues.department}
-                                onChange={(e) =>
-                                    updateField(
-                                        "department",
-                                        e.target.value as EmployeeFormValues["department"]
-                                    )
-                                }
-                                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-offset-background transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-100"
-                            >
-                                <option value="">Seleccionar departamento</option>
-                                <option value="Enfermería">Enfermería</option>
-                                <option value="Médico">Médico</option>
-                                <option value="Administración">Administración</option>
-                                <option value="Mantenimiento">Mantenimiento</option>
-                                <option value="Nutrición">Nutrición</option>
-                                <option value="Seguridad">Seguridad</option>
-                            </select>
-                            {errors.department && (
-                                <p className="text-xs text-red-600">{errors.department}</p>
                             )}
                         </div>
 
@@ -248,7 +281,8 @@ export default function AddEmployeeDialog({
                                 id="role"
                                 value={formValues.role}
                                 onChange={(e) => updateField("role", e.target.value)}
-                                placeholder="Ej. Enfermera jefe"
+                                placeholder="Ej. Analista, Coordinador, Asistente..."
+                                className="h-12 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-100"
                             />
                             {errors.role && (
                                 <p className="text-xs text-red-600">{errors.role}</p>
@@ -258,25 +292,57 @@ export default function AddEmployeeDialog({
 
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                            <Label htmlFor="status">Estado inicial</Label>
-                            <select
-                                id="status"
-                                value={formValues.status}
-                                onChange={(e) =>
-                                    updateField("status", e.target.value as EmployeeStatus)
+                            <Label>Departamento</Label>
+                            <FilterCombobox
+                                value={formValues.department}
+                                onChange={(value) =>
+                                    updateField("department", value as DepartmentSelectValue)
                                 }
-                                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-offset-background transition focus-visible:ring-2 focus-visible:ring-blue-100"
-                            >
-                                <option value="activo">Activo</option>
-                                <option value="de permiso">De permiso</option>
-                                <option value="en capacitación">En capacitación</option>
-                                <option value="inactivo">Inactivo</option>
-                            </select>
+                                options={departmentOptions}
+                                placeholder="Seleccionar departamento"
+                                searchPlaceholder="Buscar departamento..."
+                                emptyMessage="No se encontró ningún departamento."
+                            />
+                            {errors.department && (
+                                <p className="text-xs text-red-600">{errors.department}</p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
+                            <Label>Estado inicial</Label>
+                            <FilterCombobox
+                                value={formValues.status}
+                                onChange={(value) =>
+                                    updateField("status", value as StatusSelectValue)
+                                }
+                                options={statusOptions}
+                                placeholder="Seleccionar estado"
+                                searchPlaceholder="Buscar estado..."
+                                emptyMessage="No se encontró ningún estado."
+                            />
+                            {errors.status && (
+                                <p className="text-xs text-red-600">{errors.status}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
                             <Label>Código generado</Label>
-                            <Input value={generatedCode} disabled />
+                            <Input
+                                value={generatedCode}
+                                disabled
+                                className="h-12 rounded-xl border border-gray-200 bg-gray-100 px-4 text-sm text-gray-500"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Fecha de ingreso</Label>
+                            <Input
+                                value={formatToday()}
+                                disabled
+                                className="h-12 rounded-xl border border-gray-200 bg-gray-100 px-4 text-sm text-gray-500"
+                            />
                         </div>
                     </div>
 
@@ -285,13 +351,16 @@ export default function AddEmployeeDialog({
                             type="button"
                             variant="outline"
                             onClick={() => onOpenChange(false)}
-                            className="rounded-xl"
+                            className="h-11 rounded-xl border-gray-200"
                         >
                             <X className="mr-2 h-4 w-4" />
                             Cancelar
                         </Button>
 
-                        <Button type="submit" className="rounded-xl bg-blue-600 hover:bg-blue-700">
+                        <Button
+                            type="submit"
+                            className="h-11 rounded-xl bg-blue-600 hover:bg-blue-700"
+                        >
                             <Save className="mr-2 h-4 w-4" />
                             Guardar empleado
                         </Button>

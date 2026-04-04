@@ -1,6 +1,6 @@
 -- *****************************************************
 -- Patitos_del_Retiro_DB - Datos de prueba v2.0
--- Ejecutar DESPU…S de 01_schema_patitos_retiro.sql
+-- Ejecutar DESPU√âS de 01_schema_patitos_retiro.sql
 --LEER EL README DE GITHUB EN LA RAMA DE DATABASE
 -- *****************************************************
 
@@ -13,7 +13,7 @@ EXEC sp_MSforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL';
 GO
 
 -- *****************************************************
--- CAT¡LOGOS BASE --LEER EL README DE GITHUB EN LA RAMA DE DATABASE
+-- CAT√ÅLOGOS BASE --LEER EL README DE GITHUB EN LA RAMA DE DATABASE
 -- *****************************************************
 
 SET IDENTITY_INSERT [dbo].[Catalogo_Departamento] ON;
@@ -28,18 +28,18 @@ GO
 SET IDENTITY_INSERT [dbo].[Catalogo_Perfil_Usuario] ON;
 INSERT INTO [dbo].[Catalogo_Perfil_Usuario] (idCatalogo_Perfil_Usuario, Nombre_Perfil, Descripcion, Activo) VALUES
 (1, N'Gerencia',             N'Acceso a Empleados, Pacientes, Habitaciones y Reservas', 1),
-(2, N'GestiÛn de Pacientes', N'Acceso a mÛdulo de Pacientes y Habitaciones',            1),
-(3, N'Mantenimiento',        N'Acceso ˙nicamente a Habitaciones',                       1),
-(4, N'RecepciÛn',            N'Acceso ˙nicamente a Reservas',                           1);
+(2, N'Gesti√≥n de Pacientes', N'Acceso a m√≥dulo de Pacientes y Habitaciones',            1),
+(3, N'Mantenimiento',        N'Acceso √∫nicamente a Habitaciones',                       1),
+(4, N'Recepci√≥n',            N'Acceso √∫nicamente a Reservas',                           1);
 SET IDENTITY_INSERT [dbo].[Catalogo_Perfil_Usuario] OFF;
 GO
 
 SET IDENTITY_INSERT [dbo].[Catalogo_Nivel_Asistencia] ON;
 INSERT INTO [dbo].[Catalogo_Nivel_Asistencia] (idCatalogo_Nivel_Asistencia, Descripcion_Nivel, Activo) VALUES
-(1, N'Asistencia b·sica',            1),
+(1, N'Asistencia b√°sica',            1),
 (2, N'Asistencia para movilidad',    1),
-(3, N'Asistencia para alimentaciÛn', 1),
-(4, N'Asistencia para baÒo',         1),
+(3, N'Asistencia para alimentaci√≥n', 1),
+(4, N'Asistencia para ba√±o',         1),
 (5, N'Asistencia completa',          1);
 SET IDENTITY_INSERT [dbo].[Catalogo_Nivel_Asistencia] OFF;
 GO
@@ -55,17 +55,17 @@ GO
 SET IDENTITY_INSERT [dbo].[Catalogo_Paquete_Adicional] ON;
 INSERT INTO [dbo].[Catalogo_Paquete_Adicional] (idCatalogo_Paquete_Adicional, Nombre_Paquete, Descripcion, Costo_Adicional, Activo) VALUES
 (1, N'Disfrute de juegos',                 N'Acceso a sala de juegos y actividades recreativas',          15000.00, 1),
-(2, N'Visitas a los familiares',           N'CoordinaciÛn y acompaÒamiento en visitas a familiares',      20000.00, 1),
-(3, N'Paseos a sitios con acompaÒamiento', N'Paseos a sitios de interÈs con personal de acompaÒamiento', 35000.00, 1);
+(2, N'Visitas a los familiares',           N'Coordinaci√≥n y acompa√±amiento en visitas a familiares',      20000.00, 1),
+(3, N'Paseos a sitios con acompa√±amiento', N'Paseos a sitios de inter√©s con personal de acompa√±amiento', 35000.00, 1);
 SET IDENTITY_INSERT [dbo].[Catalogo_Paquete_Adicional] OFF;
 GO
 
 SET IDENTITY_INSERT [dbo].[Catalogo_Tipo_Habitacion] ON;
 INSERT INTO [dbo].[Catalogo_Tipo_Habitacion] (idCatalogo_Tipo_Habitacion, Nombre_Tipo, Descripcion, Costo_Por_Dia, Activo) VALUES
-(1, N'HabitaciÛn compartida',                  N'HabitaciÛn con capacidad para 2 o m·s pacientes',           25000.00, 1),
-(2, N'HabitaciÛn individual',                  N'HabitaciÛn privada con cama individual',                    40000.00, 1),
-(3, N'HabitaciÛn individual cama matrimonial', N'HabitaciÛn privada con cama matrimonial',                   50000.00, 1),
-(4, N'HabitaciÛn de cuidados especiales',      N'HabitaciÛn equipada para pacientes con cuidados especiales',65000.00, 1);
+(1, N'Habitaci√≥n compartida',                  N'Habitaci√≥n con capacidad para 2 o m√°s pacientes',           25000.00, 1),
+(2, N'Habitaci√≥n individual',                  N'Habitaci√≥n privada con cama individual',                    40000.00, 1),
+(3, N'Habitaci√≥n individual cama matrimonial', N'Habitaci√≥n privada con cama matrimonial',                   50000.00, 1),
+(4, N'Habitaci√≥n de cuidados especiales',      N'Habitaci√≥n equipada para pacientes con cuidados especiales',65000.00, 1);
 SET IDENTITY_INSERT [dbo].[Catalogo_Tipo_Habitacion] OFF;
 GO
 
@@ -80,8 +80,8 @@ GO
 
 SET IDENTITY_INSERT [dbo].[Catalogo_Tipo_Estancia] ON;
 INSERT INTO [dbo].[Catalogo_Tipo_Estancia] (idCatalogo_Tipo_Estancia, Descripcion_Estancia, Hora_Inicio, Hora_Fin, Activo) VALUES
-(1, N'DÌa',           N'08:00', N'17:00', 1),
-(2, N'MaÒana',        N'08:00', N'14:00', 1),
+(1, N'D√≠a',           N'08:00', N'17:00', 1),
+(2, N'Ma√±ana',        N'08:00', N'14:00', 1),
 (3, N'Tarde',         N'14:00', N'18:00', 1),
 (4, N'Full Estancia', N'00:00', N'23:59', 1);
 SET IDENTITY_INSERT [dbo].[Catalogo_Tipo_Estancia] OFF;
@@ -106,17 +106,7 @@ INSERT INTO [dbo].[Catalogo_Estado_Reparacion] (idCatalogo_Estado_Reparacion, De
 SET IDENTITY_INSERT [dbo].[Catalogo_Estado_Reparacion] OFF;
 GO
 
-SET IDENTITY_INSERT [dbo].[Provincia] ON;
-INSERT INTO [dbo].[Provincia] (idProvincia, Nombre_Provincia) VALUES
-(1, N'San JosÈ'),
-(2, N'Alajuela'),
-(3, N'Cartago'),
-(4, N'Heredia'),
-(5, N'Guanacaste'),
-(6, N'Puntarenas'),
-(7, N'LimÛn');
-SET IDENTITY_INSERT [dbo].[Provincia] OFF;
-GO
+
 
 -- *****************************************************
 -- EMPLEADOS --LEER EL README DE GITHUB EN LA RAMA DE DATABASE
@@ -125,11 +115,11 @@ GO
 SET IDENTITY_INSERT [dbo].[Empleado] ON;
 INSERT INTO [dbo].[Empleado] (idEmpleado, Nombre, Numero_Cedula, Fecha_Ingreso, Telefono, Email, Activo,
     Catalogo_Departamento_idDepartamento, Catalogo_Perfil_Usuario_idPerfil) VALUES
-(1, N'Carlos MÈndez Ulate',   '101230456', '2020-01-15', N'8888-1111', N'carlos.mendez@patitosretiro.cr',  1, 2, 1),
-(2, N'Laura RamÌrez SolÌs',   '205670123', '2019-03-10', N'8888-2222', N'laura.ramirez@patitosretiro.cr',  1, 1, 2),
-(3, N'Marco JimÈnez Vega',    '302340789', '2021-06-01', N'8888-3333', N'marco.jimenez@patitosretiro.cr',  1, 3, 3),
-(4, N'SofÌa Vargas Mora',     '401230567', '2022-02-20', N'8888-4444', N'sofia.vargas@patitosretiro.cr',   1, 1, 4),
-(5, N'Diego Castillo PÈrez',  '108900234', '2018-11-05', N'8888-5555', N'diego.castillo@patitosretiro.cr', 1, 3, 3);
+(1, N'Carlos M√©ndez Ulate',   '101230456', '2020-01-15', N'8888-1111', N'carlos.mendez@patitosretiro.cr',  1, 2, 1),
+(2, N'Laura Ram√≠rez Sol√≠s',   '205670123', '2019-03-10', N'8888-2222', N'laura.ramirez@patitosretiro.cr',  1, 1, 2),
+(3, N'Marco Jim√©nez Vega',    '302340789', '2021-06-01', N'8888-3333', N'marco.jimenez@patitosretiro.cr',  1, 3, 3),
+(4, N'Sof√≠a Vargas Mora',     '401230567', '2022-02-20', N'8888-4444', N'sofia.vargas@patitosretiro.cr',   1, 1, 4),
+(5, N'Diego Castillo P√©rez',  '108900234', '2018-11-05', N'8888-5555', N'diego.castillo@patitosretiro.cr', 1, 3, 3);
 SET IDENTITY_INSERT [dbo].[Empleado] OFF;
 GO
 
@@ -154,10 +144,10 @@ GO
 SET IDENTITY_INSERT [dbo].[Paciente] ON;
 INSERT INTO [dbo].[Paciente] (idPaciente, Nombre, Numero_Cedula, Fecha_Nacimiento, Fecha_Ingreso,
     Telefono_Contacto_Emergencia, Nombre_Contacto_Emergencia, Activo, Catalogo_Nivel_Asistencia_idNivel) VALUES
-(1, N'Rosa MarÌa Fern·ndez Chaves', '101234567', '1940-05-12', '2023-01-10', N'8777-1111', N'Pedro Fern·ndez', 1, 1),
+(1, N'Rosa Mar√≠a Fern√°ndez Chaves', '101234567', '1940-05-12', '2023-01-10', N'8777-1111', N'Pedro Fern√°ndez', 1, 1),
 (2, N'Alberto Quesada Mora',        '202345678', '1935-08-23', '2022-06-15', N'8777-2222', N'Ana Quesada',     1, 3),
-(3, N'Mercedes Solano JimÈnez',     '303456789', '1938-11-30', '2023-03-20', N'8777-3333', N'Luis Solano',     1, 5),
-(4, N'Ernesto Vargas Blanco',       '104567890', '1942-02-14', '2024-01-05', N'8777-4444', N'MarÌa Vargas',    1, 2),
+(3, N'Mercedes Solano Jim√©nez',     '303456789', '1938-11-30', '2023-03-20', N'8777-3333', N'Luis Solano',     1, 5),
+(4, N'Ernesto Vargas Blanco',       '104567890', '1942-02-14', '2024-01-05', N'8777-4444', N'Mar√≠a Vargas',    1, 2),
 (5, N'Gloria Picado Arce',          '205678901', '1936-07-08', '2023-09-12', N'8777-5555', N'Jorge Picado',    1, 4);
 SET IDENTITY_INSERT [dbo].[Paciente] OFF;
 GO
@@ -182,14 +172,14 @@ GO
 
 SET IDENTITY_INSERT [dbo].[Paciente_Medicamento] ON;
 INSERT INTO [dbo].[Paciente_Medicamento] (idPaciente_Medicamento, Nombre_Medicamento, Dosis, Frecuencia, Indicaciones, Activo, Paciente_idPaciente) VALUES
-(1, N'Metformina',    N'500mg', N'2 veces al dÌa',    N'Tomar con alimentos para diabetes',          1, 1),
+(1, N'Metformina',    N'500mg', N'2 veces al d√≠a',    N'Tomar con alimentos para diabetes',          1, 1),
 (2, N'Atorvastatina', N'20mg',  N'1 vez por la noche',N'Para control de colesterol',                 1, 1),
-(3, N'Losart·n',      N'50mg',  N'1 vez al dÌa',      N'Control de presiÛn arterial',                1, 2),
-(4, N'Omeprazol',     N'20mg',  N'En ayunas',         N'Protector g·strico',                         1, 2),
-(5, N'Warfarina',     N'5mg',   N'1 vez al dÌa',      N'Anticoagulante, controlar INR mensual',      1, 3),
-(6, N'Furosemida',    N'40mg',  N'En la maÒana',      N'DiurÈtico para retenciÛn de lÌquidos',       1, 3),
-(7, N'Amlodipino',    N'10mg',  N'1 vez al dÌa',      N'Antihipertensivo',                           1, 4),
-(8, N'Alprazolam',    N'0.25mg',N'Al dormir',         N'AnsiolÌtico, solo si es necesario',          1, 5);
+(3, N'Losart√°n',      N'50mg',  N'1 vez al d√≠a',      N'Control de presi√≥n arterial',                1, 2),
+(4, N'Omeprazol',     N'20mg',  N'En ayunas',         N'Protector g√°strico',                         1, 2),
+(5, N'Warfarina',     N'5mg',   N'1 vez al d√≠a',      N'Anticoagulante, controlar INR mensual',      1, 3),
+(6, N'Furosemida',    N'40mg',  N'En la ma√±ana',      N'Diur√©tico para retenci√≥n de l√≠quidos',       1, 3),
+(7, N'Amlodipino',    N'10mg',  N'1 vez al d√≠a',      N'Antihipertensivo',                           1, 4),
+(8, N'Alprazolam',    N'0.25mg',N'Al dormir',         N'Ansiol√≠tico, solo si es necesario',          1, 5);
 SET IDENTITY_INSERT [dbo].[Paciente_Medicamento] OFF;
 GO
 
@@ -200,12 +190,12 @@ GO
 SET IDENTITY_INSERT [dbo].[Paciente_Cuidado_Especial] ON;
 INSERT INTO [dbo].[Paciente_Cuidado_Especial] (idPaciente_Cuidado, Detalle, Paciente_idPaciente, Catalogo_Cuidado_Especial_idCuidado) VALUES
 (1, N'Alergia a la penicilina y derivados',               1, 1),
-(2, N'Dieta baja en sodio y az˙car por diabetes',         1, 3),
+(2, N'Dieta baja en sodio y az√∫car por diabetes',         1, 3),
 (3, N'Cambio de vendaje en pie derecho cada 48 horas',    2, 2),
-(4, N'Dieta lÌquida espesada por dificultad para deglutir',3, 3),
-(5, N'Alergia al l·tex - usar guantes de nitrilo',        3, 1),
+(4, N'Dieta l√≠quida espesada por dificultad para deglutir',3, 3),
+(5, N'Alergia al l√°tex - usar guantes de nitrilo',        3, 1),
 (6, N'Cambio de vendaje en rodilla izquierda diario',     3, 2),
-(7, N'Dieta blanda sin condimentos por ˙lcera g·strica',  4, 3),
+(7, N'Dieta blanda sin condimentos por √∫lcera g√°strica',  4, 3),
 (8, N'Alergia al ibuprofeno y antiinflamatorios',         5, 1);
 SET IDENTITY_INSERT [dbo].[Paciente_Cuidado_Especial] OFF;
 GO
@@ -233,13 +223,13 @@ GO
 SET IDENTITY_INSERT [dbo].[Habitacion] ON;
 INSERT INTO [dbo].[Habitacion] (idHabitacion, Numero_Habitacion, Piso, Capacidad, Observaciones,
     Catalogo_Tipo_Habitacion_idTipo, Catalogo_Estado_Habitacion_idEstado) VALUES
-(1,  N'101', 1, 2, N'Vista al jardÌn',              1, 1),
-(2,  N'102', 1, 2, N'BaÒo compartido',              1, 1),
-(3,  N'103', 1, 1, N'HabitaciÛn individual norte',  2, 2),
-(4,  N'104', 1, 1, N'HabitaciÛn individual sur',    2, 1),
+(1,  N'101', 1, 2, N'Vista al jard√≠n',              1, 1),
+(2,  N'102', 1, 2, N'Ba√±o compartido',              1, 1),
+(3,  N'103', 1, 1, N'Habitaci√≥n individual norte',  2, 2),
+(4,  N'104', 1, 1, N'Habitaci√≥n individual sur',    2, 1),
 (5,  N'105', 1, 1, N'Individual con TV',            2, 1),
 (6,  N'201', 2, 1, N'Suite con sala',               3, 2),
-(7,  N'202', 2, 1, N'Suite con balcÛn',             3, 1),
+(7,  N'202', 2, 1, N'Suite con balc√≥n',             3, 1),
 (8,  N'203', 2, 1, N'Cuidados especiales A',        4, 2),
 (9,  N'204', 2, 1, N'Cuidados especiales B',        4, 3),
 (10, N'205', 2, 2, N'Compartida con terraza',       1, 4);
@@ -257,7 +247,7 @@ INSERT INTO [dbo].[Reservacion] (idReservacion, Fecha_Inicio, Fecha_Fin, Indefin
 (1, '2023-01-10', NULL,         1, N'Estancia indefinida - paciente estable',    GETDATE(), 1, 1, 3, 4, 1, 4),
 (2, '2022-06-15', NULL,         1, N'Requiere cuidados especiales',              GETDATE(), 1, 2, 8, 4, 1, 4),
 (3, '2023-03-20', NULL,         1, N'Cuidados complejos - hab matrimonial',      GETDATE(), 1, 3, 6, 4, 1, 4),
-(4, '2024-01-05', '2024-06-30', 0, N'Estancia temporal por recuperaciÛn',       GETDATE(), 1, 4, 1, 1, 1, 4),
+(4, '2024-01-05', '2024-06-30', 0, N'Estancia temporal por recuperaci√≥n',       GETDATE(), 1, 4, 1, 1, 1, 4),
 (5, '2023-09-12', NULL,         1, N'Estancia indefinida acordada con familia',  GETDATE(), 1, 5, 3, 4, 1, 4);
 SET IDENTITY_INSERT [dbo].[Reservacion] OFF;
 GO
@@ -270,12 +260,12 @@ SET IDENTITY_INSERT [dbo].[Limpieza_Habitacion] ON;
 INSERT INTO [dbo].[Limpieza_Habitacion] (idLimpieza_Habitacion, Fecha_Limpieza, Observaciones, Habitacion_idHabitacion, Empleado_idEmpleado) VALUES
 (1,  '2024-03-01', N'Limpieza general completa',         1, 3),
 (2,  '2024-03-01', N'Limpieza general completa',         2, 3),
-(3,  '2024-03-01', N'DesinfecciÛn profunda',             3, 3),
+(3,  '2024-03-01', N'Desinfecci√≥n profunda',             3, 3),
 (4,  '2024-03-02', N'Limpieza diaria rutinaria',         4, 5),
 (5,  '2024-03-02', N'Limpieza diaria rutinaria',         5, 5),
 (6,  '2024-03-02', N'Cambio de ropa de cama',            6, 3),
 (7,  '2024-03-03', N'Limpieza general',                  7, 5),
-(8,  '2024-03-03', N'DesinfecciÛn post mantenimiento',   8, 3),
+(8,  '2024-03-03', N'Desinfecci√≥n post mantenimiento',   8, 3),
 (9,  '2024-03-01', N'Limpieza antes del cierre',         10, 5),
 (10, '2024-03-04', N'Limpieza rutinaria',                1, 3),
 (11, '2024-03-04', N'Limpieza rutinaria',                3, 5),
@@ -290,11 +280,11 @@ GO
 SET IDENTITY_INSERT [dbo].[Mantenimiento_Habitacion] ON;
 INSERT INTO [dbo].[Mantenimiento_Habitacion] (idMantenimiento_Habitacion, Fecha_Mantenimiento,
     Descripcion_Reparacion, Actualizacion_Mobiliario, Completado, Habitacion_idHabitacion, Empleado_idEmpleado) VALUES
-(1, '2024-02-15', N'ReparaciÛn de llave del baÒo con fuga',      N'Cambio de cortina de baÒo',       1, 9, 3),
+(1, '2024-02-15', N'Reparaci√≥n de llave del ba√±o con fuga',      N'Cambio de cortina de ba√±o',       1, 9, 3),
 (2, '2024-02-20', N'Cambio de foco en zona de lectura',          NULL,                               1, 9, 5),
-(3, '2024-03-01', N'InstalaciÛn de pasamanos junto a la cama',   N'Nuevo colchÛn ortopÈdico',        1, 8, 3),
+(3, '2024-03-01', N'Instalaci√≥n de pasamanos junto a la cama',   N'Nuevo colch√≥n ortop√©dico',        1, 8, 3),
 (4, '2024-03-10', N'Ajuste de puerta que no cerraba bien',       NULL,                               0, 4, 5),
-(5, '2024-03-12', N'RevisiÛn elÈctrica del tomacorriente',       N'Cambio de espejo del baÒo',       0, 9, 3);
+(5, '2024-03-12', N'Revisi√≥n el√©ctrica del tomacorriente',       N'Cambio de espejo del ba√±o',       0, 9, 3);
 SET IDENTITY_INSERT [dbo].[Mantenimiento_Habitacion] OFF;
 GO
 
@@ -306,9 +296,9 @@ SET IDENTITY_INSERT [dbo].[Reparacion_Pendiente] ON;
 INSERT INTO [dbo].[Reparacion_Pendiente] (idReparacion_Pendiente, Descripcion, Fecha_Reporte,
     Fecha_Resolucion, Prioridad, Habitacion_idHabitacion, Empleado_idEmpleado_Reporta, Catalogo_Estado_Reparacion_idEstado) VALUES
 (1, N'Pintura de paredes deteriorada',              '2024-03-01', NULL,         N'Baja',  9, 3, 1),
-(2, N'Cableado elÈctrico general requiere revisiÛn','2024-03-12', NULL,         N'Alta',  9, 3, 2),
+(2, N'Cableado el√©ctrico general requiere revisi√≥n','2024-03-12', NULL,         N'Alta',  9, 3, 2),
 (3, N'Cambio de bisagras de puerta principal',      '2024-03-10', NULL,         N'Media', 4, 5, 1),
-(4, N'TuberÌa principal del piso con presiÛn baja', '2024-02-15', '2024-03-05', N'Alta',  9, 3, 3),
+(4, N'Tuber√≠a principal del piso con presi√≥n baja', '2024-02-15', '2024-03-05', N'Alta',  9, 3, 3),
 (5, N'Ventana con dificultad para abrir',           '2024-03-08', NULL,         N'Baja',  7, 5, 1);
 SET IDENTITY_INSERT [dbo].[Reparacion_Pendiente] OFF;
 GO

@@ -4,6 +4,6 @@ import { HabitacionesService } from './habitaciones.service';
 
 @Module({
   controllers: [HabitacionesController],
-  providers: [HabitacionesService]
+  providers: [HabitacionesService],
 })
 export class HabitacionesModule {}

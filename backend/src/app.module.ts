@@ -22,4 +22,4 @@ import { CatalogosModule } from './catalogos/catalogos.module';
     CatalogosModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

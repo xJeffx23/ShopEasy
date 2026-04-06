@@ -1,55 +1,44 @@
-import { MOCK_USERS } from "@/src/data/mock-users";
 import { saveSession } from "./auth-storage";
-import type {
-    AuthSession,
-    AuthUser,
-    LoginCredentials,
-    LoginResult,
-} from "./auth-types";
+import type { LoginCredentials, LoginResult, AuthSession } from "./auth-types";
 
-function createMockToken(userId: string): string {
-    return `mock-token-${userId}-${Date.now()}`;
-}
-
-function sanitizeUser(user: AuthUser): AuthSession["user"] {
-    const { password, ...safeUser } = user;
-    return safeUser;
-}
-
-export async function loginWithMock(
-    credentials: LoginCredentials
+export async function login(
+  credentials: LoginCredentials,
 ): Promise<LoginResult> {
-    const { username, password } = credentials;
+  try {
+    const res = await fetch("http://localhost:3001/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        Nombre_usuario: credentials.username,
+        Contrasena: credentials.password,
+      }),
+    });
 
-    await new Promise((resolve) => setTimeout(resolve, 700));
-
-    const user = MOCK_USERS.find(
-        (u) => u.username === username && u.password === password
-    );
-
-    if (!user) {
-        return {
-            success: false,
-            message: "Usuario o contraseña incorrectos.",
-        };
+    if (!res.ok) {
+      return { success: false, message: "Usuario o contraseña incorrectos." };
     }
 
+    const data = (await res.json()) as {
+      access_token: string;
+      perfil: string;
+      nombre: string;
+      Cambio_Contrasena: boolean;
+    };
+
     const session: AuthSession = {
-        user: sanitizeUser(user),
-        token: createMockToken(user.id),
+      user: {
+        id: credentials.username,
+        username: credentials.username,
+        fullName: data.nombre,
+        role: data.perfil as AuthSession["user"]["role"],
+        email: "",
+      },
+      token: data.access_token,
     };
 
     saveSession(session);
-
-    return {
-        success: true,
-        message: "Inicio de sesión exitoso.",
-        session,
-    };
-}
-
-export async function login(
-    credentials: LoginCredentials
-): Promise<LoginResult> {
-    return loginWithMock(credentials);
+    return { success: true, message: "Inicio de sesión exitoso.", session };
+  } catch {
+    return { success: false, message: "Error al conectar con el servidor." };
+  }
 }

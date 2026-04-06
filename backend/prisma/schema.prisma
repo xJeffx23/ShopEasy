@@ -1,0 +1,305 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+// ─── CATÁLOGOS ────────────────────────────────────────────
+
+model Catalogo_Departamento {
+  idCatalogo_Departamento Int       @id @default(autoincrement())
+  Nombre_Departamento     String    @db.NVarChar(50)
+  Activo                  Boolean   @default(true)
+  Empleados               Empleado[]
+}
+
+model Catalogo_Perfil_Usuario {
+  idCatalogo_Perfil_Usuario Int       @id @default(autoincrement())
+  Nombre_Perfil             String    @db.NVarChar(50)
+  Descripcion               String    @db.NVarChar(200)
+  Activo                    Boolean   @default(true)
+  Empleados                 Empleado[]
+}
+
+model Catalogo_Nivel_Asistencia {
+  idCatalogo_Nivel_Asistencia Int        @id @default(autoincrement())
+  Descripcion_Nivel           String     @db.NVarChar(100)
+  Activo                      Boolean    @default(true)
+  Pacientes                   Paciente[]
+}
+
+model Catalogo_Cuidado_Especial {
+  idCatalogo_Cuidado_Especial Int                         @id @default(autoincrement())
+  Descripcion_Cuidado         String                      @db.NVarChar(100)
+  Activo                      Boolean                     @default(true)
+  Paciente_Cuidados           Paciente_Cuidado_Especial[]
+}
+
+model Catalogo_Paquete_Adicional {
+  idCatalogo_Paquete_Adicional Int                @id @default(autoincrement())
+  Nombre_Paquete               String             @db.NVarChar(100)
+  Descripcion                  String             @db.NVarChar(200)
+  Costo_Adicional              Decimal            @default(0.00) @db.Decimal(10, 2)
+  Activo                       Boolean            @default(true)
+  Paciente_Paquetes            Paciente_Paquete[]
+}
+
+model Catalogo_Tipo_Habitacion {
+  idCatalogo_Tipo_Habitacion Int          @id @default(autoincrement())
+  Nombre_Tipo                String       @db.NVarChar(100)
+  Descripcion                String       @db.NVarChar(200)
+  Costo_Por_Dia              Decimal      @db.Decimal(10, 2)
+  Activo                     Boolean      @default(true)
+  Habitaciones               Habitacion[]
+}
+
+model Catalogo_Estado_Habitacion {
+  idCatalogo_Estado_Habitacion Int          @id @default(autoincrement())
+  Descripcion_Estado           String       @db.NVarChar(50)
+  Activo                       Boolean      @default(true)
+  Habitaciones                 Habitacion[]
+}
+
+model Catalogo_Tipo_Estancia {
+  idCatalogo_Tipo_Estancia Int           @id @default(autoincrement())
+  Descripcion_Estancia     String        @db.NVarChar(100)
+  Hora_Inicio              String        @db.NVarChar(10)
+  Hora_Fin                 String        @db.NVarChar(10)
+  Activo                   Boolean       @default(true)
+  Reservaciones            Reservacion[]
+}
+
+model Catalogo_Estado_Reservacion {
+  idCatalogo_Estado_Reservacion Int           @id @default(autoincrement())
+  Descripcion_Estado            String        @db.NVarChar(50)
+  Activo                        Boolean       @default(true)
+  Reservaciones                 Reservacion[]
+}
+
+model Catalogo_Estado_Reparacion {
+  idCatalogo_Estado_Reparacion Int                    @id @default(autoincrement())
+  Descripcion_Estado           String                 @db.NVarChar(50)
+  Activo                       Boolean                @default(true)
+  Reparaciones                 Reparacion_Pendiente[]
+}
+
+// ─── EMPLEADO ─────────────────────────────────────────────
+
+model Empleado {
+  idEmpleado                             Int     @id @default(autoincrement())
+  Nombre                                 String  @db.NVarChar(100)
+  Numero_Cedula                          String  @unique @db.NVarChar(20)
+  Fecha_Ingreso                          DateTime @db.Date
+  Telefono                               String  @db.NVarChar(20)
+  Email                                  String  @db.NVarChar(255)
+  Activo                                 Boolean @default(true)
+  Catalogo_Departamento_idDepartamento   Int
+  Catalogo_Perfil_Usuario_idPerfil       Int
+
+  Departamento  Catalogo_Departamento   @relation(fields: [Catalogo_Departamento_idDepartamento], references: [idCatalogo_Departamento])
+  Perfil        Catalogo_Perfil_Usuario @relation(fields: [Catalogo_Perfil_Usuario_idPerfil], references: [idCatalogo_Perfil_Usuario])
+
+  Usuario        Usuario?
+  Reservaciones  Reservacion[]
+  Limpiezas      Limpieza_Habitacion[]
+  Mantenimientos Mantenimiento_Habitacion[]
+  Reparaciones   Reparacion_Pendiente[]
+  Reportes       Reporte_Pacientes[]
+}
+
+// ─── USUARIO (empleados) ──────────────────────────────────
+
+model Usuario {
+  idUsuario         Int      @id @default(autoincrement())
+  Nombre_usuario    String   @unique @db.NVarChar(50)
+  Contrasena        String   @db.NVarChar(255)
+  Email             String   @unique @db.NVarChar(255)
+  Activo            Boolean  @default(true)
+  Fecha_Creacion    DateTime @default(now()) @db.DateTime2
+  Cambio_Contrasena Boolean  @default(true)
+  Empleado_idEmpleado Int    @unique
+
+  Empleado Empleado @relation(fields: [Empleado_idEmpleado], references: [idEmpleado])
+}
+
+// ─── PACIENTE ─────────────────────────────────────────────
+
+model Paciente {
+  idPaciente                       Int      @id @default(autoincrement())
+  Nombre                           String   @db.NVarChar(100)
+  Numero_Cedula                    String   @unique @db.NVarChar(20)
+  Fecha_Nacimiento                 DateTime @db.Date
+  Fecha_Ingreso                    DateTime @db.Date
+  Telefono_Contacto_Emergencia     String   @db.NVarChar(20)
+  Nombre_Contacto_Emergencia       String   @db.NVarChar(100)
+  Activo                           Boolean  @default(true)
+  Catalogo_Nivel_Asistencia_idNivel Int
+
+  Nivel_Asistencia Catalogo_Nivel_Asistencia @relation(fields: [Catalogo_Nivel_Asistencia_idNivel], references: [idCatalogo_Nivel_Asistencia])
+
+  Usuario_Paciente Usuario_Paciente?
+  Medicamentos     Paciente_Medicamento[]
+  Cuidados         Paciente_Cuidado_Especial[]
+  Paquetes         Paciente_Paquete[]
+  Reservaciones    Reservacion[]
+}
+
+// ─── USUARIO_PACIENTE ─────────────────────────────────────
+
+model Usuario_Paciente {
+  idUsuario_Paciente  Int      @id @default(autoincrement())
+  Nombre_usuario      String   @unique @db.NVarChar(50)
+  Contrasena          String   @db.NVarChar(255)
+  Email               String   @unique @db.NVarChar(255)
+  Activo              Boolean  @default(true)
+  Fecha_Creacion      DateTime @default(now()) @db.DateTime2
+  Cambio_Contrasena   Boolean  @default(true)
+  Paciente_idPaciente Int      @unique
+
+  Paciente Paciente @relation(fields: [Paciente_idPaciente], references: [idPaciente])
+}
+
+// ─── MEDICAMENTOS ─────────────────────────────────────────
+
+model Paciente_Medicamento {
+  idPaciente_Medicamento Int     @id @default(autoincrement())
+  Nombre_Medicamento     String  @db.NVarChar(100)
+  Dosis                  String  @db.NVarChar(100)
+  Frecuencia             String  @db.NVarChar(100)
+  Indicaciones           String  @db.NVarChar(300)
+  Activo                 Boolean @default(true)
+  Paciente_idPaciente    Int
+
+  Paciente Paciente @relation(fields: [Paciente_idPaciente], references: [idPaciente])
+}
+
+// ─── CUIDADOS ESPECIALES ──────────────────────────────────
+
+model Paciente_Cuidado_Especial {
+  idPaciente_Cuidado                   Int    @id @default(autoincrement())
+  Detalle                              String @db.NVarChar(300)
+  Paciente_idPaciente                  Int
+  Catalogo_Cuidado_Especial_idCuidado  Int
+
+  Paciente     Paciente                  @relation(fields: [Paciente_idPaciente], references: [idPaciente])
+  Tipo_Cuidado Catalogo_Cuidado_Especial @relation(fields: [Catalogo_Cuidado_Especial_idCuidado], references: [idCatalogo_Cuidado_Especial])
+}
+
+// ─── PAQUETES ADICIONALES ─────────────────────────────────
+
+model Paciente_Paquete {
+  idPaciente_Paquete          Int      @id @default(autoincrement())
+  Fecha_Asignacion            DateTime @default(now()) @db.Date
+  Activo                      Boolean  @default(true)
+  Paciente_idPaciente         Int
+  Catalogo_Paquete_idPaquete  Int
+
+  Paciente Paciente                   @relation(fields: [Paciente_idPaciente], references: [idPaciente])
+  Paquete  Catalogo_Paquete_Adicional @relation(fields: [Catalogo_Paquete_idPaquete], references: [idCatalogo_Paquete_Adicional])
+}
+
+// ─── HABITACION ───────────────────────────────────────────
+
+model Habitacion {
+  idHabitacion                        Int     @id @default(autoincrement())
+  Numero_Habitacion                   String  @unique @db.NVarChar(10)
+  Piso                                Int
+  Capacidad                           Int     @default(1)
+  Observaciones                       String? @db.NVarChar(300)
+  Catalogo_Tipo_Habitacion_idTipo     Int
+  Catalogo_Estado_Habitacion_idEstado Int
+
+  Tipo   Catalogo_Tipo_Habitacion   @relation(fields: [Catalogo_Tipo_Habitacion_idTipo], references: [idCatalogo_Tipo_Habitacion])
+  Estado Catalogo_Estado_Habitacion @relation(fields: [Catalogo_Estado_Habitacion_idEstado], references: [idCatalogo_Estado_Habitacion])
+
+  Reservaciones  Reservacion[]
+  Limpiezas      Limpieza_Habitacion[]
+  Mantenimientos Mantenimiento_Habitacion[]
+  Reparaciones   Reparacion_Pendiente[]
+}
+
+// ─── RESERVACION ──────────────────────────────────────────
+
+model Reservacion {
+  idReservacion                        Int       @id @default(autoincrement())
+  Fecha_Inicio                         DateTime  @db.Date
+  Fecha_Fin                            DateTime? @db.Date
+  Indefinido                           Boolean   @default(false)
+  Observaciones                        String?   @db.NVarChar(300)
+  Fecha_Registro                       DateTime  @default(now()) @db.DateTime2
+  Activo                               Boolean   @default(true)
+  Paciente_idPaciente                  Int
+  Habitacion_idHabitacion              Int
+  Catalogo_Tipo_Estancia_idEstancia    Int
+  Catalogo_Estado_Reservacion_idEstado Int
+  Empleado_idEmpleado_Registra         Int
+
+  Paciente      Paciente                    @relation(fields: [Paciente_idPaciente], references: [idPaciente])
+  Habitacion    Habitacion                  @relation(fields: [Habitacion_idHabitacion], references: [idHabitacion])
+  Tipo_Estancia Catalogo_Tipo_Estancia      @relation(fields: [Catalogo_Tipo_Estancia_idEstancia], references: [idCatalogo_Tipo_Estancia])
+  Estado        Catalogo_Estado_Reservacion @relation(fields: [Catalogo_Estado_Reservacion_idEstado], references: [idCatalogo_Estado_Reservacion])
+  Empleado      Empleado                    @relation(fields: [Empleado_idEmpleado_Registra], references: [idEmpleado])
+}
+
+// ─── LIMPIEZA ─────────────────────────────────────────────
+
+model Limpieza_Habitacion {
+  idLimpieza_Habitacion   Int      @id @default(autoincrement())
+  Fecha_Limpieza          DateTime @db.Date
+  Observaciones           String?  @db.NVarChar(300)
+  Habitacion_idHabitacion Int
+  Empleado_idEmpleado     Int
+
+  Habitacion Habitacion @relation(fields: [Habitacion_idHabitacion], references: [idHabitacion])
+  Empleado   Empleado   @relation(fields: [Empleado_idEmpleado], references: [idEmpleado])
+}
+
+// ─── MANTENIMIENTO ────────────────────────────────────────
+
+model Mantenimiento_Habitacion {
+  idMantenimiento_Habitacion Int      @id @default(autoincrement())
+  Fecha_Mantenimiento        DateTime @db.Date
+  Descripcion_Reparacion     String   @db.NVarChar(500)
+  Actualizacion_Mobiliario   String?  @db.NVarChar(500)
+  Completado                 Boolean  @default(false)
+  Habitacion_idHabitacion    Int
+  Empleado_idEmpleado        Int
+
+  Habitacion Habitacion @relation(fields: [Habitacion_idHabitacion], references: [idHabitacion])
+  Empleado   Empleado   @relation(fields: [Empleado_idEmpleado], references: [idEmpleado])
+}
+
+// ─── REPARACION PENDIENTE ─────────────────────────────────
+
+model Reparacion_Pendiente {
+  idReparacion_Pendiente               Int       @id @default(autoincrement())
+  Descripcion                          String    @db.NVarChar(500)
+  Fecha_Reporte                        DateTime  @default(now()) @db.Date
+  Fecha_Resolucion                     DateTime? @db.Date
+  Prioridad                            String    @default("Media") @db.NVarChar(10)
+  Habitacion_idHabitacion              Int
+  Empleado_idEmpleado_Reporta          Int
+  Catalogo_Estado_Reparacion_idEstado  Int
+
+  Habitacion Habitacion                 @relation(fields: [Habitacion_idHabitacion], references: [idHabitacion])
+  Empleado   Empleado                   @relation(fields: [Empleado_idEmpleado_Reporta], references: [idEmpleado])
+  Estado     Catalogo_Estado_Reparacion @relation(fields: [Catalogo_Estado_Reparacion_idEstado], references: [idCatalogo_Estado_Reparacion])
+}
+
+// ─── REPORTE ──────────────────────────────────────────────
+
+model Reporte_Pacientes {
+  idReporte               Int      @id @default(autoincrement())
+  Fecha_Reporte           DateTime @default(now()) @db.DateTime2
+  Total_Registrados       Int
+  Total_Alojados          Int
+  Total_Por_Dia           Int
+  Habitaciones_Reservadas Int
+  Habitaciones_Totales    Int
+  Generado_Por            Int
+
+  Empleado Empleado @relation(fields: [Generado_Por], references: [idEmpleado])
+}

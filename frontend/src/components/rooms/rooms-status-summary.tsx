@@ -1,62 +1,57 @@
-import { Card, CardContent } from "@/src/components/ui/card";
+import { BedDouble, CalendarCheck, CheckCircle2, Wrench, XCircle } from "lucide-react";
+import { RoomStats } from "@/src/types/room";
 
 interface RoomsStatusSummaryProps {
-    available: number;
-    occupied: number;
-    maintenance: number;
-    closed: number;
+    stats: RoomStats;
 }
 
-const summaryItems = [
+const items = [
     {
-        key: "available",
+        key: "available" as const,
         label: "Disponibles",
-        dotClassName: "bg-emerald-500",
+        icon: CheckCircle2,
+        iconColor: "text-emerald-600",
+        iconBg: "bg-emerald-50",
     },
     {
-        key: "occupied",
-        label: "Ocupadas",
-        dotClassName: "bg-blue-500",
+        key: "reserved" as const,
+        label: "Reservadas",
+        icon: CalendarCheck,
+        iconColor: "text-blue-600",
+        iconBg: "bg-blue-50",
     },
     {
-        key: "maintenance",
+        key: "maintenance" as const,
         label: "Mantenimiento",
-        dotClassName: "bg-amber-500",
+        icon: Wrench,
+        iconColor: "text-amber-600",
+        iconBg: "bg-amber-50",
     },
     {
-        key: "closed",
+        key: "closed" as const,
         label: "Cerradas",
-        dotClassName: "bg-slate-400",
+        icon: XCircle,
+        iconColor: "text-red-500",
+        iconBg: "bg-red-50",
     },
-] as const;
+];
 
-export function RoomsStatusSummary({
-    available,
-    occupied,
-    maintenance,
-    closed,
-}: RoomsStatusSummaryProps) {
-    const values = {
-        available,
-        occupied,
-        maintenance,
-        closed,
-    };
-
+export function RoomsStatusSummary({ stats }: RoomsStatusSummaryProps) {
     return (
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {summaryItems.map((item) => (
-                <Card
-                    key={item.key}
-                    className="rounded-2xl border border-slate-200 bg-white shadow-sm"
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {items.map(({ key, label, icon: Icon, iconColor, iconBg }) => (
+                <div
+                    key={key}
+                    className="flex items-center gap-4 rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm"
                 >
-                    <CardContent className="flex items-center gap-3 p-4">
-                        <span className={`h-2.5 w-2.5 rounded-full ${item.dotClassName}`} />
-                        <span className="text-sm font-medium text-slate-700">
-                            {item.label} ({values[item.key]})
-                        </span>
-                    </CardContent>
-                </Card>
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
+                        <Icon className={`h-5 w-5 ${iconColor}`} />
+                    </div>
+                    <div>
+                        <p className="text-2xl font-bold text-slate-900">{stats[key]}</p>
+                        <p className="text-sm text-slate-500">{label}</p>
+                    </div>
+                </div>
             ))}
         </div>
     );

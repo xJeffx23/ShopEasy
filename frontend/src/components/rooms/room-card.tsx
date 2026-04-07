@@ -1,163 +1,195 @@
-import { Button } from "@/src/components/ui/button";
-import { Card, CardContent } from "@/src/components/ui/card";
-import { Badge } from "@/src/components/ui/badge";
-import { AlertTriangle, BedDouble, Lock, User } from "lucide-react";
-import { Room } from "@/src/types/room";
+"use client";
+
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as AlertDialog from "@radix-ui/react-alert-dialog";
+import { useState } from "react";
+import {
+    BedDouble, CalendarCheck, CheckCircle2,
+    Eye, MoreHorizontal, Pencil, Trash2, Wrench, XCircle,
+} from "lucide-react";
+import { Room, RoomStatus } from "@/src/types/room";
 
 interface RoomCardProps {
     room: Room;
+    onView: (room: Room) => void;
+    onChangeStatus?: (id: string, status: RoomStatus) => void;
+    onDelete?: (id: string) => void;
 }
 
-function getStatusLabel(status: Room["status"]) {
-    switch (status) {
-        case "available":
-            return "Disponible";
-        case "occupied":
-            return "Ocupada";
-        case "maintenance":
-            return "Mantenimiento";
-        case "closed":
-            return "Cerrada";
-        default:
-            return "";
-    }
-}
+// ── Estilos por estado ────────────────────────────────────────────────────────
 
-function getStatusBadgeClass(status: Room["status"]) {
-    switch (status) {
-        case "available":
-            return "bg-emerald-100 text-emerald-700 hover:bg-emerald-100";
-        case "occupied":
-            return "bg-blue-100 text-blue-700 hover:bg-blue-100";
-        case "maintenance":
-            return "bg-amber-100 text-amber-700 hover:bg-amber-100";
-        case "closed":
-            return "bg-slate-200 text-slate-600 hover:bg-slate-200";
-        default:
-            return "";
-    }
-}
+const statusConfig: Record<RoomStatus, {
+    cardBg: string; badge: string; badgeLabel: string;
+    icon: React.ElementType; iconColor: string;
+}> = {
+    disponible: {
+        cardBg: "bg-emerald-50 border-emerald-200",
+        badge: "bg-emerald-500 text-white",
+        badgeLabel: "Disponible",
+        icon: CheckCircle2,
+        iconColor: "text-emerald-600",
+    },
+    reservada: {
+        cardBg: "bg-blue-50 border-blue-200",
+        badge: "bg-blue-500 text-white",
+        badgeLabel: "Reservada",
+        icon: CalendarCheck,
+        iconColor: "text-blue-600",
+    },
+    mantenimiento: {
+        cardBg: "bg-amber-50 border-amber-200",
+        badge: "bg-amber-500 text-white",
+        badgeLabel: "Mantenimiento",
+        icon: Wrench,
+        iconColor: "text-amber-600",
+    },
+    cerrada: {
+        cardBg: "bg-red-50 border-red-200",
+        badge: "bg-red-500 text-white",
+        badgeLabel: "Cerrada",
+        icon: XCircle,
+        iconColor: "text-red-500",
+    },
+};
 
-export function RoomCard({ room }: RoomCardProps) {
-    const isAvailable = room.status === "available";
-    const isOccupied = room.status === "occupied";
-    const isMaintenance = room.status === "maintenance";
-    const isClosed = room.status === "closed";
+const statusChangeOptions: { label: string; value: RoomStatus }[] = [
+    { label: "Marcar como disponible", value: "disponible" },
+    { label: "Marcar como reservada", value: "reservada" },
+    { label: "Poner en mantenimiento", value: "mantenimiento" },
+    { label: "Cerrar habitación", value: "cerrada" },
+];
+
+export function RoomCard({ room, onView, onChangeStatus, onDelete }: RoomCardProps) {
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const cfg = statusConfig[room.status];
+    const Icon = cfg.icon;
 
     return (
-        <Card className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <CardContent className="flex h-full flex-col p-5">
-                <div className="mb-4 flex items-start justify-between gap-3">
-                    <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                            {room.wing} • Piso {room.floor}
-                        </p>
-                        <h3 className="mt-2 text-3xl font-bold leading-none text-slate-900">
-                            Habitación
-                        </h3>
-                        <p className="mt-1 text-4xl font-bold leading-none text-slate-900">
+        <>
+            <div className={`relative rounded-2xl border p-4 transition-shadow hover:shadow-md ${cfg.cardBg}`}>
+                {/* Número + ojo */}
+                <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                        <Icon className={`h-4 w-4 ${cfg.iconColor}`} />
+                        <span className="text-2xl font-bold text-slate-800">
                             {room.roomNumber}
-                        </p>
+                        </span>
                     </div>
-
-                    <Badge
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusBadgeClass(
-                            room.status
-                        )}`}
+                    <button
+                        onClick={() => onView(room)}
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/70 text-slate-500 transition hover:bg-white hover:text-slate-700"
+                        aria-label="Ver detalle"
                     >
-                        {getStatusLabel(room.status)}
-                    </Badge>
+                        <Eye className="h-4 w-4" />
+                    </button>
                 </div>
 
-                <div className="flex-1">
-                    {isOccupied && room.patient && (
-                        <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                                    <User className="h-5 w-5 text-blue-600" />
-                                </div>
-
-                                <div>
-                                    <p className="text-xs text-slate-500">Paciente</p>
-                                    <p className="font-semibold text-slate-900">
-                                        {room.patient.fullName}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {isAvailable && (
-                        <div className="flex h-[92px] items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 text-center">
-                            <div>
-                                <BedDouble className="mx-auto h-6 w-6 text-emerald-600" />
-                                <p className="mt-2 text-sm font-medium text-emerald-700">
-                                    Lista para admisión
-                                </p>
-                            </div>
-                        </div>
-                    )}
-
-                    {isMaintenance && room.issue && (
-                        <div className="rounded-2xl border border-amber-100 bg-amber-50/70 p-4">
-                            <div className="flex items-start gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
-                                    <AlertTriangle className="h-5 w-5 text-amber-700" />
-                                </div>
-
-                                <div>
-                                    <p className="text-xs text-slate-500">Incidencia</p>
-                                    <p className="font-semibold text-slate-900">
-                                        {room.issue.title}
-                                    </p>
-                                    <p className="text-sm text-slate-600">
-                                        {room.issue.description}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {isClosed && (
-                        <div className="flex h-[92px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 p-4 text-center">
-                            <div>
-                                <Lock className="mx-auto h-6 w-6 text-slate-400" />
-                                <p className="mt-2 text-sm font-medium text-slate-500">
-                                    Sector inactivo
-                                </p>
-                            </div>
-                        </div>
-                    )}
+                {/* Badge estado */}
+                <div className="mt-2">
+                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${cfg.badge}`}>
+                        {cfg.badgeLabel}
+                    </span>
                 </div>
 
-                <div className="mt-5 grid grid-cols-2 gap-2">
-                    <Button
-                        variant="outline"
-                        className="rounded-xl border-slate-200 bg-white text-slate-700"
-                    >
-                        Limpiar
-                    </Button>
+                {/* Tipo + piso */}
+                <p className="mt-1.5 text-xs text-slate-500">
+                    {room.type} · Piso {room.floor}
+                </p>
 
-                    {isMaintenance ? (
-                        <Button className="rounded-xl bg-blue-600 hover:bg-blue-700">
-                            Resolver
-                        </Button>
-                    ) : (
-                        <Button
-                            variant="outline"
-                            className="rounded-xl border-slate-200 bg-white text-slate-700"
-                        >
-                            Servicio
-                        </Button>
-                    )}
-                </div>
-
-                {isClosed && (
-                    <p className="mt-4 text-center text-sm text-slate-400">
-                        Actualmente no disponible
+                {/* Paciente (si reservada) */}
+                {room.status === "reservada" && room.patientName && (
+                    <p className="mt-2 truncate text-sm font-semibold text-slate-800">
+                        {room.patientName}
                     </p>
                 )}
-            </CardContent>
-        </Card>
+
+                {/* Menú */}
+                <div className="mt-3 flex justify-end">
+                    <DropdownMenu.Root>
+                        <DropdownMenu.Trigger asChild>
+                            <button className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/70 text-slate-500 hover:bg-white hover:text-slate-700">
+                                <MoreHorizontal className="h-4 w-4" />
+                            </button>
+                        </DropdownMenu.Trigger>
+
+                        <DropdownMenu.Portal>
+                            <DropdownMenu.Content
+                                align="end"
+                                sideOffset={4}
+                                className="z-[9999] min-w-[210px] overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg animate-in fade-in-0 zoom-in-95"
+                            >
+                                <DropdownMenu.Item
+                                    onSelect={() => onView(room)}
+                                    className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100"
+                                >
+                                    <Eye className="h-3.5 w-3.5 text-slate-400" />
+                                    Ver detalle / registrar
+                                </DropdownMenu.Item>
+
+                                <DropdownMenu.Separator className="my-1 h-px bg-slate-100" />
+
+                                {statusChangeOptions
+                                    .filter((o) => o.value !== room.status)
+                                    .map((opt) => (
+                                        <DropdownMenu.Item
+                                            key={opt.value}
+                                            onSelect={() => onChangeStatus?.(room.id, opt.value)}
+                                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100"
+                                        >
+                                            <Pencil className="h-3.5 w-3.5 text-slate-400" />
+                                            {opt.label}
+                                        </DropdownMenu.Item>
+                                    ))}
+
+                                <DropdownMenu.Separator className="my-1 h-px bg-slate-100" />
+
+                                <DropdownMenu.Item
+                                    onSelect={() => setConfirmOpen(true)}
+                                    className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 outline-none hover:bg-red-50"
+                                >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    Eliminar habitación
+                                </DropdownMenu.Item>
+                            </DropdownMenu.Content>
+                        </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
+                </div>
+            </div>
+
+            {/* Confirmación eliminar */}
+            <AlertDialog.Root open={confirmOpen} onOpenChange={setConfirmOpen}>
+                <AlertDialog.Portal>
+                    <AlertDialog.Overlay className="fixed inset-0 z-[9998] bg-black/40 animate-in fade-in-0" />
+                    <AlertDialog.Content className="fixed left-1/2 top-1/2 z-[9999] w-full max-w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-200 bg-white p-6 shadow-xl animate-in fade-in-0 zoom-in-95">
+                        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
+                            <Trash2 className="h-5 w-5 text-red-500" />
+                        </div>
+                        <AlertDialog.Title className="text-center text-base font-semibold text-slate-900">
+                            Eliminar habitación
+                        </AlertDialog.Title>
+                        <AlertDialog.Description className="mt-2 text-center text-sm text-slate-500">
+                            ¿Eliminar la habitación{" "}
+                            <span className="font-medium text-slate-700">{room.roomNumber}</span>?
+                            Esta acción no se puede deshacer.
+                        </AlertDialog.Description>
+                        <div className="mt-6 flex gap-3">
+                            <AlertDialog.Cancel asChild>
+                                <button className="h-10 flex-1 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                                    Cancelar
+                                </button>
+                            </AlertDialog.Cancel>
+                            <AlertDialog.Action asChild>
+                                <button
+                                    onClick={() => onDelete?.(room.id)}
+                                    className="h-10 flex-1 rounded-xl bg-red-600 text-sm font-medium text-white hover:bg-red-700 active:scale-[0.98]"
+                                >
+                                    Sí, eliminar
+                                </button>
+                            </AlertDialog.Action>
+                        </div>
+                    </AlertDialog.Content>
+                </AlertDialog.Portal>
+            </AlertDialog.Root>
+        </>
     );
 }

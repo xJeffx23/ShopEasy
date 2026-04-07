@@ -5,6 +5,7 @@ import { PatientsHeader } from "@/src/components/patients/patients-header";
 import { PatientsStats } from "@/src/components/patients/patients-stats";
 import { PatientsFilters } from "@/src/components/patients/patients-filters";
 import { PatientsTable } from "@/src/components/patients/patients-table";
+import AddPatientDialog from "@/src/components/patients/add-patient-dialog";
 import type { Patient, PatientsData, PatientStats, PatientStatus } from "@/src/types/patient";
 
 interface PatientsViewProps {
@@ -31,6 +32,7 @@ export default function PatientsView({ data }: PatientsViewProps) {
     const [search, setSearch] = useState("");
     const [assistanceFilter, setAssist] = useState("all");
     const [statusFilter, setStatus] = useState("all");
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     // ── Filtrado ──────────────────────────────────────────────────────────────
 
@@ -53,15 +55,15 @@ export default function PatientsView({ data }: PatientsViewProps) {
 
     const stats = useMemo(() => computeStats(patients), [patients]);
 
-    // ── Acciones CRUD preparadas para el backend ──────────────────────────────
+    // ── Acciones CRUD ─────────────────────────────────────────────────────────
 
     /**
      * Agregar paciente.
      * Backend: POST /api/patients
      */
-    function handleAdd() {
-        // TODO: abrir AddPatientDialog
-        console.log("[handleAdd] abrir dialog de agregar paciente");
+    function handleAdd(newPatient: Patient) {
+        setPatients((prev) => [newPatient, ...prev]);
+        // TODO: await createPatient(newPatient)
     }
 
     /**
@@ -105,31 +107,40 @@ export default function PatientsView({ data }: PatientsViewProps) {
     // ── Render ────────────────────────────────────────────────────────────────
 
     return (
-        <section className="space-y-6">
-            <PatientsHeader
-                title={data.title}
-                subtitle={data.subtitle}
-                onAdd={handleAdd}
-                onExport={handleExport}
-            />
+        <>
+            <section className="space-y-6">
+                <PatientsHeader
+                    title={data.title}
+                    subtitle={data.subtitle}
+                    onAdd={() => setIsDialogOpen(true)}
+                    onExport={handleExport}
+                />
 
-            <PatientsStats stats={stats} />
+                <PatientsStats stats={stats} />
 
-            <PatientsFilters
-                search={search}
-                assistanceFilter={assistanceFilter}
-                statusFilter={statusFilter}
-                onSearchChange={setSearch}
-                onAssistanceChange={setAssist}
-                onStatusChange={setStatus}
-            />
+                <PatientsFilters
+                    search={search}
+                    assistanceFilter={assistanceFilter}
+                    statusFilter={statusFilter}
+                    onSearchChange={setSearch}
+                    onAssistanceChange={setAssist}
+                    onStatusChange={setStatus}
+                />
 
-            <PatientsTable
-                patients={filtered}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onToggleStatus={handleToggleStatus}
+                <PatientsTable
+                    patients={filtered}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onToggleStatus={handleToggleStatus}
+                />
+            </section>
+
+            <AddPatientDialog
+                open={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+                onSubmit={handleAdd}
+                nextPatientNumber={patients.length + 1}
             />
-        </section>
+        </>
     );
 }

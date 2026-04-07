@@ -1,51 +1,62 @@
-"use client";
-
+import { Download } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { ReportsSummaryCards } from "@/src/components/reports/reports-summary-cards";
-import { ReportsOccupancyCard } from "@/src/components/reports/reports-occupancy-card";
-import { ReportsPatientPulseCard } from "@/src/components/reports/reports-patient-pulse-card";
-import { ReportsPatientsChart } from "@/src/components/reports/reports-patients-chart";
-import { DepartmentalBreakdownTable } from "@/src/components/reports/departmental-breakdown-table";
+import { ReportsPatientsByDay } from "@/src/components/reports/reports-patients-by-day";
+import { ReportsOccupancyTrend } from "@/src/components/reports/reports-occupancy-trend";
+import { ReportsRoomsChart } from "@/src/components/reports/reports-rooms-chart";
+import { ReportsMovementChart } from "@/src/components/reports/reports-movement-chart";
+import { ReportsAssistanceChart } from "@/src/components/reports/reports-assistance-chart";
+import { ReportsData } from "@/src/types/report";
 
-export function ReportsView() {
+interface ReportsViewProps {
+    data: ReportsData;
+}
+
+export default function ReportsView({ data }: ReportsViewProps) {
     return (
-        <main className="space-y-6 p-6">
-            <section className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+        <section className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Reports Dashboard</h1>
-                    <p className="text-muted-foreground">
-                        Performance overview and clinical capacity metrics.
+                    <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+                        Reportes
+                    </h1>
+                    <p className="mt-1 text-sm text-slate-500">
+                        Métricas y estadísticas del sistema
                     </p>
                 </div>
 
-                <div className="flex w-fit flex-wrap items-center gap-2 rounded-xl border bg-card p-1">
-                    <Button variant="secondary" size="sm">
-                        Last 30 Days
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                        Quarterly
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                        Custom Range
-                    </Button>
-                </div>
-            </section>
+                <Button
+                    variant="outline"
+                    className="h-10 shrink-0 rounded-xl border-slate-200 px-4 text-sm"
+                >
+                    <Download className="mr-2 h-4 w-4" />
+                    Exportar Reporte
+                </Button>
+            </div>
 
-            <section className="grid gap-4 xl:grid-cols-12">
-                <div className="grid gap-4 sm:grid-cols-2 xl:col-span-5">
-                    <ReportsSummaryCards />
-                    <ReportsOccupancyCard />
-                    <ReportsPatientPulseCard />
-                </div>
+            {/* Fila 1: 4 KPIs del enunciado */}
+            <ReportsSummaryCards summary={data.summary} />
 
-                <div className="xl:col-span-7">
-                    <ReportsPatientsChart />
-                </div>
-            </section>
+            {/* Fila 2: Tendencia de ocupación | Estado de habitaciones */}
+            <div className="grid gap-6 lg:grid-cols-2">
+                <ReportsOccupancyTrend data={data.occupancyTrend} />
+                {/* Enunciado a.iv */}
+                <ReportsRoomsChart
+                    distribution={data.roomStatusDist}
+                    summary={data.summary}
+                />
+            </div>
 
-            <section>
-                <DepartmentalBreakdownTable />
-            </section>
-        </main>
+            {/* Fila 3: Pacientes por día | Pacientes por nivel de asistencia */}
+            <div className="grid gap-6 lg:grid-cols-2">
+                {/* Enunciado a.iii */}
+                <ReportsPatientsByDay data={data.patientsByDay} />
+                <ReportsAssistanceChart data={data.assistanceLevelDist} />
+            </div>
+
+            {/* Fila 4: Ingresos y egresos (ancho completo) */}
+            <ReportsMovementChart data={data.patientMovement} />
+        </section>
     );
 }

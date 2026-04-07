@@ -1,56 +1,81 @@
-"use client";
+import {
+    BedDouble, CalendarCheck, Users, UserCheck,
+    type LucideIcon,
+} from "lucide-react";
+import { ReportSummary } from "@/src/types/report";
 
-import { Activity, TrendingUp, Users } from "lucide-react";
-import { Card, CardContent } from "@/src/components/ui/card";
-import { reportSummaryCards } from "@/src/data/reports-data";
-
-function getCardIcon(type: string) {
-    switch (type) {
-        case "patients":
-            return (
-                <div className="rounded-xl bg-blue-50 p-2 text-blue-600">
-                    <Users className="h-5 w-5" />
-                </div>
-            );
-        case "active":
-            return (
-                <div className="rounded-xl bg-emerald-50 p-2 text-emerald-600">
-                    <TrendingUp className="h-5 w-5" />
-                </div>
-            );
-        default:
-            return (
-                <div className="rounded-xl bg-muted p-2 text-muted-foreground">
-                    <Activity className="h-5 w-5" />
-                </div>
-            );
-    }
+interface ReportsSummaryCardsProps {
+    summary: ReportSummary;
 }
 
-function getTrendColor(type: string) {
-    if (type === "patients") return "text-emerald-600";
-    if (type === "active") return "text-emerald-600";
-    return "text-muted-foreground";
+interface CardDef {
+    label: string;
+    value: string;
+    description: string;
+    icon: LucideIcon;
+    iconBg: string;
+    iconColor: string;
 }
 
-export function ReportsSummaryCards() {
+export function ReportsSummaryCards({ summary }: ReportsSummaryCardsProps) {
+    const cards: CardDef[] = [
+        {
+            // a.i Cantidad de pacientes registrados
+            label: "Pacientes Registrados",
+            value: String(summary.totalPatients),
+            description: "Total en el sistema",
+            icon: Users,
+            iconBg: "bg-blue-50",
+            iconColor: "text-blue-600",
+        },
+        {
+            // a.ii Cantidad de pacientes alojados
+            label: "Pacientes Alojados",
+            value: String(summary.hostedPatients),
+            description: "Actualmente en el asilo",
+            icon: UserCheck,
+            iconBg: "bg-emerald-50",
+            iconColor: "text-emerald-600",
+        },
+        {
+            // a.iv Habitaciones reservadas vs totales
+            label: "Habitaciones Reservadas",
+            value: `${summary.reservedRooms}/${summary.totalRooms}`,
+            description: `${Math.round((summary.reservedRooms / summary.totalRooms) * 100)}% de ocupación`,
+            icon: BedDouble,
+            iconBg: "bg-amber-50",
+            iconColor: "text-amber-600",
+        },
+        {
+            label: "Reservaciones Activas",
+            value: String(summary.activeReservations),
+            description: "Estancias en curso",
+            icon: CalendarCheck,
+            iconBg: "bg-violet-50",
+            iconColor: "text-violet-600",
+        },
+    ];
+
     return (
-        <>
-            {reportSummaryCards.map((card) => (
-                <Card key={card.title} className="rounded-2xl">
-                    <CardContent className="p-5">
-                        <div className="mb-4 flex items-start justify-between">
-                            {getCardIcon(card.type)}
-                            <span className={`text-sm font-medium ${getTrendColor(card.type)}`}>
-                                {card.trend}
-                            </span>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {cards.map((card) => {
+                const Icon = card.icon;
+                return (
+                    <div
+                        key={card.label}
+                        className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm"
+                    >
+                        <div className="flex items-start justify-between">
+                            <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${card.iconBg}`}>
+                                <Icon className={`h-4 w-4 ${card.iconColor}`} />
+                            </div>
                         </div>
-
-                        <p className="text-sm text-muted-foreground">{card.title}</p>
-                        <h3 className="text-3xl font-bold">{card.value}</h3>
-                    </CardContent>
-                </Card>
-            ))}
-        </>
+                        <p className="mt-4 text-sm text-slate-500">{card.label}</p>
+                        <p className="mt-1 text-2xl font-bold text-slate-900">{card.value}</p>
+                        <p className="mt-0.5 text-xs text-slate-400">{card.description}</p>
+                    </div>
+                );
+            })}
+        </div>
     );
 }

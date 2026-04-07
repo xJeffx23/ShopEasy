@@ -1,29 +1,42 @@
-import CapacityTrend from "@/src/components/dashboard/capacity-trend";
 import DashboardHeader from "@/src/components/dashboard/dashboard-header";
-import PatientPulse from "@/src/components/dashboard/patient-pulse";
-import QuickActions from "@/src/components/dashboard/quick-actions";
-import RecentActivity from "@/src/components/dashboard/recent-activity";
 import StatsGrid from "@/src/components/dashboard/stats-grid";
-import { dashboardMock } from "@/src/data/dashboard.mock";
+import CapacityTrend from "@/src/components/dashboard/capacity-trend";
+import RoomStatusChart from "@/src/components/dashboard/room-status-chart";
+import CareLevelChart from "@/src/components/dashboard/care-level-chart";
+import QuickSummary from "@/src/components/dashboard/quick-summary";
+import RecentActivity from "@/src/components/dashboard/recent-activity";
+import { DashboardData } from "@/src/types/dashboard";
 
-export default function DashboardView() {
-    const data = dashboardMock;
+interface DashboardViewProps {
+    data: DashboardData;
+}
 
+export default function DashboardView({ data }: DashboardViewProps) {
     return (
-        <section className="space-y-8">
+        <section className="space-y-6">
+            {/* Título */}
             <DashboardHeader title={data.title} subtitle={data.subtitle} />
 
+            {/* Fila 1: 4 stat cards */}
             <StatsGrid stats={data.stats} />
 
-            <div className="grid gap-6 xl:grid-cols-[1.6fr_0.95fr]">
-                <RecentActivity items={data.recentActivity} />
-
-                <aside className="space-y-6">
-                    <PatientPulse pulse={data.pulse} />
-                    <QuickActions actions={data.quickActions} />
-                    <CapacityTrend trend={{ occupancyRate: 82 }} />
-                </aside>
+            {/* Fila 2: Tendencia | Estado de habitaciones */}
+            <div className="grid gap-6 lg:grid-cols-2">
+                <CapacityTrend
+                    occupancyRate={data.trend.occupancyRate}
+                    weeklyData={data.trend.weeklyData}
+                />
+                <RoomStatusChart data={data.roomStatus} />
             </div>
+
+            {/* Fila 3: Niveles de asistencia | Resumen rápido */}
+            <div className="grid gap-6 lg:grid-cols-2">
+                <CareLevelChart data={data.careLevels} />
+                <QuickSummary data={data.quickSummary} />
+            </div>
+
+            {/* Fila 4: Actividad reciente (ancho completo) */}
+            <RecentActivity items={data.recentActivity} />
         </section>
     );
 }

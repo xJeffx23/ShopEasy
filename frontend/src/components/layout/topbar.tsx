@@ -2,66 +2,67 @@
 
 import { useState } from "react";
 import { Bell, Search } from "lucide-react";
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from "@/src/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
+import { Badge } from "@/src/components/ui/badge";
+
+// TODO: Reemplazar con datos reales del contexto de autenticación
+const MOCK_USER = {
+    name: "Administrador",
+    initials: "AD",
+    notificationCount: 3,
+};
 
 export default function Topbar() {
     const [searchValue, setSearchValue] = useState("");
 
     return (
-        <header className="shrink-0 border-b border-gray-200 bg-white px-6 py-3">
-            <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-6">
-                <div className="flex items-center gap-6 text-sm text-gray-400">
-                    <span className="cursor-pointer transition hover:text-gray-600">
-                        Inicio
-                    </span>
-                    <span className="cursor-pointer font-medium text-blue-600">
-                        Dashboard
-                    </span>
-                    <span className="cursor-pointer transition hover:text-gray-600">
-                        Resumen
-                    </span>
-                    <span className="cursor-pointer transition hover:text-gray-600">
-                        Agenda
-                    </span>
-                    <span className="cursor-pointer transition hover:text-gray-600">
-                        Inventario
-                    </span>
+        <header className="shrink-0 border-b border-slate-100 bg-white px-6 py-3">
+            <div className="flex items-center justify-between gap-4">
+                {/* Búsqueda global */}
+                <div className="relative w-[280px]">
+                    <Search
+                        size={15}
+                        className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+                    <input
+                        type="text"
+                        value={searchValue}
+                        onChange={(e) => setSearchValue(e.target.value)}
+                        placeholder="Buscar pacientes, habitaciones..."
+                        className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                    />
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="relative w-[260px]">
-                        <Search
-                            size={16}
-                            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                        />
-
-                        <input
-                            type="text"
-                            value={searchValue}
-                            onChange={(e) => setSearchValue(e.target.value)}
-                            placeholder="Buscar pacientes..."
-                            className="h-10 w-full rounded-full border border-transparent bg-gray-100 pl-10 pr-4 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-100"
-                        />
-                    </div>
-
+                {/* Acciones derecha */}
+                <div className="flex items-center gap-3">
+                    {/* Notificaciones */}
                     <button
                         type="button"
-                        className="flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"
+                        className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
                         aria-label="Notificaciones"
                     >
-                        <Bell size={18} strokeWidth={2} />
+                        <Bell size={17} strokeWidth={2} />
+                        {MOCK_USER.notificationCount > 0 && (
+                            <Badge className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-semibold text-white">
+                                {MOCK_USER.notificationCount}
+                            </Badge>
+                        )}
                     </button>
 
-                    <Avatar className="h-10 w-10 ring-1 ring-gray-200">
-                        <AvatarImage src="" alt="Usuario" />
-                        <AvatarFallback className="bg-teal-200 text-sm font-semibold text-teal-800">
-                            DR
-                        </AvatarFallback>
-                    </Avatar>
+                    {/* Separador visual */}
+                    <div className="h-6 w-px bg-slate-200" />
+
+                    {/* Perfil */}
+                    <div className="flex items-center gap-2.5">
+                        <Avatar className="h-8 w-8 ring-1 ring-slate-200">
+                            <AvatarFallback className="bg-blue-50 text-xs font-semibold text-blue-700">
+                                {MOCK_USER.initials}
+                            </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium text-slate-700">
+                            {MOCK_USER.name}
+                        </span>
+                    </div>
                 </div>
             </div>
         </header>

@@ -9,30 +9,15 @@ interface StatCardProps {
 function getAccentStyles(accent: StatAccent) {
     switch (accent) {
         case "blue":
-            return {
-                iconWrap: "bg-blue-50 text-blue-600",
-                badge: "bg-blue-100 text-blue-600",
-            };
+            return { icon: "bg-blue-50 text-blue-500", badge: "text-blue-500" };
         case "green":
-            return {
-                iconWrap: "bg-emerald-50 text-emerald-600",
-                badge: "bg-emerald-100 text-emerald-600",
-            };
+            return { icon: "bg-teal-50 text-teal-500", badge: "text-teal-500" };
         case "indigo":
-            return {
-                iconWrap: "bg-indigo-50 text-indigo-600",
-                badge: "bg-indigo-100 text-indigo-600",
-            };
+            return { icon: "bg-indigo-50 text-indigo-400", badge: "text-indigo-400" };
         case "amber":
-            return {
-                iconWrap: "bg-amber-50 text-amber-700",
-                badge: "bg-amber-100 text-amber-700",
-            };
+            return { icon: "bg-green-50 text-green-500", badge: "text-green-500" };
         default:
-            return {
-                iconWrap: "bg-slate-100 text-slate-600",
-                badge: "bg-slate-100 text-slate-600",
-            };
+            return { icon: "bg-slate-100 text-slate-500", badge: "text-slate-500" };
     }
 }
 
@@ -41,29 +26,23 @@ export default function StatCard({ stat }: StatCardProps) {
     const styles = getAccentStyles(stat.accent);
 
     return (
-        <Card className="rounded-2xl border border-slate-200/80 shadow-sm">
-            <CardContent className="p-5">
+        <Card className="rounded-2xl border border-slate-200/60 bg-white shadow-sm">
+            <CardContent className="p-6">
+                {/* Fila superior: label + icono */}
                 <div className="flex items-start justify-between">
-                    <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-xl ${styles.iconWrap}`}
-                    >
+                    <p className="text-sm text-slate-500">{stat.label}</p>
+                    <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${styles.icon}`}>
                         <Icon className="h-4 w-4" />
                     </div>
-
-                    <span
-                        className={`rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wide ${styles.badge}`}
-                    >
-                        {stat.badge}
-                    </span>
                 </div>
 
-                <div className="mt-5 space-y-2">
-                    <p className="text-sm text-slate-500">{stat.label}</p>
-                    <p className="text-2xl font-semibold tracking-tight text-slate-900">
-                        {stat.value}
-                    </p>
-                    <p className="text-sm text-slate-600">{stat.description}</p>
-                </div>
+                {/* Valor principal */}
+                <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+                    {stat.value}
+                </p>
+
+                {/* Descripción */}
+                <p className="mt-1 text-sm text-slate-500">{stat.description}</p>
             </CardContent>
         </Card>
     );

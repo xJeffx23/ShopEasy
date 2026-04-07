@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import {
     LayoutDashboard,
     Users,
@@ -11,6 +12,7 @@ import {
     FileText,
     Settings,
     CircleHelp,
+    PlusCircle,
 } from "lucide-react";
 
 const menuItems = [
@@ -22,58 +24,92 @@ const menuItems = [
     { label: "Reportes", href: "/sistema/reports", icon: FileText },
 ];
 
+const bottomItems = [
+    { label: "Configuración", href: "/sistema/settings", icon: Settings },
+    { label: "Ayuda", href: "/sistema/help", icon: CircleHelp },
+];
+
 export default function Sidebar() {
     const pathname = usePathname();
 
     return (
-        <aside className="flex h-screen w-[220px] shrink-0 flex-col border-r border-gray-200 bg-white px-3 py-4">
-            <div>
-                <div className="mb-6 px-2">
-                    <h1 className="text-[15px] font-semibold text-gray-900">
+        <aside className="flex h-screen w-[220px] shrink-0 flex-col border-r border-slate-100 bg-white px-3 py-5">
+            {/* Logo */}
+            <div className="mb-6 flex items-center gap-2.5 px-2">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-[13px] font-bold text-white">
+                    P
+                </div>
+                <div>
+                    <p className="text-[13px] font-semibold leading-tight text-slate-900">
                         Patitos del Retiro
-                    </h1>
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-gray-400">
-                        Clinical Management
+                    </p>
+                    <p className="text-[10px] uppercase tracking-[0.15em] text-slate-400">
+                        Gestión clínica
                     </p>
                 </div>
-
-                <nav className="space-y-1">
-                    {menuItems.map((item) => {
-                        const Icon = item.icon;
-                        const isActive = pathname === item.href;
-
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${isActive
-                                        ? "bg-blue-50 font-medium text-blue-600"
-                                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
-                                    }`}
-                            >
-                                <Icon size={17} />
-                                <span>{item.label}</span>
-                            </Link>
-                        );
-                    })}
-                </nav>
             </div>
 
-            <div className="mt-auto px-1">
-                <button className="mb-4 w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700">
+            {/* Navegación principal */}
+            <nav className="flex-1 space-y-0.5">
+                {menuItems.map((item, i) => {
+                    const Icon = item.icon;
+                    // Dashboard: solo activo en ruta exacta. Resto: activo si la ruta empieza con el href.
+                    const isActive =
+                        item.href === "/sistema/dashboard"
+                            ? pathname === item.href
+                            : pathname.startsWith(item.href);
+
+                    return (
+                        <motion.div
+                            key={item.href}
+                            initial={{ opacity: 0, x: -6 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.18, delay: i * 0.04 }}
+                        >
+                            <Link
+                                href={item.href}
+                                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${isActive
+                                        ? "bg-blue-50 font-medium text-blue-600"
+                                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+                                    }`}
+                            >
+                                <Icon
+                                    size={16}
+                                    className={isActive ? "text-blue-600" : "text-slate-400"}
+                                />
+                                <span>{item.label}</span>
+                                {isActive && (
+                                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-500" />
+                                )}
+                            </Link>
+                        </motion.div>
+                    );
+                })}
+            </nav>
+
+            {/* Parte inferior */}
+            <div className="mt-4 space-y-3">
+                {/* CTA principal */}
+                <Link
+                    href="/sistema/reservations/new"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98]"
+                >
+                    <PlusCircle size={15} />
                     Nueva admisión
-                </button>
+                </Link>
 
-                <div className="space-y-1">
-                    <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-800">
-                        <Settings size={17} />
-                        Configuración
-                    </button>
-
-                    <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-800">
-                        <CircleHelp size={17} />
-                        Ayuda
-                    </button>
+                {/* Configuración y ayuda */}
+                <div className="space-y-0.5">
+                    {bottomItems.map(({ label, href, icon: Icon }) => (
+                        <Link
+                            key={href}
+                            href={href}
+                            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-800"
+                        >
+                            <Icon size={16} className="text-slate-400" />
+                            {label}
+                        </Link>
+                    ))}
                 </div>
             </div>
         </aside>

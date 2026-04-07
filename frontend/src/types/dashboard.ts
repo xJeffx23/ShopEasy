@@ -1,41 +1,67 @@
-export type DashboardIconName =
-    | "users"
-    | "heartPulse"
-    | "bedDouble"
-    | "briefcaseMedical"
-    | "userPlus"
-    | "calendarPlus"
-    | "fileText";
+// ─── Capacity Trend ──────────────────────────────────────────────────────────
+
+export interface CapacityDataPoint {
+    day: string;
+    occupancy: number;
+}
+
+export interface DashboardTrend {
+    occupancyRate: number;
+    weeklyData: CapacityDataPoint[];
+}
+
+// ─── Room Status Chart ────────────────────────────────────────────────────────
+
+export interface RoomStatusData {
+    name: string;
+    value: number;
+    color: string;
+}
+
+// ─── Care Level Chart ─────────────────────────────────────────────────────────
+
+export interface CareLevel {
+    level: string;
+    count: number;
+    color: string;
+}
+
+// ─── Quick Summary ────────────────────────────────────────────────────────────
+
+export interface QuickSummaryData {
+    occupancyRate: number;
+    roomsInMaintenance: number;
+    staffPerPatient: number;
+}
+
+// ─── Stats ────────────────────────────────────────────────────────────────────
 
 export type StatAccent = "blue" | "green" | "indigo" | "amber";
 
 export interface DashboardStat {
     id: string;
     label: string;
-    value: number;
+    value: string;
     description: string;
     badge: string;
+    iconName: string;
     accent: StatAccent;
-    iconName: DashboardIconName;
 }
+
+// ─── Activity ─────────────────────────────────────────────────────────────────
 
 export interface ActivityItem {
     id: string;
-    initials: string;
     patientName: string;
+    initials: string;
     eventDescription: string;
     type: string;
+    typeColor: "green" | "blue" | "amber" | "default";
     room: string;
     timeAgo: string;
-    typeColor: "green" | "blue" | "amber" | "gray";
 }
 
-export interface QuickActionItem {
-    id: string;
-    label: string;
-    iconName: DashboardIconName;
-    accent: "blue" | "green" | "amber";
-}
+// ─── Pulse ────────────────────────────────────────────────────────────────────
 
 export interface PulseMember {
     id: string;
@@ -52,24 +78,27 @@ export interface DashboardPulse {
     extraCount: number;
 }
 
-export interface CapacityBar {
+// ─── Quick Actions ────────────────────────────────────────────────────────────
+
+export interface QuickActionItem {
     id: string;
-    value: number;
-    accent: "gray" | "blueLight" | "blue" | "blueDark";
+    label: string;
+    iconName: string;
+    accent: "blue" | "green" | "amber" | "default";
+    href: string;
 }
 
-export interface DashboardCapacityTrend {
-    startLabel: string;
-    endLabel: string;
-    bars: CapacityBar[];
-}
+// ─── Root ─────────────────────────────────────────────────────────────────────
 
 export interface DashboardData {
     title: string;
     subtitle: string;
     stats: DashboardStat[];
     recentActivity: ActivityItem[];
-    quickActions: QuickActionItem[];
     pulse: DashboardPulse;
-    capacityTrend: DashboardCapacityTrend;
+    quickActions: QuickActionItem[];
+    trend: DashboardTrend;
+    roomStatus: RoomStatusData[];
+    careLevels: CareLevel[];
+    quickSummary: QuickSummaryData;
 }

@@ -1,22 +1,18 @@
 import {
+    UserRound,
     BedDouble,
-    BriefcaseMedical,
-    CalendarPlus,
-    FileText,
-    HeartPulse,
-    UserPlus,
     Users,
+    CalendarDays,
+    UserPlus,
+    CalendarPlus,
     type LucideIcon,
 } from "lucide-react";
 
-import type { DashboardIconName } from "@/src/types/dashboard";
-
-export const dashboardIcons: Record<DashboardIconName, LucideIcon> = {
-    users: Users,
-    heartPulse: HeartPulse,
+export const dashboardIcons: Record<string, LucideIcon> = {
+    userRound: UserRound,
     bedDouble: BedDouble,
-    briefcaseMedical: BriefcaseMedical,
+    users: Users,
+    calendarDays: CalendarDays,
     userPlus: UserPlus,
     calendarPlus: CalendarPlus,
-    fileText: FileText,
 };

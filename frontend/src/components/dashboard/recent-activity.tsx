@@ -1,3 +1,7 @@
+"use client";
+
+import { motion } from "framer-motion";
+import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { ActivityItem } from "@/src/types/dashboard";
@@ -8,14 +12,10 @@ interface RecentActivityProps {
 
 function getTypeBadge(color: ActivityItem["typeColor"]) {
     switch (color) {
-        case "green":
-            return "bg-emerald-100 text-emerald-700";
-        case "blue":
-            return "bg-blue-100 text-blue-700";
-        case "amber":
-            return "bg-amber-100 text-amber-700";
-        default:
-            return "bg-slate-100 text-slate-600";
+        case "green": return "bg-emerald-100 text-emerald-700";
+        case "blue": return "bg-blue-100 text-blue-700";
+        case "amber": return "bg-amber-100 text-amber-700";
+        default: return "bg-slate-100 text-slate-600";
     }
 }
 
@@ -32,8 +32,12 @@ export default function RecentActivity({ items }: RecentActivityProps) {
                     </p>
                 </div>
 
-                <Button variant="ghost" className="text-sm font-medium text-blue-600 hover:text-blue-700">
-                    Ver todo
+                <Button
+                    variant="ghost"
+                    asChild
+                    className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                >
+                    <Link href="/sistema/patients">Ver todo</Link>
                 </Button>
             </div>
 
@@ -45,46 +49,52 @@ export default function RecentActivity({ items }: RecentActivityProps) {
                 </CardHeader>
 
                 <CardContent className="p-0">
-                    <div className="grid grid-cols-[1.6fr_1fr_1fr_0.8fr] px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+                    {/* Cabecera de columnas */}
+                    <div className="grid grid-cols-[1.6fr_1fr_1fr_0.8fr] px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
                         <span>Paciente / Evento</span>
                         <span>Tipo</span>
                         <span>Habitación</span>
                         <span>Tiempo</span>
                     </div>
 
-                    {items.map((item) => (
-                        <div
+                    {items.map((item, index) => (
+                        <motion.div
                             key={item.id}
-                            className="grid grid-cols-[1.6fr_1fr_1fr_0.8fr] items-center border-t border-slate-100 px-6 py-5"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2, delay: index * 0.06 }}
+                            className="grid grid-cols-[1.6fr_1fr_1fr_0.8fr] items-center border-t border-slate-100 px-6 py-4"
                         >
-                            <div className="flex items-center gap-4">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
+                            {/* Paciente */}
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
                                     {item.initials}
                                 </div>
-
                                 <div className="min-w-0">
-                                    <p className="truncate text-sm font-semibold text-slate-900 md:text-base">
+                                    <p className="truncate text-sm font-semibold text-slate-900">
                                         {item.patientName}
                                     </p>
-                                    <p className="truncate text-sm text-slate-500">
+                                    <p className="truncate text-xs text-slate-500">
                                         {item.eventDescription}
                                     </p>
                                 </div>
                             </div>
 
+                            {/* Tipo */}
                             <div>
                                 <span
-                                    className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold ${getTypeBadge(
-                                        item.typeColor
-                                    )}`}
+                                    className={`inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${getTypeBadge(item.typeColor)}`}
                                 >
                                     {item.type}
                                 </span>
                             </div>
 
-                            <div className="text-sm text-slate-600 md:text-base">{item.room}</div>
+                            {/* Habitación */}
+                            <div className="text-sm text-slate-600">{item.room}</div>
+
+                            {/* Tiempo */}
                             <div className="text-sm text-slate-400">{item.timeAgo}</div>
-                        </div>
+                        </motion.div>
                     ))}
                 </CardContent>
             </Card>

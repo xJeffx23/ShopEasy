@@ -1,8 +1,4 @@
-export type EmployeeStatus =
-    | "activo"
-    | "de permiso"
-    | "en capacitación"
-    | "inactivo";
+// ─── Enums del dominio ────────────────────────────────────────────────────────
 
 export type EmployeeDepartment =
     | "Administrativo"
@@ -10,30 +6,40 @@ export type EmployeeDepartment =
     | "DTI"
     | "Financiero";
 
+export type EmployeeProfile =
+    | "Gerencia"
+    | "Gestión de pacientes"
+    | "Mantenimiento"
+    | "Recepción";
+
+export type EmployeeStatus =
+    | "activo"
+    | "de permiso"
+    | "en capacitación"
+    | "inactivo";
+
+// ─── Entidad principal ────────────────────────────────────────────────────────
+
 export interface EmployeeItem {
     id: string;
     fullName: string;
+    idNumber: string;        // Número de cédula
     email: string;
-    employeeCode: string;
-    hireDate: string;
     department: EmployeeDepartment;
-    role: string;
+    role: string;        // Cargo libre (Ej: Analista, Coordinador...)
+    profile: EmployeeProfile; // Perfil de acceso al sistema
     status: EmployeeStatus;
+    employeeCode: string;        // EMP-001, EMP-002...
+    hireDate: string;        // Fecha de ingreso formateada
+    initials: string;        // Para el avatar
     avatarUrl?: string;
-    initials: string;
+    phone?: string;
 }
 
-export interface EmployeeMetric {
-    id: string;
-    label: string;
-    value: string;
-    helper: string;
-    accent: "green" | "blue" | "amber";
-}
+// ─── Datos raíz que consume EmployeesView ────────────────────────────────────
 
-export interface EmployeeDirectoryData {
+export interface EmployeesData {
     title: string;
     subtitle: string;
     employees: EmployeeItem[];
-    metrics: EmployeeMetric[];
 }

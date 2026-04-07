@@ -3,45 +3,95 @@
 import { useMemo, useState } from "react";
 
 import AddEmployeeDialog from "@/src/components/employees/add-employee-dialog";
-import EmployeeStats from "@/src/components/employees/employee-stats";
 import EmployeesFilters from "@/src/components/employees/employees-filters";
 import EmployeesHeader from "@/src/components/employees/employees-header";
 import EmployeesTable from "@/src/components/employees/employees-table";
-import { employeesMock } from "@/src/data/employees.mock";
-import type { EmployeeItem } from "@/src/types/employee";
+import type { EmployeeItem, EmployeesData, EmployeeStatus } from "@/src/types/employee";
 
-export default function EmployeesView() {
-    const data = employeesMock;
+interface EmployeesViewProps {
+    data: EmployeesData;
+}
 
+/** Elimina tildes y convierte a minúsculas para comparar sin importar acentos */
+function normalize(str: string): string {
+    return str
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+export default function EmployeesView({ data }: EmployeesViewProps) {
     const [employees, setEmployees] = useState<EmployeeItem[]>(data.employees);
     const [search, setSearch] = useState("");
     const [department, setDepartment] = useState("all");
-    const [role, setRole] = useState("all");
-    const [isAddEmployeeOpen, setIsAddEmployeeOpen] = useState(false);
+    const [profile, setProfile] = useState("all");
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const filteredEmployees = useMemo(() => {
-        return employees.filter((employee) => {
-            const normalizedSearch = search.trim().toLowerCase();
+    // ── Filtrado ──────────────────────────────────────────────────────────────
 
-            const matchesSearch =
-                normalizedSearch.length === 0 ||
-                employee.fullName.toLowerCase().includes(normalizedSearch) ||
-                employee.email.toLowerCase().includes(normalizedSearch) ||
-                employee.department.toLowerCase().includes(normalizedSearch) ||
-                employee.role.toLowerCase().includes(normalizedSearch);
+    const filtered = useMemo(() => {
+        const q = normalize(search.trim());
+        return employees.filter((emp) => {
+            const matchSearch =
+                q.length === 0 ||
+                normalize(emp.fullName).includes(q) ||
+                normalize(emp.email).includes(q) ||
+                normalize(emp.department).includes(q) ||
+                normalize(emp.role).includes(q) ||
+                normalize(emp.employeeCode).includes(q) ||
+                normalize(emp.idNumber).includes(q);
 
-            const matchesDepartment =
-                department === "all" || employee.department === department;
+            const matchDept = department === "all" || emp.department === department;
+            const matchProfile = profile === "all" || emp.profile === profile;
 
-            const matchesRole = role === "all" || employee.role === role;
-
-            return matchesSearch && matchesDepartment && matchesRole;
+            return matchSearch && matchDept && matchProfile;
         });
-    }, [employees, search, department, role]);
+    }, [employees, search, department, profile]);
 
-    function handleAddEmployee(newEmployee: EmployeeItem) {
+    // ── Acciones CRUD — preparadas para conectar al backend ──────────────────
+
+    /**
+     * Agregar empleado.
+     * Backend: POST /api/employees
+     */
+    function handleAdd(newEmployee: EmployeeItem) {
         setEmployees((prev) => [newEmployee, ...prev]);
     }
+
+    /**
+     * Editar empleado.
+     * Backend: PUT /api/employees/:id
+     * Por ahora abre el mismo dialog de agregar reutilizando los datos.
+     * TODO: implementar EditEmployeeDialog cuando el backend esté listo.
+     */
+    function handleEdit(employee: EmployeeItem) {
+        // TODO: abrir dialog de edición con datos precargados
+        console.log("[handleEdit] Empleado a editar:", employee);
+    }
+
+    /**
+     * Eliminar empleado.
+     * Backend: DELETE /api/employees/:id
+     */
+    function handleDelete(id: string) {
+        setEmployees((prev) => prev.filter((emp) => emp.id !== id));
+        // TODO: await deleteEmployee(id)
+    }
+
+    /**
+     * Activar / desactivar empleado.
+     * Backend: PATCH /api/employees/:id/status  { status: newStatus }
+     */
+    function handleToggleStatus(id: string, newStatus: EmployeeStatus) {
+        setEmployees((prev) =>
+            prev.map((emp) =>
+                emp.id === id ? { ...emp, status: newStatus } : emp
+            )
+        );
+        // TODO: await updateEmployeeStatus(id, newStatus)
+    }
+
+    // ── Render ────────────────────────────────────────────────────────────────
 
     return (
         <>
@@ -49,7 +99,7 @@ export default function EmployeesView() {
                 <EmployeesHeader
                     title={data.title}
                     subtitle={data.subtitle}
-                    onAddEmployee={() => setIsAddEmployeeOpen(true)}
+                    onAddEmployee={() => setIsDialogOpen(true)}
                 />
 
                 <EmployeesFilters
@@ -57,19 +107,22 @@ export default function EmployeesView() {
                     onSearchChange={setSearch}
                     department={department}
                     onDepartmentChange={setDepartment}
-                    role={role}
-                    onRoleChange={setRole}
+                    profile={profile}
+                    onProfileChange={setProfile}
                 />
 
-                <EmployeesTable employees={filteredEmployees} />
-
-                <EmployeeStats metrics={data.metrics} />
+                <EmployeesTable
+                    employees={filtered}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onToggleStatus={handleToggleStatus}
+                />
             </section>
 
             <AddEmployeeDialog
-                open={isAddEmployeeOpen}
-                onOpenChange={setIsAddEmployeeOpen}
-                onSubmit={handleAddEmployee}
+                open={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+                onSubmit={handleAdd}
                 nextEmployeeNumber={employees.length + 1}
             />
         </>

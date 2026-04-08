@@ -12,12 +12,8 @@ interface EmployeesViewProps {
     data: EmployeesData;
 }
 
-/** Elimina tildes y convierte a minúsculas para comparar sin importar acentos */
 function normalize(str: string): string {
-    return str
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
+    return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 export default function EmployeesView({ data }: EmployeesViewProps) {
@@ -26,8 +22,6 @@ export default function EmployeesView({ data }: EmployeesViewProps) {
     const [department, setDepartment] = useState("all");
     const [profile, setProfile] = useState("all");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    // ── Filtrado ──────────────────────────────────────────────────────────────
 
     const filtered = useMemo(() => {
         const q = normalize(search.trim());
@@ -48,50 +42,41 @@ export default function EmployeesView({ data }: EmployeesViewProps) {
         });
     }, [employees, search, department, profile]);
 
-    // ── Acciones CRUD — preparadas para conectar al backend ──────────────────
+    // ── Acciones CRUD ─────────────────────────────────────────────────────────
 
-    /**
-     * Agregar empleado.
-     * Backend: POST /api/employees
-     */
+    /** Backend: POST /api/employees */
     function handleAdd(newEmployee: EmployeeItem) {
         setEmployees((prev) => [newEmployee, ...prev]);
     }
 
-    /**
-     * Editar empleado.
-     * Backend: PUT /api/employees/:id
-     * Por ahora abre el mismo dialog de agregar reutilizando los datos.
-     * TODO: implementar EditEmployeeDialog cuando el backend esté listo.
-     */
+    /** Backend: PUT /api/employees/:id */
     function handleEdit(employee: EmployeeItem) {
-        // TODO: abrir dialog de edición con datos precargados
         console.log("[handleEdit] Empleado a editar:", employee);
     }
 
-    /**
-     * Eliminar empleado.
-     * Backend: DELETE /api/employees/:id
-     */
+    /** Backend: DELETE /api/employees/:id */
     function handleDelete(id: string) {
         setEmployees((prev) => prev.filter((emp) => emp.id !== id));
-        // TODO: await deleteEmployee(id)
+    }
+
+    /** Backend: PATCH /api/employees/:id/status */
+    function handleToggleStatus(id: string, newStatus: EmployeeStatus) {
+        setEmployees((prev) =>
+            prev.map((emp) => emp.id === id ? { ...emp, status: newStatus } : emp)
+        );
     }
 
     /**
-     * Activar / desactivar empleado.
-     * Backend: PATCH /api/employees/:id/status  { status: newStatus }
+     * Crear acceso al sistema para un empleado (RRHH).
+     * Backend: POST /api/users
+     *   { employeeId, username, password, profile: employee.profile }
+     * El backend debe marcar Cambio_Contrasena = true para forzar
+     * el cambio en el primer inicio de sesión.
      */
-    function handleToggleStatus(id: string, newStatus: EmployeeStatus) {
-        setEmployees((prev) =>
-            prev.map((emp) =>
-                emp.id === id ? { ...emp, status: newStatus } : emp
-            )
-        );
-        // TODO: await updateEmployeeStatus(id, newStatus)
+    function handleCreateAccess(employeeId: string, username: string, password: string) {
+        console.log("[handleCreateAccess]", { employeeId, username, password });
+        // TODO: await createEmployeeUser(employeeId, username, password)
     }
-
-    // ── Render ────────────────────────────────────────────────────────────────
 
     return (
         <>
@@ -116,6 +101,7 @@ export default function EmployeesView({ data }: EmployeesViewProps) {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onToggleStatus={handleToggleStatus}
+                    onCreateAccess={handleCreateAccess}
                 />
             </section>
 

@@ -3,14 +3,16 @@
 import { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
-import { MoreHorizontal, Pencil, Trash2, ShieldCheck, UserX, UserCheck } from "lucide-react";
+import {
+    KeyRound, MoreHorizontal, Pencil,
+    ShieldCheck, Trash2, UserCheck, UserX,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
 import {
-    EmployeeItem,
-    EmployeeStatus,
-    EmployeeDepartment,
-    EmployeeProfile,
+    EmployeeItem, EmployeeStatus,
+    EmployeeDepartment, EmployeeProfile,
 } from "@/src/types/employee";
+import CreateUserAccessDialog from "@/src/components/employees/create-user-access-dialog";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -19,6 +21,7 @@ interface EmployeesTableProps {
     onEdit?: (employee: EmployeeItem) => void;
     onDelete?: (id: string) => void;
     onToggleStatus?: (id: string, newStatus: EmployeeStatus) => void;
+    onCreateAccess?: (employeeId: string, username: string, password: string) => void;
 }
 
 // ─── Badge helpers ────────────────────────────────────────────────────────────
@@ -61,17 +64,19 @@ function getStatusLabel(status: EmployeeStatus) {
     }
 }
 
-// ─── Menú de acciones por fila ────────────────────────────────────────────────
+// ─── Menú de acciones ─────────────────────────────────────────────────────────
 
 interface RowActionsProps {
     employee: EmployeeItem;
     onEdit?: (employee: EmployeeItem) => void;
     onDelete?: (id: string) => void;
     onToggleStatus?: (id: string, newStatus: EmployeeStatus) => void;
+    onCreateAccess?: (employeeId: string, username: string, password: string) => void;
 }
 
-function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsProps) {
+function RowActions({ employee, onEdit, onDelete, onToggleStatus, onCreateAccess }: RowActionsProps) {
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [accessDialogOpen, setAccessDialog] = useState(false);
 
     const isActive = employee.status === "activo";
     const nextStatus: EmployeeStatus = isActive ? "inactivo" : "activo";
@@ -92,12 +97,12 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
                     <DropdownMenu.Content
                         align="end"
                         sideOffset={4}
-                        className="z-[9999] min-w-[170px] overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg animate-in fade-in-0 zoom-in-95"
+                        className="z-[9999] min-w-[200px] overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg animate-in fade-in-0 zoom-in-95"
                     >
                         {/* Editar */}
                         <DropdownMenu.Item
                             onSelect={() => onEdit?.(employee)}
-                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100 focus:bg-slate-100"
+                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100"
                         >
                             <Pencil className="h-3.5 w-3.5 text-slate-400" />
                             Editar empleado
@@ -106,7 +111,7 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
                         {/* Cambiar perfil */}
                         <DropdownMenu.Item
                             onSelect={() => onEdit?.(employee)}
-                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100 focus:bg-slate-100"
+                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100"
                         >
                             <ShieldCheck className="h-3.5 w-3.5 text-slate-400" />
                             Cambiar perfil
@@ -115,7 +120,7 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
                         {/* Activar / Desactivar */}
                         <DropdownMenu.Item
                             onSelect={() => onToggleStatus?.(employee.id, nextStatus)}
-                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100 focus:bg-slate-100"
+                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100"
                         >
                             {isActive
                                 ? <UserX className="h-3.5 w-3.5 text-amber-500" />
@@ -126,10 +131,21 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
 
                         <DropdownMenu.Separator className="my-1 h-px bg-slate-100" />
 
+                        {/* ── Crear acceso al sistema ── */}
+                        <DropdownMenu.Item
+                            onSelect={() => setAccessDialog(true)}
+                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-blue-600 outline-none hover:bg-blue-50"
+                        >
+                            <KeyRound className="h-3.5 w-3.5" />
+                            Crear acceso al sistema
+                        </DropdownMenu.Item>
+
+                        <DropdownMenu.Separator className="my-1 h-px bg-slate-100" />
+
                         {/* Eliminar */}
                         <DropdownMenu.Item
                             onSelect={() => setConfirmOpen(true)}
-                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 outline-none hover:bg-red-50 focus:bg-red-50"
+                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 outline-none hover:bg-red-50"
                         >
                             <Trash2 className="h-3.5 w-3.5" />
                             Eliminar empleado
@@ -138,12 +154,21 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
                 </DropdownMenu.Portal>
             </DropdownMenu.Root>
 
-            {/* Dialog de confirmación de eliminación */}
+            {/* Dialog: crear acceso al sistema */}
+            <CreateUserAccessDialog
+                open={accessDialogOpen}
+                onOpenChange={setAccessDialog}
+                employee={employee}
+                onSubmit={(employeeId, username, password) => {
+                    onCreateAccess?.(employeeId, username, password);
+                }}
+            />
+
+            {/* Dialog: confirmar eliminación */}
             <AlertDialog.Root open={confirmOpen} onOpenChange={setConfirmOpen}>
                 <AlertDialog.Portal>
                     <AlertDialog.Overlay className="fixed inset-0 z-[9998] bg-black/40 animate-in fade-in-0" />
                     <AlertDialog.Content className="fixed left-1/2 top-1/2 z-[9999] w-full max-w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-200 bg-white p-6 shadow-xl animate-in fade-in-0 zoom-in-95">
-                        {/* Icono */}
                         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
                             <Trash2 className="h-5 w-5 text-red-500" />
                         </div>
@@ -164,7 +189,6 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
                                     Cancelar
                                 </button>
                             </AlertDialog.Cancel>
-
                             <AlertDialog.Action asChild>
                                 <button
                                     onClick={() => onDelete?.(employee.id)}
@@ -184,10 +208,7 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
 // ─── Tabla principal ──────────────────────────────────────────────────────────
 
 export default function EmployeesTable({
-    employees,
-    onEdit,
-    onDelete,
-    onToggleStatus,
+    employees, onEdit, onDelete, onToggleStatus, onCreateAccess,
 }: EmployeesTableProps) {
     if (employees.length === 0) {
         return (
@@ -218,7 +239,6 @@ export default function EmployeesTable({
                     key={employee.id}
                     className="grid grid-cols-[2.2fr_1.1fr_0.9fr_1.1fr_1.2fr_1fr_40px] items-center border-t border-slate-100 px-6 py-4 transition-colors hover:bg-slate-50/50"
                 >
-                    {/* Nombre + email */}
                     <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 shrink-0">
                             <AvatarImage src={employee.avatarUrl} alt={employee.fullName} />
@@ -234,42 +254,37 @@ export default function EmployeesTable({
                         </div>
                     </div>
 
-                    {/* Código */}
                     <div className="text-sm font-medium text-slate-500">
                         {employee.employeeCode}
                     </div>
 
-                    {/* Ingreso */}
                     <div className="text-sm text-slate-500">{employee.hireDate}</div>
 
-                    {/* Departamento */}
                     <div>
                         <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getDepartmentBadge(employee.department)}`}>
                             {employee.department}
                         </span>
                     </div>
 
-                    {/* Perfil */}
                     <div>
                         <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${getProfileBadge(employee.profile)}`}>
                             {employee.profile}
                         </span>
                     </div>
 
-                    {/* Estado */}
                     <div>
                         <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getStatusBadge(employee.status)}`}>
                             {getStatusLabel(employee.status)}
                         </span>
                     </div>
 
-                    {/* Acciones */}
                     <div className="flex justify-end">
                         <RowActions
                             employee={employee}
                             onEdit={onEdit}
                             onDelete={onDelete}
                             onToggleStatus={onToggleStatus}
+                            onCreateAccess={onCreateAccess}
                         />
                     </div>
                 </div>

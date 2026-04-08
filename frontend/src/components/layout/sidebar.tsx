@@ -13,6 +13,7 @@ import {
     Settings,
     CircleHelp,
     PlusCircle,
+    UserSquare2,
 } from "lucide-react";
 
 const menuItems = [
@@ -22,6 +23,7 @@ const menuItems = [
     { label: "Habitaciones", href: "/sistema/rooms", icon: BedDouble },
     { label: "Reservaciones", href: "/sistema/reservations", icon: CalendarDays },
     { label: "Reportes", href: "/sistema/reports", icon: FileText },
+    { label: "Panel Paciente", href: "/sistema/patient-panel", icon: UserSquare2 },
 ];
 
 const bottomItems = [
@@ -53,7 +55,6 @@ export default function Sidebar() {
             <nav className="flex-1 space-y-0.5">
                 {menuItems.map((item, i) => {
                     const Icon = item.icon;
-                    // Dashboard: solo activo en ruta exacta. Resto: activo si la ruta empieza con el href.
                     const isActive =
                         item.href === "/sistema/dashboard"
                             ? pathname === item.href
@@ -89,7 +90,6 @@ export default function Sidebar() {
 
             {/* Parte inferior */}
             <div className="mt-4 space-y-3">
-                {/* CTA principal */}
                 <Link
                     href="/sistema/reservations/new"
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98]"
@@ -98,7 +98,6 @@ export default function Sidebar() {
                     Nueva admisión
                 </Link>
 
-                {/* Configuración y ayuda */}
                 <div className="space-y-0.5">
                     {bottomItems.map(({ label, href, icon: Icon }) => (
                         <Link

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -26,13 +26,16 @@ export default function LoginView() {
         setLoading(true);
 
         try {
-            const result = await login({
-                username,
-                password,
-            });
+            const result = await login({ username, password });
 
             if (!result.success) {
                 setError(result.message);
+                return;
+            }
+
+            // Si es el primer login, redirigir al cambio de contraseña obligatorio
+            if (result.mustChangePassword) {
+                router.push("/auth/change-password");
                 return;
             }
 
@@ -46,8 +49,9 @@ export default function LoginView() {
     };
 
     return (
-        <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-            <aside className="hidden md:flex relative flex-col justify-center items-center bg-[#243C8F] text-white px-12 overflow-hidden">
+        <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
+            {/* Panel izquierdo */}
+            <aside className="relative hidden flex-col items-center justify-center overflow-hidden bg-blue-600 px-12 text-white md:flex">
                 <AnimatedAuthBackground />
 
                 <motion.div
@@ -62,49 +66,51 @@ export default function LoginView() {
                         className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm"
                     >
                         <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                        Plataforma inteligente
+                        Sistema de Gestión Clínica
                     </motion.div>
 
                     <h1 className="text-4xl font-semibold leading-tight">
-                        Gestiona tus <br />
-                        clientes con <br />
-                        confianza
+                        Cuida a tus <br />
+                        residentes con <br />
+                        dedicación
                     </h1>
 
                     <p className="text-white/80">
-                        Centraliza datos, optimiza pedidos y mejora la experiencia del cliente
-                        con automatización avanzada.
+                        Gestiona pacientes, habitaciones, reservaciones y personal del asilo
+                        Patitos del Retiro desde un solo lugar.
                     </p>
 
-                    <div className="flex gap-6 text-sm text-white/70">
-                        <span>✔ Analítica en tiempo real</span>
-                        <span>✔ Automatización inteligente</span>
+                    <div className="flex flex-wrap gap-6 text-sm text-white/70">
+                        <span>✔ Control de habitaciones</span>
+                        <span>✔ Gestión de pacientes</span>
                     </div>
                 </motion.div>
             </aside>
 
-            <main className="flex items-center justify-center bg-background px-6 py-12">
+            {/* Panel derecho */}
+            <main className="flex items-center justify-center bg-white px-6 py-12">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.6 }}
                     className="w-full max-w-md space-y-8"
                 >
+                    {/* Logo */}
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-[#243C8F] text-white flex items-center justify-center font-semibold">
-                            SE
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-sm font-bold text-white">
+                            P
                         </div>
                         <div>
-                            <h2 className="text-lg font-semibold">ShopEasy CRM</h2>
-                            <p className="text-sm text-muted-foreground">por NextCR</p>
+                            <h2 className="text-base font-semibold text-slate-900">
+                                Patitos del Retiro
+                            </h2>
+                            <p className="text-xs text-slate-500">Sistema de Gestión Clínica</p>
                         </div>
                     </div>
 
                     <div>
-                        <h3 className="text-2xl font-semibold">Bienvenido</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Inicia sesión para continuar
-                        </p>
+                        <h3 className="text-2xl font-semibold text-slate-900">Bienvenido</h3>
+                        <p className="text-sm text-slate-500">Inicia sesión para continuar</p>
                     </div>
 
                     <motion.form
@@ -114,20 +120,15 @@ export default function LoginView() {
                         animate="visible"
                         variants={{
                             hidden: {},
-                            visible: {
-                                transition: { staggerChildren: 0.12 },
-                            },
+                            visible: { transition: { staggerChildren: 0.12 } },
                         }}
                     >
                         <motion.div
-                            variants={{
-                                hidden: { opacity: 0, y: 20 },
-                                visible: { opacity: 1, y: 0 },
-                            }}
+                            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
                         >
                             <Label htmlFor="username">Usuario</Label>
                             <div className="relative mt-2">
-                                <Mail className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                                <Mail className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
                                 <Input
                                     id="username"
                                     type="text"
@@ -141,14 +142,11 @@ export default function LoginView() {
                         </motion.div>
 
                         <motion.div
-                            variants={{
-                                hidden: { opacity: 0, y: 20 },
-                                visible: { opacity: 1, y: 0 },
-                            }}
+                            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
                         >
                             <Label htmlFor="contrasena">Contraseña</Label>
                             <div className="relative mt-2">
-                                <Lock className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                                <Lock className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
                                 <Input
                                     id="contrasena"
                                     type={mostrarContrasena ? "text" : "password"}
@@ -161,13 +159,12 @@ export default function LoginView() {
                                 <button
                                     type="button"
                                     onClick={() => setMostrarContrasena(!mostrarContrasena)}
-                                    className="absolute right-3 top-3.5 text-muted-foreground"
+                                    className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
                                 >
-                                    {mostrarContrasena ? (
-                                        <EyeOff className="h-4 w-4" />
-                                    ) : (
-                                        <Eye className="h-4 w-4" />
-                                    )}
+                                    {mostrarContrasena
+                                        ? <EyeOff className="h-4 w-4" />
+                                        : <Eye className="h-4 w-4" />
+                                    }
                                 </button>
                             </div>
                         </motion.div>
@@ -183,14 +180,11 @@ export default function LoginView() {
                         )}
 
                         <motion.div
-                            variants={{
-                                hidden: { opacity: 0, y: 20 },
-                                visible: { opacity: 1, y: 0 },
-                            }}
+                            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
                         >
                             <Button
                                 type="submit"
-                                className="w-full bg-[#243C8F] hover:bg-[#1f3277]"
+                                className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.98]"
                                 disabled={loading}
                             >
                                 {loading ? "Iniciando sesión..." : "Iniciar sesión"}
@@ -198,8 +192,8 @@ export default function LoginView() {
                         </motion.div>
                     </motion.form>
 
-                    <div className="rounded-xl border bg-muted/30 p-4 text-sm text-muted-foreground">
-                        <p className="font-medium text-foreground">Credenciales mock</p>
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                        <p className="font-medium text-slate-700">Credenciales de prueba</p>
                         <p>Usuario: admin</p>
                         <p>Contraseña: admin</p>
                     </div>

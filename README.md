@@ -1,104 +1,136 @@
-# 🛍️ ShopEasy – Frontend
+# 🐥 Patitos del Retiro – Sistema de Gestión Clínica
 
-ShopEasy es una aplicación web moderna diseñada para gestionar procesos de compra de manera eficiente, intuitiva y escalable.
+Sistema web para la gestión integral del asilo de ancianos **Patitos del Retiro**. Permite administrar pacientes, habitaciones, empleados, reservaciones y generar reportes desde una sola plataforma.
+
+---
+
+## 🏗️ Arquitectura
+
+El proyecto está organizado como un monorepo con dos carpetas principales:
+
+```
+ShopEasy/
+├── frontend/   # Next.js + TypeScript
+└── backend/    # NestJS + Prisma + SQL Server
+```
 
 ---
 
 ## 🚀 Tecnologías utilizadas
 
-- Next.js (App Router)
-- React
+### Frontend
+- Next.js 14 (App Router)
 - TypeScript
 - TailwindCSS
+- shadcn/ui + Radix UI
+- Framer Motion
+- Recharts
 
+### Backend
+- NestJS
+- Prisma ORM
+- Microsoft SQL Server Express
+- JWT (autenticación)
 
 ---
 
 ## 🧩 Requisitos previos
 
-Antes de ejecutar el proyecto asegúrate de tener instalado:
-
-- Node.js (v18 o superior)
+- Node.js v18 o superior
 - npm
-
-Puedes verificar tu versión con:
+- Microsoft SQL Server Express
 
 ```bash
 node -v
 npm -v
 ```
 
+---
+
 ## ⚙️ Instalación y ejecución
 
-### 1️⃣ Clonar el repositorio
+### 1. Clonar el repositorio
 
 ```bash
 git clone https://github.com/xJeffx23/ShopEasy.git
+cd ShopEasy
 ```
 
-### 3️⃣ Instalar dependencias
+### 2. Configurar el Frontend
 
 ```bash
+cd frontend
 npm install
-```
-
-### 4️⃣ Ejecutar el servidor de desarrollo
-
-```bash
 npm run dev
 ```
 
-### 5️⃣ Abrir en el navegador
+Disponible en: `http://localhost:3000`
 
-Ir a:
+### 3. Configurar el Backend
+
 ```bash
-http://localhost:3000
+cd backend
+npm install
 ```
 
+Crear el archivo `.env` en `backend/`:
 
-# Newtech_DB - Base de Datos
-
-Base de datos para el sistema de ventas Newtech, desarrollada en MySQL.
-
-## Requisitos
-
-- MySQL 8.0 o superior
-- MySQL Workbench (opcional)
-
-## Cómo importar la base de datos
-
-### Opción 1: Desde MySQL Workbench
-
-1. Abre MySQL Workbench
-2. Ve a **Server → Data Import**
-3. Selecciona **"Import from Self-Contained File"**
-4. Busca el archivo `database/Newtech_DB.sql`
-5. En **"Default Schema to be Imported To"** escribe `Newtech_DB`
-6. Haz clic en **"Start Import"**
-
-### Opción 2: Desde la terminal
-```bash
-mysql -u root -p < database/Newtech_DB.sql
+```env
+DATABASE_URL="sqlserver://localhost:1433;database=PatitosDB;user=sa;password=TuPassword;trustServerCertificate=true"
+JWT_SECRET="tu_secreto_jwt"
 ```
 
-Luego ingresa tu contraseña de MySQL cuando la pida.
+Ejecutar migraciones y levantar el servidor:
 
-## Contenido de la base de datos
+```bash
+npx prisma migrate dev
+npm run start:dev
+```
 
-### Estructura
-- 24 tablas en total
-- Catálogos, usuarios, clientes, productos, pedidos, facturas, pagos y envíos
+Disponible en: `http://localhost:3001`
 
-### Datos precargados
-- 7 provincias, 82 cantones y todos los distritos de Costa Rica
-- 2 clientes de prueba (1 Regular, 1 VIP)
-- 3 productos de ejemplo
-- 2 pedidos con sus respectivas facturas, pagos y envíos
+---
 
-## Credenciales de prueba
+## 📦 Módulos del sistema
 
-| Usuario | Contraseña | Rol |
-|---|---|---|
-| arodriguez | pass123 | Administrador |
-| mgonzalez | pass456 | Cliente |
+| Módulo | Descripción |
+|---|---|
+| **Autenticación** | Login con JWT, cambio de contraseña en primer acceso |
+| **Empleados** | Registro de personal, perfiles de acceso y gestión de usuarios |
+| **Pacientes** | Registro con medicamentos, cuidados especiales y paquetes |
+| **Habitaciones** | Estados, limpiezas y mantenimientos |
+| **Reservaciones** | Control de estancias con tipos y fechas |
+| **Reportería** | Estadísticas de ocupación, pacientes y habitaciones |
+| **Panel Paciente** | Vista de reservaciones activas e historial |
 
+---
+
+## 👤 Perfiles de acceso
+
+| Perfil | Acceso |
+|---|---|
+| **Gerencia** | Todos los módulos |
+| **Gestión de pacientes** | Pacientes y Habitaciones |
+| **Mantenimiento** | Habitaciones |
+| **Recepción** | Reservaciones |
+
+---
+
+## 🔑 Credenciales de prueba
+
+| Usuario | Contraseña |
+|---|---|
+| admin | admin |
+
+> El sistema solicitará cambio de contraseña en el primer inicio de sesión.
+
+---
+
+## 👥 Equipo
+
+- Jefferson Calderón Mesén
+- Rodolfo Arévalo Guardado
+- Saymon Xavier Araya Garro
+- Dorian Salas Elizondo
+
+**Curso:** Arquitectura de Software – Universidad Internacional de las Américas

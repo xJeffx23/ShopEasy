@@ -44,6 +44,15 @@ export class ReservacionesController {
     return this.reservacionesService.update(+id, updateReservacionDto);
   }
 
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Actualizar estado de una reservación' })
+  @ApiResponse({ status: 200, description: 'Estado de reservación actualizado exitosamente' })
+  @ApiResponse({ status: 404, description: 'Reservación no encontrada' })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
+  updateStatus(@Param('id') id: string, @Body() statusDto: { idCatalogo_Estado_Reservacion: number }) {
+    return this.reservacionesService.update(+id, statusDto);
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar una reservación' })
   @ApiResponse({ status: 200, description: 'Reservación eliminada exitosamente' })

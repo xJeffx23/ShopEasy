@@ -8,6 +8,9 @@ import FilterCombobox from "@/src/components/ui/filter-combobox";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
+import { getPatientsForSelect } from "@/src/services/patients-select.service";
+import { getRoomsForSelect } from "@/src/services/rooms-select.service";
+import { getEmployeesForSelect } from "@/src/services/employees-select.service";
 import {
     Dialog, DialogContent, DialogDescription,
     DialogHeader, DialogTitle,
@@ -109,9 +112,20 @@ export default function AddReservationDialog({
 }: AddReservationDialogProps) {
     const [form, setForm] = useState<FormValues>(initial);
     const [errors, setErrors] = useState<FormErrors>({});
+    const [patients, setPatients] = useState<any[]>([]);
+    const [rooms, setRooms] = useState<any[]>([]);
+    const [employees, setEmployees] = useState<any[]>([]);
 
     useEffect(() => {
         if (!open) { setForm(initial); setErrors({}); }
+    }, [open]);
+
+    useEffect(() => {
+        if (open) {
+            getPatientsForSelect().then(setPatients);
+            getRoomsForSelect().then(setRooms);
+            getEmployeesForSelect().then(setEmployees);
+        }
     }, [open]);
 
     function set<K extends keyof FormValues>(field: K, value: FormValues[K]) {
@@ -121,13 +135,13 @@ export default function AddReservationDialog({
 
     function validate(): boolean {
         const e: FormErrors = {};
-        if (!form.patientName.trim()) e.patientName = "Requerido.";
-        if (!form.roomNumber.trim()) e.roomNumber = "Requerido.";
+        if (!form.patientId || form.patientId === "all") e.patientName = "Requerido.";
+        if (!form.roomId || form.roomId === "all") e.roomNumber = "Requerido.";
         if (form.roomType === "all") e.roomType = "Requerido.";
         if (!form.startDate) e.startDate = "Requerido.";
         if (!form.indefinite && !form.endDate) e.endDate = "Requerido o marcar indefinida.";
         if (form.schedule === "all") e.schedule = "Requerido.";
-        if (!form.createdBy.trim()) e.createdBy = "Requerido.";
+        if (!form.createdBy || form.createdBy === "all") e.createdBy = "Requerido.";
         setErrors(e);
         return Object.keys(e).length === 0;
     }
@@ -138,8 +152,8 @@ export default function AddReservationDialog({
 
         // Convertir datos del formulario al formato que espera el backend
         const backendData = {
-            patientId: form.patientId || "2", // TODO: Obtener ID real del paciente (temporalmente Ana María)
-            roomId: form.roomId || "1",     // TODO: Obtener ID real de la habitación
+            patientId: form.patientId,      // ✅ ID real del paciente seleccionado
+            roomId: form.roomId,           // ✅ ID real de la habitación seleccionada
             startDate: form.startDate,       // Formato YYYY-MM-DD
             endDate: form.indefinite ? "" : form.endDate,
             stayType: form.schedule,        // ID numérico como string
@@ -179,11 +193,16 @@ export default function AddReservationDialog({
                             <Label className="text-xs font-medium text-slate-600">
                                 Nombre del Paciente
                             </Label>
-                            <Input
-                                value={form.patientName}
-                                onChange={(e) => set("patientName", e.target.value)}
-                                placeholder="Nombre completo"
-                                className={inputCls}
+                            <FilterCombobox
+                                value={form.patientId}
+                                onChange={(value) => set("patientId", value)}
+                                options={[
+                                    { label: "Seleccione un paciente", value: "all" },
+                                    ...patients.map(p => ({ label: p.label, value: p.value }))
+                                ]}
+                                placeholder="Buscar paciente..."
+                                searchPlaceholder="Buscar por nombre o cédula..."
+                                emptyMessage="No se encontraron pacientes."
                             />
                             {errors.patientName && <p className="text-[11px] text-red-500">{errors.patientName}</p>}
                         </div>
@@ -192,11 +211,16 @@ export default function AddReservationDialog({
                             <Label className="text-xs font-medium text-slate-600">
                                 Número de Habitación
                             </Label>
-                            <Input
-                                value={form.roomNumber}
-                                onChange={(e) => set("roomNumber", e.target.value)}
-                                placeholder="Ej. 101, 202..."
-                                className={inputCls}
+                            <FilterCombobox
+                                value={form.roomId}
+                                onChange={(value) => set("roomId", value)}
+                                options={[
+                                    { label: "Seleccione una habitación", value: "all" },
+                                    ...rooms.map(r => ({ label: r.label, value: r.value }))
+                                ]}
+                                placeholder="Buscar habitación..."
+                                searchPlaceholder="Buscar por número o tipo..."
+                                emptyMessage="No se encontraron habitaciones."
                             />
                             {errors.roomNumber && <p className="text-[11px] text-red-500">{errors.roomNumber}</p>}
                         </div>
@@ -305,11 +329,16 @@ export default function AddReservationDialog({
                             <Label className="text-xs font-medium text-slate-600">
                                 Registrado por
                             </Label>
-                            <Input
+                            <FilterCombobox
                                 value={form.createdBy}
-                                onChange={(e) => set("createdBy", e.target.value)}
-                                placeholder="Nombre del empleado"
-                                className={inputCls}
+                                onChange={(value) => set("createdBy", value)}
+                                options={[
+                                    { label: "Seleccione un empleado", value: "all" },
+                                    ...employees.map(e => ({ label: e.label, value: e.value }))
+                                ]}
+                                placeholder="Buscar empleado..."
+                                searchPlaceholder="Buscar por nombre o email..."
+                                emptyMessage="No se encontraron empleados."
                             />
                             {errors.createdBy && <p className="text-[11px] text-red-500">{errors.createdBy}</p>}
                         </div>

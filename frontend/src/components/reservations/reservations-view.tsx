@@ -6,6 +6,7 @@ import { ReservationsStats } from "@/src/components/reservations/reservations-st
 import { ReservationsFilters } from "@/src/components/reservations/reservations-filters";
 import { ReservationsTable } from "@/src/components/reservations/reservations-table";
 import AddReservationDialog from "@/src/components/reservations/add-reservation-dialog";
+import { EditReservationDialog } from "@/src/components/reservations/edit-reservation-dialog";
 import { createReservation, updateReservation, deleteReservation, updateReservationStatus } from "@/src/services/reservations.service";
 import type {
     Reservation, ReservationsData,
@@ -35,6 +36,8 @@ export default function ReservationsView({ data }: ReservationsViewProps) {
     const [statusFilter, setStatus] = useState("all");
     const [scheduleFilter, setSchedule] = useState("all");
     const [isDialogOpen, setDialog] = useState(false);
+    const [editDialogOpen, setEditDialog] = useState(false);
+    const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
 
     // ── Filtrado ──────────────────────────────────────────────────────────────
 
@@ -73,20 +76,21 @@ export default function ReservationsView({ data }: ReservationsViewProps) {
 
     /**
      * Editar reservación.
-     * Backend: PUT /api/reservations/:id
+     * Abre el diálogo de edición con los datos precargados.
      */
-    async function handleEdit(r: Reservation) {
-        try {
-            const updatedReservation = await updateReservation(r.id, r);
-            setReservations((prev) =>
-                prev.map((res) => res.id === r.id ? updatedReservation : res)
-            );
-            // TODO: abrir EditReservationDialog con datos precargados
-            console.log("[handleEdit] Reservación actualizada:", r);
-        } catch (error) {
-            console.error('Error updating reservation:', error);
-            // TODO: Mostrar mensaje de error al usuario
-        }
+    function handleEdit(r: Reservation) {
+        setEditingReservation(r);
+        setEditDialog(true);
+    }
+
+    /**
+     * Manejar la actualización de una reservación desde el diálogo de edición.
+     */
+    function handleReservationUpdated(updatedReservation: Reservation) {
+        setReservations((prev) =>
+            prev.map((res) => res.id === updatedReservation.id ? updatedReservation : res)
+        );
+        console.log("[handleReservationUpdated] Reservación actualizada:", updatedReservation);
     }
 
     /**
@@ -153,6 +157,13 @@ export default function ReservationsView({ data }: ReservationsViewProps) {
                 open={isDialogOpen}
                 onOpenChange={setDialog}
                 onSubmit={handleAdd}
+            />
+
+            <EditReservationDialog
+                open={editDialogOpen}
+                onOpenChange={setEditDialog}
+                reservation={editingReservation}
+                onReservationUpdated={handleReservationUpdated}
             />
         </>
     );

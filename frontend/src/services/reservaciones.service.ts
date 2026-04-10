@@ -41,7 +41,7 @@ export const reservacionesService = {
   },
 
   async update(id: number, reservacion: Partial<Reservacion>): Promise<Reservacion> {
-    const response = await api.put<Reservacion>(`/reservaciones/${id}`, reservacion);
+    const response = await api.patch<Reservacion>(`/reservaciones/${id}`, reservacion);
     return response.data;
   },
 

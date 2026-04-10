@@ -133,12 +133,34 @@ export async function createReservation(reservationData: any): Promise<Reservati
 
 export async function updateReservation(id: string, reservationData: any): Promise<Reservation> {
   try {
+    // Validar y formatear las fechas (manejar formato DD/MM/YYYY)
+    let startDate: Date | null = null;
+    let endDate: Date | null = null;
+    
+    if (reservationData.startDate) {
+      // Los inputs type="date" ya entregan formato yyyy-MM-DD
+      startDate = new Date(reservationData.startDate);
+      
+      if (isNaN(startDate.getTime())) {
+        throw new Error('Fecha de inicio inválida');
+      }
+    }
+    
+    if (reservationData.endDate) {
+      // Los inputs type="date" ya entregan formato yyyy-MM-DD
+      endDate = new Date(reservationData.endDate);
+      
+      if (isNaN(endDate.getTime())) {
+        throw new Error('Fecha de fin inválida');
+      }
+    }
+    
     const backendData = {
       Paciente_idPaciente: reservationData.patientId ? parseInt(reservationData.patientId) : undefined,
       Habitacion_idHabitacion: reservationData.roomId ? parseInt(reservationData.roomId) : undefined,
-      Fecha_Inicio: reservationData.startDate ? new Date(reservationData.startDate).toISOString() : undefined,
-      Fecha_Fin: reservationData.endDate ? new Date(reservationData.endDate).toISOString() : null,
-      idCatalogo_Estado_Reservacion: reservationData.status ? mapStatusToId(reservationData.status) : undefined,
+      Fecha_Inicio: startDate ? startDate.toISOString() : undefined,
+      Fecha_Fin: endDate ? endDate.toISOString() : null,
+      Catalogo_Estado_Reservacion_idEstado: reservationData.status ? mapStatusToId(reservationData.status) : undefined,
       Costo_Total: reservationData.totalCost,
       Activo: true
     };
@@ -178,7 +200,7 @@ export async function deleteReservation(id: string): Promise<void> {
 export async function updateReservationStatus(id: string, status: ReservationStatus): Promise<Reservation> {
   try {
     const backendData = {
-      idCatalogo_Estado_Reservacion: mapStatusToId(status),
+      Catalogo_Estado_Reservacion_idEstado: mapStatusToId(status),
       Activo: true
     };
     

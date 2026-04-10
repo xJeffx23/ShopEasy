@@ -20,6 +20,11 @@ export const empleadosService = {
     const response = await api.get<Empleado[]>('/empleados');
     return response.data;
   },
+  
+  async getById(id: number): Promise<Empleado> {
+    const response = await api.get<Empleado>(`/empleados/${id}`);
+    return response.data;
+  },
 
   async getById(id: number): Promise<Empleado> {
     const response = await api.get<Empleado>(`/empleados/${id}`);

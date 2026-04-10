@@ -19,27 +19,29 @@ import type {
 
 // ─── Opciones ─────────────────────────────────────────────────────────────────
 
-/** Enunciado b: Estancia en las instalaciones */
+/** Enunciado b: Estancia en las instalaciones - Mapeo a IDs del backend */
 const scheduleOptions = [
     { label: "Seleccione tipo de estancia", value: "all" },
-    { label: "Día (8am - 5pm)", value: "Día (8am - 5pm)" },
-    { label: "Mañana (8am - 2pm)", value: "Mañana (8am - 2pm)" },
-    { label: "Tarde (2pm - 6pm)", value: "Tarde (2pm - 6pm)" },
-    { label: "Full estancia", value: "Full estancia" },
+    { label: "Día (8am - 5pm)", value: "1" },
+    { label: "Mañana (8am - 2pm)", value: "2" },
+    { label: "Tarde (2pm - 6pm)", value: "3" },
+    { label: "Full estancia", value: "4" },
 ];
 
-/** Enunciado b.v: Tipo de habitación */
+/** Enunciado b.v: Tipo de habitación - Para referencia visual */
 const roomTypeOptions = [
     { label: "Seleccione tipo de habitación", value: "all" },
-    { label: "Compartida", value: "Compartida" },
-    { label: "Individual", value: "Individual" },
-    { label: "Individual cama matrimonial", value: "Individual cama matrimonial" },
-    { label: "Cuidados especiales", value: "Cuidados especiales" },
+    { label: "Compartida", value: "1" },
+    { label: "Individual", value: "2" },
+    { label: "Individual cama matrimonial", value: "3" },
+    { label: "Cuidados especiales", value: "4" },
 ];
 
 const statusOptions = [
-    { label: "Activa", value: "activa" },
-    { label: "Pendiente", value: "pendiente" },
+    { label: "Activa", value: "1" },
+    { label: "Pendiente", value: "4" },
+    { label: "Finalizada", value: "2" },
+    { label: "Cancelada", value: "3" },
 ];
 
 // ─── Tipos del form ───────────────────────────────────────────────────────────
@@ -134,23 +136,18 @@ export default function AddReservationDialog({
         e.preventDefault();
         if (!validate()) return;
 
-        const newReservation: Reservation = {
-            id: crypto.randomUUID(),
-            patientId: form.patientId || crypto.randomUUID(),
-            patientName: form.patientName.trim(),
-            roomId: form.roomId || crypto.randomUUID(),
-            roomNumber: form.roomNumber.trim(),
-            roomType: form.roomType as ReservationRoomType,
-            startDate: formatDateFromInput(form.startDate),
-            endDate: form.indefinite ? undefined : formatDateFromInput(form.endDate),
-            indefinite: form.indefinite,
-            schedule: form.schedule as StaySchedule,
-            status: form.status,
-            createdBy: form.createdBy.trim(),
-            observations: form.observations.trim() || undefined,
+        // Convertir datos del formulario al formato que espera el backend
+        const backendData = {
+            patientId: form.patientId || "2", // TODO: Obtener ID real del paciente (temporalmente Ana María)
+            roomId: form.roomId || "1",     // TODO: Obtener ID real de la habitación
+            startDate: form.startDate,       // Formato YYYY-MM-DD
+            endDate: form.indefinite ? "" : form.endDate,
+            stayType: form.schedule,        // ID numérico como string
+            status: form.status,            // ID numérico como string
         };
 
-        onSubmit(newReservation);
+        console.log('Sending reservation data:', backendData);
+        onSubmit(backendData);
         onOpenChange(false);
     }
 

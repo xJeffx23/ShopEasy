@@ -6,6 +6,7 @@ import { PatientsStats } from "@/src/components/patients/patients-stats";
 import { PatientsFilters } from "@/src/components/patients/patients-filters";
 import { PatientsTable } from "@/src/components/patients/patients-table";
 import AddPatientDialog from "@/src/components/patients/add-patient-dialog";
+import { createPatient, updatePatient, deletePatient, updatePatientStatus } from "@/src/services/patients.service";
 import type { Patient, PatientsData, PatientStats, PatientStatus } from "@/src/types/patient";
 
 interface PatientsViewProps {
@@ -61,9 +62,15 @@ export default function PatientsView({ data }: PatientsViewProps) {
      * Agregar paciente.
      * Backend: POST /api/patients
      */
-    function handleAdd(newPatient: Patient) {
-        setPatients((prev) => [newPatient, ...prev]);
-        // TODO: await createPatient(newPatient)
+    async function handleAdd(newPatient: any) {
+        try {
+            const createdPatient = await createPatient(newPatient);
+            setPatients((prev) => [createdPatient, ...prev]);
+            setIsDialogOpen(false);
+        } catch (error) {
+            console.error('Error creating patient:', error);
+            // TODO: Mostrar mensaje de error al usuario
+        }
     }
 
     /**
@@ -79,29 +86,48 @@ export default function PatientsView({ data }: PatientsViewProps) {
      * Editar paciente.
      * Backend: PUT /api/patients/:id
      */
-    function handleEdit(patient: Patient) {
-        // TODO: abrir EditPatientDialog con datos precargados
-        console.log("[handleEdit] Paciente a editar:", patient);
+    async function handleEdit(patient: Patient) {
+        try {
+            const updatedPatient = await updatePatient(patient.id, patient);
+            setPatients((prev) =>
+                prev.map((p) => p.id === patient.id ? updatedPatient : p)
+            );
+            // TODO: abrir EditPatientDialog con datos precargados
+            console.log("[handleEdit] Paciente actualizado:", patient);
+        } catch (error) {
+            console.error('Error updating patient:', error);
+            // TODO: Mostrar mensaje de error al usuario
+        }
     }
 
     /**
      * Eliminar paciente.
      * Backend: DELETE /api/patients/:id
      */
-    function handleDelete(id: string) {
-        setPatients((prev) => prev.filter((p) => p.id !== id));
-        // TODO: await deletePatient(id)
+    async function handleDelete(id: string) {
+        try {
+            await deletePatient(id);
+            setPatients((prev) => prev.filter((p) => p.id !== id));
+        } catch (error) {
+            console.error('Error deleting patient:', error);
+            // TODO: Mostrar mensaje de error al usuario
+        }
     }
 
     /**
      * Activar / desactivar paciente.
      * Backend: PATCH /api/patients/:id/status  { status: newStatus }
      */
-    function handleToggleStatus(id: string, newStatus: PatientStatus) {
-        setPatients((prev) =>
-            prev.map((p) => p.id === id ? { ...p, status: newStatus } : p)
-        );
-        // TODO: await updatePatientStatus(id, newStatus)
+    async function handleToggleStatus(id: string, newStatus: PatientStatus) {
+        try {
+            const updatedPatient = await updatePatientStatus(id, newStatus);
+            setPatients((prev) =>
+                prev.map((p) => p.id === id ? updatedPatient : p)
+            );
+        } catch (error) {
+            console.error('Error updating patient status:', error);
+            // TODO: Mostrar mensaje de error al usuario
+        }
     }
 
     // ── Render ────────────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
-# 🛍️ ShopEasy – Frontend
+# 🏠 Patitos del Retiro – Sistema de Gestión para Asilo de Ancianos
 
-ShopEasy es una aplicación web moderna diseñada para gestionar procesos de compra de manera eficiente, intuitiva y escalable.
+Patitos del Retiro es un sistema web moderno diseñado para gestionar procesos en un asilo de ancianos de manera eficiente, intuitiva y escalable.
 
 ---
 
@@ -10,7 +10,9 @@ ShopEasy es una aplicación web moderna diseñada para gestionar procesos de com
 - React
 - TypeScript
 - TailwindCSS
-
+- NestJS
+- Prisma
+- SQL Server Express
 
 ---
 
@@ -20,6 +22,7 @@ Antes de ejecutar el proyecto asegúrate de tener instalado:
 
 - Node.js (v18 o superior)
 - npm
+- SQL Server Express
 
 Puedes verificar tu versión con:
 
@@ -36,69 +39,95 @@ npm -v
 git clone https://github.com/xJeffx23/ShopEasy.git
 ```
 
+### 2️⃣ Configurar la base de datos
+
+Importa el esquema desde `database/MSSQL_SERVER_Express/01_SCHEMA_PATITOS_RETIRADOS.sql` y los datos desde `02_DATA_PATITOS_RETIRADOS.sql`.
+
 ### 3️⃣ Instalar dependencias
 
 ```bash
+# Backend
+cd backend
+npm install
+
+# Frontend
+cd ../frontend
 npm install
 ```
 
-### 4️⃣ Ejecutar el servidor de desarrollo
+### 4️⃣ Configurar variables de entorno
+
+Crea un archivo `.env` en `backend/` con:
+```
+DATABASE_URL="sqlserver://localhost:1433;database=Patitos_del_Retiro_DB;trustServerCertificate=true"
+JWT_SECRET=tu_jwt_secret
+```
+
+### 5️⃣ Ejecutar el backend
 
 ```bash
+cd backend
+npm run start:dev
+```
+
+### 6️⃣ Ejecutar el frontend
+
+En otra terminal:
+
+```bash
+cd frontend
 npm run dev
 ```
 
-### 5️⃣ Abrir en el navegador
+### 7️⃣ Abrir en el navegador
 
-Ir a:
-```bash
-http://localhost:3000
-```
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:3001/api
+- Documentación Swagger: http://localhost:3001/api/docs
 
+---
 
-# Newtech_DB - Base de Datos
+## 📋 Funcionalidades
 
-Base de datos para el sistema de ventas Newtech, desarrollada en MySQL.
+### Empleados
+- Registro de empleados con departamento y perfil
+- Gestión de asistencia
+- Evaluación del personal
+- Generación de planillas
 
-## Requisitos
+### Pacientes
+- Registro de pacientes con nivel de asistencia
+- Medicamentos y cuidados especiales
+- Paquetes adicionales
 
-- MySQL 8.0 o superior
-- MySQL Workbench (opcional)
+### Habitaciones
+- Control de estado de habitaciones
+- Limpieza y mantenimiento
+- Reservaciones
 
-## Cómo importar la base de datos
+### Reservaciones
+- Control de estancias (día, mañana, tarde, full)
+- Tipos de habitación
 
-### Opción 1: Desde MySQL Workbench
+### Reportería
+- Estadísticas de pacientes y habitaciones
 
-1. Abre MySQL Workbench
-2. Ve a **Server → Data Import**
-3. Selecciona **"Import from Self-Contained File"**
-4. Busca el archivo `database/Newtech_DB.sql`
-5. En **"Default Schema to be Imported To"** escribe `Newtech_DB`
-6. Haz clic en **"Start Import"**
+---
 
-### Opción 2: Desde la terminal
-```bash
-mysql -u root -p < database/Newtech_DB.sql
-```
+## 🎨 Logo
 
-Luego ingresa tu contraseña de MySQL cuando la pida.
+Logo diseñado con paleta de colores: Negro, Amarillo, Blanco, Celeste, Marrón.
 
-## Contenido de la base de datos
+---
 
-### Estructura
-- 24 tablas en total
-- Catálogos, usuarios, clientes, productos, pedidos, facturas, pagos y envíos
+## 📊 Base de datos
 
-### Datos precargados
-- 7 provincias, 82 cantones y todos los distritos de Costa Rica
-- 2 clientes de prueba (1 Regular, 1 VIP)
-- 3 productos de ejemplo
-- 2 pedidos con sus respectivas facturas, pagos y envíos
+Base de datos para el asilo Patitos del Retiro, desarrollada en SQL Server Express.
 
-## Credenciales de prueba
+### Contenido
+- Tablas para empleados, pacientes, habitaciones, reservaciones, etc.
+- Datos de prueba incluidos
 
-| Usuario | Contraseña | Rol |
-|---|---|---|
-| arodriguez | pass123 | Administrador |
-| mgonzalez | pass456 | Cliente |
+### Importación
+Sigue las instrucciones en `database/MSSQL_SERVER_Express/README.txt`.
 

@@ -25,13 +25,22 @@ export class ReservacionesService {
   }
 
   async create(data: any) {
-    return this.prisma.reservacion.create({
-      data,
-      include: {
-        Paciente: true,
-        Habitacion: true
-      }
-    });
+    try {
+      console.log('Creating reservation with data:', data);
+      
+      // Usar directamente los datos del frontend - ya vienen formateados correctamente
+      const result = await this.prisma.reservacion.create({
+        data: data,
+        include: {
+          Paciente: true,
+          Habitacion: true
+        }
+      });
+      return result;
+    } catch (error) {
+      console.error('Error creating reservation:', error);
+      throw error;
+    }
   }
 
   async update(id: number, data: any) {

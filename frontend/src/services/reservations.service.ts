@@ -1,5 +1,5 @@
 import { reservacionesService } from './reservaciones.service';
-import { ReservationsData, Reservation, ReservationStatus } from '@/src/types/reservation';
+import type { Reservation, ReservationStats, ReservationStatus, ReservationRoomType, StaySchedule, ReservationsData } from "@/src/types/reservation";
 
 export async function getReservationsData(): Promise<ReservationsData> {
   try {
@@ -61,8 +61,8 @@ function mapReservationStatus(statusId: number): ReservationStatus {
   return mapping[statusId] || 'pendiente';
 }
 
-function mapStatusToId(status: ReservationStatus): number {
-  const mapping: Record<ReservationStatus, number> = {
+function mapStatusToId(status: string): number {
+  const mapping: { [key: string]: number } = {
     'activa': 1,
     'finalizada': 2,
     'cancelada': 3,
@@ -71,20 +71,44 @@ function mapStatusToId(status: ReservationStatus): number {
   return mapping[status] || 4;
 }
 
+function mapRoomType(roomType: string): ReservationRoomType {
+  return (roomType || 'Individual') as ReservationRoomType;
+}
+
+function mapStayType(stayTypeId: number): StaySchedule {
+  const mapping: { [key: number]: StaySchedule } = {
+    1: 'Día (8am - 5pm)',
+    2: 'Mañana (8am - 2pm)',
+    3: 'Tarde (2pm - 6pm)',
+    4: 'Full estancia'
+  };
+  return mapping[stayTypeId] || 'Full estancia';
+}
+
 // CRUD Functions
 export async function createReservation(reservationData: any): Promise<Reservation> {
   try {
+    // Validar y formatear las fechas - formato DATE para SQL Server
+    const startDate = new Date(reservationData.startDate);
+    const endDate = reservationData.endDate && reservationData.endDate !== '' ? new Date(reservationData.endDate) : null;
+    
+    // Validar que las fechas sean válidas
+    if (isNaN(startDate.getTime())) {
+      throw new Error('Fecha de inicio inválida');
+    }
+    
     const backendData = {
       Paciente_idPaciente: parseInt(reservationData.patientId),
       Habitacion_idHabitacion: parseInt(reservationData.roomId),
-      Fecha_Inicio: new Date(reservationData.startDate).toISOString(),
-      Fecha_Fin: reservationData.endDate ? new Date(reservationData.endDate).toISOString() : null,
-      idCatalogo_Estado_Reservacion: mapStatusToId(reservationData.status || 'pendiente'),
-      Costo_Total: reservationData.totalCost || 0,
+      Fecha_Inicio: startDate.toISOString(), // Formato ISO-8601 DateTime para Prisma
+      Fecha_Fin: endDate && !isNaN(endDate.getTime()) ? endDate.toISOString() : null,
+      Catalogo_Tipo_Estancia_idEstancia: parseInt(reservationData.stayType) || 4, // Default: Full Estancia
+      Catalogo_Estado_Reservacion_idEstado: mapStatusToId(reservationData.status || 'pendiente'),
+      Empleado_idEmpleado_Registra: 1, // Default: Carlos Méndez (ID 1)
       Activo: true
     };
     
-    const response = await reservacionesService.create(backendData);
+    const response = await reservacionesService.create(backendData as any);
     
     return {
       id: response.idReservacion.toString(),
@@ -92,12 +116,12 @@ export async function createReservation(reservationData: any): Promise<Reservati
       patientName: response.Paciente?.Nombre || 'Paciente',
       roomId: response.Habitacion_idHabitacion.toString(),
       roomNumber: response.Habitacion?.Numero_Habitacion || 'No asignada',
-      roomType: 'Individual' as const,
+      roomType: mapRoomType('Individual'),
       startDate: new Date(response.Fecha_Inicio).toLocaleDateString('es-CR'),
       endDate: response.Fecha_Fin ? new Date(response.Fecha_Fin).toLocaleDateString('es-CR') : undefined,
       indefinite: !response.Fecha_Fin,
-      schedule: 'Full estancia' as const,
-      status: mapReservationStatus(response.idCatalogo_Estado_Reservacion),
+      schedule: mapStayType(4), // Default: Full estancia
+      status: mapReservationStatus(4), // Default: pendiente
       createdBy: 'Sistema',
       observations: ''
     };

@@ -61,6 +61,7 @@ export default function ReservationsView({ data }: ReservationsViewProps) {
      */
     async function handleAdd(newRes: any) {
         try {
+            console.log('Creating reservation with data:', newRes);
             const createdReservation = await createReservation(newRes);
             setReservations((prev) => [createdReservation, ...prev]);
             setDialog(false);

@@ -70,18 +70,30 @@ function calculateAge(birthDate: Date): number {
   return age;
 }
 
+function parseDateString(dateStr: string): Date {
+  if (!dateStr) return new Date();
+
+  // Si viene en formato DD/MM/YYYY
+  if (dateStr.includes('/')) {
+    const [d, m, y] = dateStr.split('/');
+    return new Date(`${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`);
+  }
+
+  // Si viene en formato YYYY-MM-DD o ISO
+  return new Date(dateStr);
+}
+
 export async function createPatient(patientData: any): Promise<Patient> {
   try {
+    const fechaNacimiento = parseDateString(patientData.birthDate);
+
     const backendData = {
       Nombre: patientData.fullName || 'Paciente sin nombre',
       Numero_Cedula: patientData.idNumber || 'TEMP-' + Date.now(),
-      Fecha_Nacimiento: new Date(patientData.birthDate).toISOString(),
-      Telefono_Contacto_Emergencia: patientData.emergencyContact?.phone || '',
-      Nombre_Contacto_Emergencia: patientData.emergencyContact?.name || '',
-      Telefono: patientData.phone || '',
-      Email: patientData.email || '',
-      Direccion: patientData.address || '',
+      Fecha_Nacimiento: fechaNacimiento.toISOString(),
       Fecha_Ingreso: new Date().toISOString(),
+      Telefono_Contacto_Emergencia: patientData.emergencyContact?.phone || '00000000',
+      Nombre_Contacto_Emergencia: patientData.emergencyContact?.name || 'Contacto',
       Catalogo_Nivel_Asistencia_idNivel: mapAssistanceLevelToId(patientData.assistanceLevel || 'Asistencia básica'),
       Activo: true
     };
@@ -90,7 +102,7 @@ export async function createPatient(patientData: any): Promise<Patient> {
 
     return {
       id: response.idPaciente.toString(),
-      fullName: `${response.Nombre} ${response.Apellidos || ''}`.trim(),
+      fullName: response.Nombre,
       idNumber: response.Numero_Cedula || response.idPaciente.toString(),
       patientCode: `PAT${response.idPaciente.toString().padStart(4, '0')}`,
       birthDate: new Date(response.Fecha_Nacimiento).toLocaleDateString('es-CR'),
@@ -101,7 +113,7 @@ export async function createPatient(patientData: any): Promise<Patient> {
       status: response.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
       emergencyContact: {
         name: response.Nombre_Contacto_Emergencia || 'Contacto',
-        phone: response.Telefono_Contacto_Emergencia || response.Telefono || 'N/A'
+        phone: response.Telefono_Contacto_Emergencia || 'N/A'
       },
       medications: [],
       specialCares: [],
@@ -115,10 +127,8 @@ export async function createPatient(patientData: any): Promise<Patient> {
 
 export async function updatePatient(id: string, patientData: any): Promise<Patient> {
   try {
-    const backendData = {
-      Nombre: patientData.fullName?.split(' ')[0] || patientData.fullName,
-      Apellidos: patientData.fullName?.split(' ').slice(1).join(' ') || '',
-      Fecha_Nacimiento: patientData.birthDate ? new Date(patientData.birthDate).toISOString() : undefined,
+    const backendData: any = {
+      Nombre: patientData.fullName || undefined,
       Telefono_Contacto_Emergencia: patientData.emergencyContact?.phone || '',
       Nombre_Contacto_Emergencia: patientData.emergencyContact?.name || '',
       Telefono: patientData.phone || '',
@@ -126,6 +136,10 @@ export async function updatePatient(id: string, patientData: any): Promise<Patie
       Direccion: patientData.address || '',
       Activo: patientData.status !== 'inactivo'
     };
+
+    if (patientData.birthDate) {
+      backendData.Fecha_Nacimiento = parseDateString(patientData.birthDate).toISOString();
+    }
 
     const response = await pacientesService.update(parseInt(id), backendData);
 

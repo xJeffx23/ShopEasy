@@ -1,10 +1,18 @@
 import api from "./api";
 import { PatientPanelData } from "@/types/patient-panel";
 
-/**
- * Obtiene los datos del panel del paciente.
- */
 export async function getPatientPanelData(): Promise<PatientPanelData> {
-    const response = await api.get<PatientPanelData>("/pacientes/panel");
-    return response.data;
+    try {
+        const response = await api.get<PatientPanelData>("/pacientes/panel");
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching patient panel:", error);
+        // Retornar datos vacíos si el endpoint no existe
+        return {
+            patient: null,
+            medications: [],
+            appointments: [],
+            notifications: []
+        } as unknown as PatientPanelData;
+    }
 }

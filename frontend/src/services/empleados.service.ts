@@ -3,15 +3,17 @@ import api from './api';
 export interface Empleado {
   idEmpleado: number;
   Nombre: string;
-  Apellidos: string;
-  Email: string;
+  Numero_Cedula: string;
+  Fecha_Ingreso: string;
   Telefono: string;
+  Email: string;
   Activo: boolean;
-  Fecha_Contratacion?: string;
-  Fecha_Ingreso?: string;
-  Numero_Cedula?: string;
   Catalogo_Departamento_idDepartamento?: number;
   Catalogo_Perfil_Usuario_idPerfil?: number;
+  Departamento?: {
+    idCatalogo_Departamento: number;
+    Nombre_Departamento: string;
+  };
   Perfil?: {
     idCatalogo_Perfil_Usuario: number;
     Nombre_Perfil: string;
@@ -21,14 +23,13 @@ export interface Empleado {
 
 export interface CreateEmpleadoDto {
   Nombre: string;
-  Apellidos: string;
-  Email: string;
+  Numero_Cedula: string;
+  Fecha_Ingreso: string;
   Telefono: string;
+  Email: string;
   Activo: boolean;
-  Numero_Cedula?: string;
-  Fecha_Ingreso?: string;
-  Catalogo_Departamento_idDepartamento?: number;
-  Catalogo_Perfil_Usuario_idPerfil?: number;
+  Catalogo_Departamento_idDepartamento: number;
+  Catalogo_Perfil_Usuario_idPerfil: number;
 }
 
 export const empleadosService = {
@@ -53,7 +54,7 @@ export const empleadosService = {
   },
 
   async updateStatus(id: number, activo: boolean): Promise<Empleado> {
-    const response = await api.patch<Empleado>(`/empleados/${id}/status`, { Activo: activo });
+    const response = await api.patch<Empleado>(`/empleados/${id}/status`, { status: activo });
     return response.data;
   },
 

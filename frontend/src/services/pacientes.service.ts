@@ -3,19 +3,17 @@ import api from './api';
 export interface Paciente {
   idPaciente: number;
   Nombre: string;
-  Apellidos: string;
+  Numero_Cedula: string;
   Fecha_Nacimiento: string;
-  Telefono: string;
-  Email: string;
-  Direccion: string;
-  Activo: boolean;
   Fecha_Ingreso: string;
-  Numero_Cedula?: string;
-  Telefono_Contacto_Emergencia?: string;
-  Nombre_Contacto_Emergencia?: string;
-  Catalogo_Nivel_Asistencia_idNivel?: number;
-  Cuidados_Especial?: any[];
-  Medicamentos?: any[];
+  Telefono_Contacto_Emergencia: string;
+  Nombre_Contacto_Emergencia: string;
+  Activo: boolean;
+  Catalogo_Nivel_Asistencia_idNivel: number;
+  Apellidos?: string;
+  Telefono?: string;
+  Email?: string;
+  Direccion?: string;
   Nivel_Asistencia?: {
     idCatalogo_Nivel_Asistencia: number;
     Descripcion_Nivel: string;
@@ -24,17 +22,13 @@ export interface Paciente {
 
 export interface CreatePacienteDto {
   Nombre: string;
-  Apellidos?: string;
+  Numero_Cedula: string;
   Fecha_Nacimiento: string;
-  Telefono?: string;
-  Email?: string;
-  Direccion?: string;
-  Activo: boolean;
   Fecha_Ingreso: string;
-  Numero_Cedula?: string;
-  Telefono_Contacto_Emergencia?: string;
-  Nombre_Contacto_Emergencia?: string;
-  Catalogo_Nivel_Asistencia_idNivel?: number;
+  Telefono_Contacto_Emergencia: string;
+  Nombre_Contacto_Emergencia: string;
+  Catalogo_Nivel_Asistencia_idNivel: number;
+  Activo?: boolean;
 }
 
 export const pacientesService = {

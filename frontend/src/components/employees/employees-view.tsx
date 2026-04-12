@@ -6,6 +6,7 @@ import AddEmployeeDialog from "@/components/employees/add-employee-dialog";
 import EmployeesFilters from "@/components/employees/employees-filters";
 import EmployeesHeader from "@/components/employees/employees-header";
 import EmployeesTable from "@/components/employees/employees-table";
+import { createEmployee, deleteEmployee, updateEmployeeStatus } from "@/services/employees.service";
 import type { EmployeeItem, EmployeesData, EmployeeStatus } from "@/types/employee";
 
 interface EmployeesViewProps {
@@ -22,6 +23,7 @@ export default function EmployeesView({ data }: EmployeesViewProps) {
     const [department, setDepartment] = useState("all");
     const [profile, setProfile] = useState("all");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const filtered = useMemo(() => {
         const q = normalize(search.trim());
@@ -42,40 +44,56 @@ export default function EmployeesView({ data }: EmployeesViewProps) {
         });
     }, [employees, search, department, profile]);
 
-    // ── Acciones CRUD ─────────────────────────────────────────────────────────
-
-    /** Backend: POST /api/employees */
-    function handleAdd(newEmployee: EmployeeItem) {
-        setEmployees((prev) => [newEmployee, ...prev]);
+    async function handleAdd(employeeData: any) {
+        setIsLoading(true);
+        try {
+            const newEmployee = await createEmployee(employeeData);
+            setEmployees((prev) => [newEmployee, ...prev]);
+            setIsDialogOpen(false);
+        } catch (error) {
+            console.error("Error creating employee:", error);
+            alert("Error al crear empleado");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
-    /** Backend: PUT /api/employees/:id */
     function handleEdit(employee: EmployeeItem) {
         console.log("[handleEdit] Empleado a editar:", employee);
     }
 
-    /** Backend: DELETE /api/employees/:id */
-    function handleDelete(id: string) {
-        setEmployees((prev) => prev.filter((emp) => emp.id !== id));
+    async function handleDelete(id: string) {
+        if (!confirm("¿Estás seguro de eliminar este empleado?")) return;
+
+        setIsLoading(true);
+        try {
+            await deleteEmployee(id);
+            setEmployees((prev) => prev.filter((emp) => emp.id !== id));
+        } catch (error) {
+            console.error("Error deleting employee:", error);
+            alert("Error al eliminar empleado");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
-    /** Backend: PATCH /api/employees/:id/status */
-    function handleToggleStatus(id: string, newStatus: EmployeeStatus) {
-        setEmployees((prev) =>
-            prev.map((emp) => emp.id === id ? { ...emp, status: newStatus } : emp)
-        );
+    async function handleToggleStatus(id: string, newStatus: EmployeeStatus) {
+        setIsLoading(true);
+        try {
+            await updateEmployeeStatus(id, newStatus);
+            setEmployees((prev) =>
+                prev.map((emp) => emp.id === id ? { ...emp, status: newStatus } : emp)
+            );
+        } catch (error) {
+            console.error("Error updating employee status:", error);
+            alert("Error al actualizar estado");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
-    /**
-     * Crear acceso al sistema para un empleado (RRHH).
-     * Backend: POST /api/users
-     *   { employeeId, username, password, profile: employee.profile }
-     * El backend debe marcar Cambio_Contrasena = true para forzar
-     * el cambio en el primer inicio de sesión.
-     */
     function handleCreateAccess(employeeId: string, username: string, password: string) {
         console.log("[handleCreateAccess]", { employeeId, username, password });
-        // TODO: await createEmployeeUser(employeeId, username, password)
     }
 
     return (

@@ -5,6 +5,7 @@ import { RoomsHeader } from "@/components/rooms/rooms-header";
 import { RoomsStatusSummary } from "@/components/rooms/rooms-status-summary";
 import { RoomsGrid } from "@/components/rooms/rooms-grid";
 import AddRoomDialog from "@/components/rooms/add-room-dialog";
+import { createRoom, updateRoomStatus, deleteRoom } from "@/services/rooms.service";
 import type {
     Room, RoomCleaning, RoomMaintenance,
     RoomsData, RoomStats, RoomStatus,
@@ -27,42 +28,52 @@ function computeStats(rooms: Room[]): RoomStats {
 export default function RoomsView({ data }: RoomsViewProps) {
     const [rooms, setRooms] = useState<Room[]>(data.rooms);
     const [isDialogOpen, setDialog] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const stats = useMemo(() => computeStats(rooms), [rooms]);
 
-    // ── Acciones CRUD preparadas para el backend ──────────────────────────────
-
-    /**
-     * Agregar habitación.
-     * Backend: POST /api/rooms
-     */
-    function handleAdd(newRoom: Room) {
-        setRooms((prev) => [...prev, newRoom]);
-        // TODO: await createRoom(newRoom)
+    async function handleAdd(roomData: any) {
+        setIsLoading(true);
+        try {
+            const newRoom = await createRoom(roomData);
+            setRooms((prev) => [...prev, newRoom]);
+            setDialog(false);
+        } catch (error) {
+            console.error("Error creating room:", error);
+            alert("Error al crear habitación");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
-    /**
-     * Cambiar estado.
-     * Backend: PATCH /api/rooms/:id/status  { status }
-     */
-    function handleChangeStatus(id: string, status: RoomStatus) {
-        setRooms((prev) => prev.map((r) => r.id === id ? { ...r, status } : r));
-        // TODO: await updateRoomStatus(id, status)
+    async function handleChangeStatus(id: string, status: RoomStatus) {
+        setIsLoading(true);
+        try {
+            await updateRoomStatus(id, status);
+            setRooms((prev) => prev.map((r) => r.id === id ? { ...r, status } : r));
+        } catch (error) {
+            console.error("Error updating room status:", error);
+            alert("Error al actualizar estado");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
-    /**
-     * Eliminar habitación.
-     * Backend: DELETE /api/rooms/:id
-     */
-    function handleDelete(id: string) {
-        setRooms((prev) => prev.filter((r) => r.id !== id));
-        // TODO: await deleteRoom(id)
+    async function handleDelete(id: string) {
+        if (!confirm("¿Estás seguro de eliminar esta habitación?")) return;
+
+        setIsLoading(true);
+        try {
+            await deleteRoom(id);
+            setRooms((prev) => prev.filter((r) => r.id !== id));
+        } catch (error) {
+            console.error("Error deleting room:", error);
+            alert("Error al eliminar habitación");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
-    /**
-     * Registrar limpieza (enunciado b.i y b.ii).
-     * Backend: POST /api/rooms/:id/cleanings
-     */
     function handleAddCleaning(roomId: string, cleaning: RoomCleaning) {
         setRooms((prev) =>
             prev.map((r) =>
@@ -71,13 +82,8 @@ export default function RoomsView({ data }: RoomsViewProps) {
                     : r
             )
         );
-        // TODO: await createCleaning(roomId, cleaning)
     }
 
-    /**
-     * Registrar mantenimiento (enunciado c.i, c.ii y c.iii).
-     * Backend: POST /api/rooms/:id/maintenances
-     */
     function handleAddMaintenance(roomId: string, maintenance: RoomMaintenance) {
         setRooms((prev) =>
             prev.map((r) =>
@@ -86,10 +92,7 @@ export default function RoomsView({ data }: RoomsViewProps) {
                     : r
             )
         );
-        // TODO: await createMaintenance(roomId, maintenance)
     }
-
-    // ── Render ────────────────────────────────────────────────────────────────
 
     return (
         <>

@@ -6,6 +6,7 @@ import { PatientsStats } from "@/components/patients/patients-stats";
 import { PatientsFilters } from "@/components/patients/patients-filters";
 import { PatientsTable } from "@/components/patients/patients-table";
 import AddPatientDialog from "@/components/patients/add-patient-dialog";
+import { createPatient, updatePatient, deletePatient, updatePatientStatus } from "@/services/patients.service";
 import type { Patient, PatientsData, PatientStats, PatientStatus } from "@/types/patient";
 
 interface PatientsViewProps {
@@ -33,8 +34,7 @@ export default function PatientsView({ data }: PatientsViewProps) {
     const [assistanceFilter, setAssist] = useState("all");
     const [statusFilter, setStatus] = useState("all");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    // ── Filtrado ──────────────────────────────────────────────────────────────
+    const [isLoading, setIsLoading] = useState(false);
 
     const filtered = useMemo(() => {
         const q = normalize(search.trim());
@@ -55,56 +55,57 @@ export default function PatientsView({ data }: PatientsViewProps) {
 
     const stats = useMemo(() => computeStats(patients), [patients]);
 
-    // ── Acciones CRUD ─────────────────────────────────────────────────────────
-
-    /**
-     * Agregar paciente.
-     * Backend: POST /api/patients
-     */
-    function handleAdd(newPatient: Patient) {
-        setPatients((prev) => [newPatient, ...prev]);
-        // TODO: await createPatient(newPatient)
+    async function handleAdd(patientData: any) {
+        setIsLoading(true);
+        try {
+            const newPatient = await createPatient(patientData);
+            setPatients((prev) => [newPatient, ...prev]);
+            setIsDialogOpen(false);
+        } catch (error) {
+            console.error("Error creating patient:", error);
+            alert("Error al crear paciente");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
-    /**
-     * Exportar reporte.
-     * Backend: GET /api/patients/report
-     */
     function handleExport() {
-        // TODO: await fetch(`/api/patients/report`) y descargar PDF/Excel
         console.log("[handleExport] exportar reporte de pacientes");
     }
 
-    /**
-     * Editar paciente.
-     * Backend: PUT /api/patients/:id
-     */
     function handleEdit(patient: Patient) {
-        // TODO: abrir EditPatientDialog con datos precargados
         console.log("[handleEdit] Paciente a editar:", patient);
     }
 
-    /**
-     * Eliminar paciente.
-     * Backend: DELETE /api/patients/:id
-     */
-    function handleDelete(id: string) {
-        setPatients((prev) => prev.filter((p) => p.id !== id));
-        // TODO: await deletePatient(id)
+    async function handleDelete(id: string) {
+        if (!confirm("¿Estás seguro de eliminar este paciente?")) return;
+
+        setIsLoading(true);
+        try {
+            await deletePatient(id);
+            setPatients((prev) => prev.filter((p) => p.id !== id));
+        } catch (error) {
+            console.error("Error deleting patient:", error);
+            alert("Error al eliminar paciente");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
-    /**
-     * Activar / desactivar paciente.
-     * Backend: PATCH /api/patients/:id/status  { status: newStatus }
-     */
-    function handleToggleStatus(id: string, newStatus: PatientStatus) {
-        setPatients((prev) =>
-            prev.map((p) => p.id === id ? { ...p, status: newStatus } : p)
-        );
-        // TODO: await updatePatientStatus(id, newStatus)
+    async function handleToggleStatus(id: string, newStatus: PatientStatus) {
+        setIsLoading(true);
+        try {
+            await updatePatientStatus(id, newStatus);
+            setPatients((prev) =>
+                prev.map((p) => p.id === id ? { ...p, status: newStatus } : p)
+            );
+        } catch (error) {
+            console.error("Error updating patient status:", error);
+            alert("Error al actualizar estado");
+        } finally {
+            setIsLoading(false);
+        }
     }
-
-    // ── Render ────────────────────────────────────────────────────────────────
 
     return (
         <>

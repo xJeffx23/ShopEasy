@@ -3,11 +3,10 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PacientesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async findAll() {
     return this.prisma.paciente.findMany({
-      where: { Activo: true },
       include: {
         Nivel_Asistencia: true,
         Medicamentos: { where: { Activo: true } },
@@ -46,7 +45,7 @@ export class PacientesService {
   async create(createPatientDto: any) {
     try {
       console.log('Creating patient with data:', createPatientDto);
-      
+
       // Usar directamente los datos del frontend - ya vienen formateados correctamente
       const result = await this.prisma.paciente.create({
         data: createPatientDto,

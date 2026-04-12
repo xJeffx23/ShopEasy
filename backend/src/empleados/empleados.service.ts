@@ -7,7 +7,6 @@ export class EmpleadosService {
 
   async findAll() {
     return this.prisma.empleado.findMany({
-      where: { Activo: true },
       include: {
         Departamento: true,
         Perfil: true,

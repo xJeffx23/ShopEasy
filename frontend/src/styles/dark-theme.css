@@ -1,0 +1,453 @@
+/* 
+  TEMA OSCuro COMPLETO - Máxima especificidad para cubrir toda la aplicación
+  Este archivo sobrescribe absolutamente todos los estilos para el tema oscuro
+*/
+
+/* Aplicación global del tema oscuro */
+html.dark,
+html[data-theme="dark"] {
+  color-scheme: dark !important;
+}
+
+/* Body y contenedor principal */
+html.dark body,
+html[data-theme="dark"] body,
+.dark body,
+body.dark {
+  background-color: #0f172a !important;
+  background: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+/* Todos los elementos dentro del body */
+html.dark *,
+html[data-theme="dark"] *,
+.dark *,
+body.dark * {
+  border-color: #334155 !important;
+}
+
+/* Fondos - Sobrescritura completa */
+html.dark [class*="bg-"],
+html[data-theme="dark"] [class*="bg-"],
+.dark [class*="bg-"] {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-white,
+html[data-theme="dark"] .bg-white,
+.dark .bg-white {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-slate-50,
+html[data-theme="dark"] .bg-slate-50,
+.dark .bg-slate-50 {
+  background-color: #0f172a !important;
+}
+
+html.dark .bg-slate-100,
+html[data-theme="dark"] .bg-slate-100,
+.dark .bg-slate-100 {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-slate-200,
+html[data-theme="dark"] .bg-slate-200,
+.dark .bg-slate-200 {
+  background-color: #334155 !important;
+}
+
+html.dark .bg-slate-300,
+html[data-theme="dark"] .bg-slate-300,
+.dark .bg-slate-300 {
+  background-color: #475569 !important;
+}
+
+html.dark .bg-slate-800,
+html[data-theme="dark"] .bg-slate-800,
+.dark .bg-slate-800 {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-slate-900,
+html[data-theme="dark"] .bg-slate-900,
+.dark .bg-slate-900 {
+  background-color: #0f172a !important;
+}
+
+html.dark .bg-gray-50,
+html[data-theme="dark"] .bg-gray-50,
+.dark .bg-gray-50 {
+  background-color: #0f172a !important;
+}
+
+html.dark .bg-gray-100,
+html[data-theme="dark"] .bg-gray-100,
+.dark .bg-gray-100 {
+  background-color: #1e293b !important;
+}
+
+/* Textos - Sobrescritura completa */
+html.dark [class*="text-"],
+html[data-theme="dark"] [class*="text-"],
+.dark [class*="text-"] {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-900,
+html[data-theme="dark"] .text-slate-900,
+.dark .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-800,
+html[data-theme="dark"] .text-slate-800,
+.dark .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-slate-700,
+html[data-theme="dark"] .text-slate-700,
+.dark .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-600,
+html[data-theme="dark"] .text-slate-600,
+.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-slate-500,
+html[data-theme="dark"] .text-slate-500,
+.dark .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-slate-400,
+html[data-theme="dark"] .text-slate-400,
+.dark .text-slate-400 {
+  color: #64748b !important;
+}
+
+html.dark .text-slate-300,
+html[data-theme="dark"] .text-slate-300,
+.dark .text-slate-300 {
+  color: #475569 !important;
+}
+
+html.dark .text-gray-900,
+html[data-theme="dark"] .text-gray-900,
+.dark .text-gray-900 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-gray-800,
+html[data-theme="dark"] .text-gray-800,
+.dark .text-gray-800 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-gray-700,
+html[data-theme="dark"] .text-gray-700,
+.dark .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-gray-600,
+html[data-theme="dark"] .text-gray-600,
+.dark .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+/* Bordes - Sobrescritura completa */
+html.dark [class*="border-"],
+html[data-theme="dark"] [class*="border-"],
+.dark [class*="border-"] {
+  border-color: #334155 !important;
+}
+
+html.dark .border-slate-200,
+html[data-theme="dark"] .border-slate-200,
+.dark .border-slate-200 {
+  border-color: #334155 !important;
+}
+
+html.dark .border-slate-300,
+html[data-theme="dark"] .border-slate-300,
+.dark .border-slate-300 {
+  border-color: #475569 !important;
+}
+
+html.dark .border-slate-400,
+html[data-theme="dark"] .border-slate-400,
+.dark .border-slate-400 {
+  border-color: #64748b !important;
+}
+
+/* Componentes específicos */
+html.dark .card,
+html[data-theme="dark"] .card,
+.dark .card,
+html.dark [class*="Card"],
+html[data-theme="dark"] [class*="Card"],
+.dark [class*="Card"] {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html.dark input,
+html.dark textarea,
+html.dark select,
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select,
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus,
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] textarea:focus,
+html[data-theme="dark"] select:focus,
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #60a5fa !important;
+  outline-color: #60a5fa !important;
+}
+
+/* Botones */
+html.dark button,
+html.dark [role="button"],
+html[data-theme="dark"] button,
+html[data-theme="dark"] [role="button"],
+.dark button,
+.dark [role="button"] {
+  background-color: #374151 !important;
+  color: #f8fafc !important;
+  border-color: #4b5563 !important;
+}
+
+html.dark .bg-blue-600,
+html.dark button.bg-blue-600,
+html[data-theme="dark"] .bg-blue-600,
+html[data-theme="dark"] button.bg-blue-600,
+.dark .bg-blue-600,
+.dark button.bg-blue-600 {
+  background-color: #3b82f6 !important;
+}
+
+html.dark .hover\:bg-blue-700:hover,
+html.dark button.bg-blue-600:hover,
+html[data-theme="dark"] .hover\:bg-blue-700:hover,
+html[data-theme="dark"] button.bg-blue-600:hover,
+.dark .hover\:bg-blue-700:hover,
+.dark button.bg-blue-600:hover {
+  background-color: #2563eb !important;
+}
+
+/* Sidebar específico */
+html.dark .bg-slate-900,
+html[data-theme="dark"] .bg-slate-900,
+.dark .bg-slate-900,
+html.dark aside,
+html[data-theme="dark"] aside,
+.dark aside {
+  background-color: #0f172a !important;
+}
+
+/* Tablas */
+html.dark table,
+html.dark tbody,
+html.dark thead,
+html.dark tr,
+html.dark th,
+html.dark td,
+html[data-theme="dark"] table,
+html[data-theme="dark"] tbody,
+html[data-theme="dark"] thead,
+html[data-theme="dark"] tr,
+html[data-theme="dark"] th,
+html[data-theme="dark"] td,
+.dark table,
+.dark tbody,
+.dark thead,
+.dark tr,
+.dark th,
+.dark td {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+/* Hover states universales */
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-100:hover,
+html.dark .hover\:bg-white:hover,
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-gray-100:hover,
+html[data-theme="dark"] .hover\:bg-slate-50:hover,
+html[data-theme="dark"] .hover\:bg-slate-100:hover,
+html[data-theme="dark"] .hover\:bg-white:hover,
+html[data-theme="dark"] .hover\:bg-gray-50:hover,
+html[data-theme="dark"] .hover\:bg-gray-100:hover,
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-white:hover,
+.dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-gray-100:hover {
+  background-color: #334155 !important;
+}
+
+html.dark .hover\:text-slate-900:hover,
+html.dark .hover\:text-slate-800:hover,
+html.dark .hover\:text-slate-700:hover,
+html[data-theme="dark"] .hover\:text-slate-900:hover,
+html[data-theme="dark"] .hover\:text-slate-800:hover,
+html[data-theme="dark"] .hover\:text-slate-700:hover,
+.dark .hover\:text-slate-900:hover,
+.dark .hover\:text-slate-800:hover,
+.dark .hover\:text-slate-700:hover {
+  color: #f8fafc !important;
+}
+
+/* Modales y overlays */
+html.dark .bg-black\/50,
+html.dark .bg-opacity-50,
+html[data-theme="dark"] .bg-black\/50,
+html[data-theme="dark"] .bg-opacity-50,
+.dark .bg-black\/50,
+.dark .bg-opacity-50 {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .fixed,
+html.dark .absolute,
+html.dark .relative,
+html[data-theme="dark"] .fixed,
+html[data-theme="dark"] .absolute,
+html[data-theme="dark"] .relative,
+.dark .fixed,
+.dark .absolute,
+.dark .relative {
+  background-color: inherit !important;
+}
+
+/* Scrollbar personalizada */
+html.dark ::-webkit-scrollbar,
+html[data-theme="dark"] ::-webkit-scrollbar,
+.dark ::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+html.dark ::-webkit-scrollbar-track,
+html[data-theme="dark"] ::-webkit-scrollbar-track,
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b !important;
+}
+
+html.dark ::-webkit-scrollbar-thumb,
+html[data-theme="dark"] ::-webkit-scrollbar-thumb,
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569 !important;
+  border-radius: 4px !important;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover,
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover,
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b !important;
+}
+
+/* Forzar tema oscuro en elementos específicos */
+html.dark .min-h-screen,
+html.dark .container,
+html.dark .main,
+html.dark .content,
+html.dark .wrapper,
+html[data-theme="dark"] .min-h-screen,
+html[data-theme="dark"] .container,
+html[data-theme="dark"] .main,
+html[data-theme="dark"] .content,
+html[data-theme="dark"] .wrapper,
+.dark .min-h-screen,
+.dark .container,
+.dark .main,
+.dark .content,
+.dark .wrapper {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+/* Asegurar que todos los divs y contenedores tengan fondo oscuro */
+html.dark div,
+html.dark section,
+html.dark main,
+html.dark article,
+html.dark aside,
+html.dark nav,
+html.dark header,
+html.dark footer,
+html[data-theme="dark"] div,
+html[data-theme="dark"] section,
+html[data-theme="dark"] main,
+html[data-theme="dark"] article,
+html[data-theme="dark"] aside,
+html[data-theme="dark"] nav,
+html[data-theme="dark"] header,
+html[data-theme="dark"] footer,
+.dark div,
+.dark section,
+.dark main,
+.dark article,
+.dark aside,
+.dark nav,
+.dark header,
+.dark footer {
+  background-color: inherit !important;
+}
+
+/* Forzar texto claro en todos los elementos */
+html.dark *,
+html[data-theme="dark"] *,
+.dark * {
+  color: #f8fafc !important;
+}
+
+/* Excepciones para elementos que deben mantener su color original */
+html.dark svg,
+html.dark img,
+html.dark video,
+html.dark canvas,
+html[data-theme="dark"] svg,
+html[data-theme="dark"] img,
+html[data-theme="dark"] video,
+html[data-theme="dark"] canvas,
+.dark svg,
+.dark img,
+.dark video,
+.dark canvas {
+  color: inherit !important;
+}
+
+/* Aplicar a todas las clases posibles */
+html.dark [class*="bg-"],
+html.dark [class*="background"],
+html.dark [style*="background"],
+html[data-theme="dark"] [class*="bg-"],
+html[data-theme="dark"] [class*="background"],
+html[data-theme="dark"] [style*="background"],
+.dark [class*="bg-"],
+.dark [class*="background"],
+.dark [style*="background"] {
+  background-color: #1e293b !important;
+  background: #1e293b !important;
+}

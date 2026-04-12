@@ -8,6 +8,8 @@ import { HabitacionesModule } from './habitaciones/habitaciones.module';
 import { ReservacionesModule } from './reservaciones/reservaciones.module';
 import { ReportesModule } from './reportes/reportes.module';
 import { CatalogosModule } from './catalogos/catalogos.module';
+import { LimpiezasModule } from './limpiezas/limpiezas.module';
+import { MantenimientosModule } from './mantenimientos/mantenimientos.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { CatalogosModule } from './catalogos/catalogos.module';
     ReservacionesModule,
     ReportesModule,
     CatalogosModule,
+    LimpiezasModule,
+    MantenimientosModule,
   ],
 })
 export class AppModule {}

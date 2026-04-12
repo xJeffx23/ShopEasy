@@ -100,28 +100,7 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
                             className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100 focus:bg-slate-100"
                         >
                             <Pencil className="h-3.5 w-3.5 text-slate-400" />
-                            Editar empleado
-                        </DropdownMenu.Item>
-
-                        {/* Cambiar perfil */}
-                        <DropdownMenu.Item
-                            onSelect={() => onEdit?.(employee)}
-                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100 focus:bg-slate-100"
-                        >
-                            <ShieldCheck className="h-3.5 w-3.5 text-slate-400" />
-                            Cambiar perfil
-                        </DropdownMenu.Item>
-
-                        {/* Activar / Desactivar */}
-                        <DropdownMenu.Item
-                            onSelect={() => onToggleStatus?.(employee.id, nextStatus)}
-                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100 focus:bg-slate-100"
-                        >
-                            {isActive
-                                ? <UserX className="h-3.5 w-3.5 text-amber-500" />
-                                : <UserCheck className="h-3.5 w-3.5 text-emerald-500" />
-                            }
-                            {isActive ? "Desactivar empleado" : "Activar empleado"}
+                            Editar información
                         </DropdownMenu.Item>
 
                         <DropdownMenu.Separator className="my-1 h-px bg-slate-100" />

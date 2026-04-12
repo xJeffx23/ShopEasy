@@ -107,8 +107,8 @@ export function PatientDetailModal({
                                             Sin medicamentos registrados.
                                         </p>
                                     ) : (
-                                        patient.medications.map((med) => (
-                                            <div key={med.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                                        patient.medications.map((med, index) => (
+                                            <div key={med.id || `med-${index}`} className="rounded-xl border border-slate-200 bg-white p-4">
                                                 <div className="flex items-center justify-between">
                                                     <p className="font-semibold text-slate-900">{med.name}</p>
                                                     <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
@@ -135,8 +135,8 @@ export function PatientDetailModal({
                                             Sin cuidados especiales registrados.
                                         </p>
                                     ) : (
-                                        patient.specialCares.map((care) => (
-                                            <div key={care.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                                        patient.specialCares.map((care, index) => (
+                                            <div key={care.id || `care-${index}`} className="rounded-xl border border-slate-200 bg-white p-4">
                                                 <p className="font-semibold text-slate-900">{care.type}</p>
                                                 <p className="mt-1 text-xs text-slate-500">{care.detail}</p>
                                             </div>
@@ -153,8 +153,8 @@ export function PatientDetailModal({
                                             Sin paquetes adicionales asignados.
                                         </p>
                                     ) : (
-                                        patient.packages.map((pkg) => (
-                                            <div key={pkg.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4">
+                                        patient.packages.map((pkg, index) => (
+                                            <div key={pkg.id || `pkg-${index}`} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4">
                                                 <div>
                                                     <p className="font-semibold text-slate-900">{pkg.type}</p>
                                                     <p className="mt-0.5 text-xs text-slate-500">
@@ -180,7 +180,7 @@ export function PatientDetailModal({
                                 Contacto de Emergencia
                             </p>
                             <p className="mt-1 text-sm text-slate-500">
-                                {patient.emergencyContact.name} — {patient.emergencyContact.phone}
+                                {patient.emergencyContact?.name || 'Contacto de emergencia'} - {patient.emergencyContact?.phone || 'N/A'}
                             </p>
                         </div>
                     </div>

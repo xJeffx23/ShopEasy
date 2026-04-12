@@ -18,12 +18,28 @@ export async function getPatientsData(): Promise<PatientsData> {
       assistanceLevel: mapAssistanceLevel(paciente.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
       status: paciente.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
       emergencyContact: {
-        name: 'Contacto de emergencia', // TODO: Obtener desde campo real
-        phone: paciente.Telefono || 'N/A'
+        name: paciente.Nombre_Contacto_Emergencia || 'Contacto de emergencia',
+        phone: paciente.Telefono_Contacto_Emergencia || 'N/A'
       },
-      medications: [], // TODO: Mapear desde medicamentos del paciente
-      specialCares: [], // TODO: Mapear desde cuidados especiales
-      packages: [] // TODO: Mapear desde paquetes adicionales
+      medications: paciente.Medicamentos?.map((med: any) => ({
+        id: med.idPaciente_Medicamento.toString(),
+        name: med.Nombre_Medicamento,
+        dose: med.Dosis,
+        frequency: med.Frecuencia,
+        schedule: '', // Campo no existe en backend
+        notes: med.Indicaciones || undefined
+      })) || [],
+      specialCares: paciente.Cuidados?.map((care: any) => ({
+        id: care.idPaciente_Cuidado.toString(),
+        type: care.Tipo_Cuidado?.Descripcion_Cuidado || 'Cuidado especial',
+        detail: care.Detalle
+      })) || [],
+      packages: paciente.Paquetes?.map((pkg: any) => ({
+        id: pkg.idPaciente_Paquete.toString(),
+        type: pkg.Paquete?.Nombre_Paquete || 'Paquete adicional',
+        assignedDate: new Date(pkg.Fecha_Asignacion).toLocaleDateString('es-CR'),
+        active: pkg.Activo
+      })) || []
     }));
 
     // Calcular estadísticas
@@ -94,7 +110,24 @@ export async function createPatient(patientData: any): Promise<Patient> {
       Direccion: patientData.address || '',
       Fecha_Ingreso: new Date().toISOString(),
       Catalogo_Nivel_Asistencia_idNivel: mapAssistanceLevelToId(patientData.assistanceLevel || 'Asistencia básica'),
-      Activo: true
+      Activo: true,
+      // Incluir medicamentos, cuidados y paquetes
+      Medicamentos: patientData.medications?.map((med: any) => ({
+        Nombre_Medicamento: med.name,
+        Dosis: med.dose,
+        Frecuencia: med.frequency,
+        Indicaciones: med.notes || '',
+        Activo: true
+      })) || [],
+      Cuidados: patientData.specialCares?.map((care: any) => ({
+        Detalle: care.detail,
+        Catalogo_Cuidado_Especial_idCuidado: 1 // TODO: Mapear tipo de cuidado a ID
+      })) || [],
+      Paquetes: patientData.packages?.map((pkg: any) => ({
+        Fecha_Asignacion: new Date().toISOString(),
+        Activo: pkg.active,
+        Catalogo_Paquete_idPaquete: 1 // TODO: Mapear tipo de paquete a ID
+      })) || []
     };
     
     const response = await pacientesService.create(backendData);

@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { BedDouble, Brush, Plus, Save, Wrench, X } from "lucide-react";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Button } from "@/src/components/ui/button";
 import { Room, RoomCleaning, RoomMaintenance } from "@/src/types/room";
+import { roomCleaningService, roomMaintenanceService } from "@/src/services/room-operations.service";
+import FilterCombobox from "@/src/components/ui/filter-combobox";
+import { getEmployeesForSelect, EmployeeOption } from "@/src/services/employees-select.service";
 
 interface RoomDetailModalProps {
     room: Room | null;
@@ -57,6 +60,7 @@ function formatDateFromInput(value: string) {
 interface CleaningFormValues {
     date: string;
     employeeName: string;
+    employeeId: number | null;
     notes: string;
 }
 
@@ -67,15 +71,16 @@ interface MaintenanceFormValues {
     furnitureDetail: string;
     recommendedRepairs: string;
     employeeName: string;
+    employeeId: number | null;
 }
 
 const initCleaning: CleaningFormValues = {
-    date: "", employeeName: "", notes: "",
+    date: "", employeeName: "", employeeId: null, notes: "",
 };
 
 const initMaintenance: MaintenanceFormValues = {
     date: "", repairDescription: "", furnitureUpdate: false,
-    furnitureDetail: "", recommendedRepairs: "", employeeName: "",
+    furnitureDetail: "", recommendedRepairs: "", employeeName: "", employeeId: null,
 };
 
 // ─── Componente principal ─────────────────────────────────────────────────────
@@ -88,39 +93,71 @@ export function RoomDetailModal({
     const [showMaintenanceForm, setShowMaintenanceForm] = useState(false);
     const [cleaningForm, setCleaningForm] = useState<CleaningFormValues>(initCleaning);
     const [maintenanceForm, setMaintenanceForm] = useState<MaintenanceFormValues>(initMaintenance);
+    const [employees, setEmployees] = useState<EmployeeOption[]>([]);
+    const [loadingEmployees, setLoadingEmployees] = useState(false);
+
+    useEffect(() => {
+        async function loadEmployees() {
+            setLoadingEmployees(true);
+            try {
+                const employeesData = await getEmployeesForSelect();
+                setEmployees(employeesData);
+            } catch (error) {
+                console.error('Error loading employees:', error);
+            } finally {
+                setLoadingEmployees(false);
+            }
+        }
+
+        if (open) {
+            loadEmployees();
+        }
+    }, [open]);
 
     if (!room) return null;
 
     const inputCls = "h-9 rounded-xl border-slate-200 bg-white text-sm focus:border-blue-300 focus:ring-2 focus:ring-blue-100";
 
-    function handleAddCleaning() {
-        if (!room || !cleaningForm.date || !cleaningForm.employeeName.trim()) return;
-        const cleaning: RoomCleaning = {
-            id: crypto.randomUUID(),
-            date: formatDateFromInput(cleaningForm.date),
-            employeeName: cleaningForm.employeeName.trim(),
-            notes: cleaningForm.notes.trim() || undefined,
-        };
-        onAddCleaning?.(room.id, cleaning);
-        setCleaningForm(initCleaning);
-        setShowCleaningForm(false);
+    async function handleAddCleaning() {
+        if (!room || !cleaningForm.date || !cleaningForm.employeeId) return;
+        try {
+            const cleaning: Omit<RoomCleaning, 'id'> & { employeeId: number | null } = {
+                date: formatDateFromInput(cleaningForm.date),
+                employeeName: cleaningForm.employeeName.trim(),
+                employeeId: cleaningForm.employeeId,
+                notes: cleaningForm.notes.trim() || undefined,
+            };
+            const newCleaning = await roomCleaningService.addRoomCleaning(room.id, cleaning);
+            onAddCleaning?.(room.id, newCleaning);
+            setCleaningForm(initCleaning);
+            setShowCleaningForm(false);
+        } catch (error) {
+            console.error('Error al agregar limpieza:', error);
+            // Aquí podrías mostrar un mensaje de error al usuario
+        }
     }
 
-    function handleAddMaintenance() {
-        if (!room || !maintenanceForm.date || !maintenanceForm.repairDescription.trim() || !maintenanceForm.employeeName.trim()) return;
-        const maintenance: RoomMaintenance = {
-            id: crypto.randomUUID(),
-            date: formatDateFromInput(maintenanceForm.date),
-            repairDescription: maintenanceForm.repairDescription.trim(),
-            furnitureUpdate: maintenanceForm.furnitureUpdate,
-            furnitureDetail: maintenanceForm.furnitureDetail.trim() || undefined,
-            recommendedRepairs: maintenanceForm.recommendedRepairs.trim() || undefined,
-            completed: false,
-            employeeName: maintenanceForm.employeeName.trim(),
-        };
-        onAddMaintenance?.(room.id, maintenance);
-        setMaintenanceForm(initMaintenance);
-        setShowMaintenanceForm(false);
+    async function handleAddMaintenance() {
+        if (!room || !maintenanceForm.date || !maintenanceForm.repairDescription.trim() || !maintenanceForm.employeeId) return;
+        try {
+            const maintenance: Omit<RoomMaintenance, 'id'> & { employeeId: number | null } = {
+                date: formatDateFromInput(maintenanceForm.date),
+                repairDescription: maintenanceForm.repairDescription.trim(),
+                furnitureUpdate: maintenanceForm.furnitureUpdate,
+                furnitureDetail: maintenanceForm.furnitureDetail.trim() || undefined,
+                recommendedRepairs: maintenanceForm.recommendedRepairs.trim() || undefined,
+                completed: false,
+                employeeName: maintenanceForm.employeeName.trim(),
+                employeeId: maintenanceForm.employeeId,
+            };
+            const newMaintenance = await roomMaintenanceService.addRoomMaintenance(room.id, maintenance);
+            onAddMaintenance?.(room.id, newMaintenance);
+            setMaintenanceForm(initMaintenance);
+            setShowMaintenanceForm(false);
+        } catch (error) {
+            console.error('Error al agregar mantenimiento:', error);
+            // Aquí podrías mostrar un mensaje de error al usuario
+        }
     }
 
     const tabs: { id: Tab; label: string; icon: React.ReactNode; count: number }[] = [
@@ -250,11 +287,19 @@ export function RoomDetailModal({
                                                 <div className="space-y-1">
                                                     {/* b.ii Personal */}
                                                     <Label className="text-[11px] text-slate-400">Personal que efectuó la limpieza</Label>
-                                                    <Input
+                                                    <FilterCombobox
                                                         value={cleaningForm.employeeName}
-                                                        onChange={(e) => setCleaningForm((p) => ({ ...p, employeeName: e.target.value }))}
-                                                        placeholder="Nombre del empleado"
-                                                        className={inputCls}
+                                                        onChange={(value) => {
+                                                            const selectedEmployee = employees.find(emp => emp.value === value);
+                                                            setCleaningForm((p) => ({ 
+                                                                ...p, 
+                                                                employeeName: selectedEmployee?.nombre || value,
+                                                                employeeId: selectedEmployee?.id || null
+                                                            }));
+                                                        }}
+                                                        options={employees}
+                                                        placeholder={loadingEmployees ? "Cargando empleados..." : "Seleccionar empleado"}
+                                                        emptyMessage="No se encontraron empleados"
                                                     />
                                                 </div>
                                             </div>
@@ -290,17 +335,63 @@ export function RoomDetailModal({
 
                                     {/* Lista de limpiezas */}
                                     {room.cleanings.length === 0 ? (
-                                        <p className="py-4 text-center text-sm text-slate-400">Sin registros de limpieza.</p>
-                                    ) : (
-                                        [...room.cleanings].reverse().map((c) => (
-                                            <div key={c.id} className="rounded-xl border border-slate-200 bg-white p-3">
-                                                <div className="flex items-center justify-between">
-                                                    <p className="text-sm font-semibold text-slate-900">{c.date}</p>
-                                                </div>
-                                                <p className="text-xs text-slate-500">Personal: {c.employeeName}</p>
-                                                {c.notes && <p className="mt-0.5 text-xs text-slate-400">{c.notes}</p>}
+                                        <div className="py-8 text-center">
+                                            <div className="mx-auto w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-3">
+                                                <Brush className="w-6 h-6 text-blue-400" />
                                             </div>
-                                        ))
+                                            <p className="text-sm text-slate-400">Sin registros de limpieza</p>
+                                            <p className="text-xs text-slate-300 mt-1">Los registros aparecerán aquí cuando se registren limpiezas</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between px-1">
+                                                <h4 className="text-xs font-medium text-slate-600">Historial de limpiezas</h4>
+                                                <span className="text-xs text-slate-400">{room.cleanings.length} registros</span>
+                                            </div>
+                                            {[...room.cleanings].reverse().map((c, index) => (
+                                                <div key={c.id} className="rounded-xl border border-slate-200 bg-white p-4 hover:shadow-sm transition-shadow">
+                                                    <div className="flex items-start justify-between mb-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                                                <Brush className="w-4 h-4 text-blue-600" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-semibold text-slate-900">{c.date}</p>
+                                                                <p className="text-xs text-slate-500">Registro #{room.cleanings.length - index}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                                                            <span className="text-xs text-green-600 font-medium">Completado</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+                                                                <span className="text-xs text-slate-600 font-medium">P</span>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-xs font-medium text-slate-700">Personal asignado</p>
+                                                                <p className="text-sm text-slate-900">{c.employeeName}</p>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {c.notes && (
+                                                            <div className="flex items-start gap-2">
+                                                                <div className="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center mt-0.5">
+                                                                    <span className="text-xs text-amber-600 font-medium">N</span>
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <p className="text-xs font-medium text-slate-700">Observaciones</p>
+                                                                    <p className="text-sm text-slate-600 bg-slate-50 rounded-lg p-2 mt-1">{c.notes}</p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     )}
                                 </div>
                             )}
@@ -337,11 +428,19 @@ export function RoomDetailModal({
                                                 </div>
                                                 <div className="space-y-1">
                                                     <Label className="text-[11px] text-slate-400">Personal responsable</Label>
-                                                    <Input
+                                                    <FilterCombobox
                                                         value={maintenanceForm.employeeName}
-                                                        onChange={(e) => setMaintenanceForm((p) => ({ ...p, employeeName: e.target.value }))}
-                                                        placeholder="Nombre del empleado"
-                                                        className={inputCls}
+                                                        onChange={(value) => {
+                                                            const selectedEmployee = employees.find(emp => emp.value === value);
+                                                            setMaintenanceForm((p) => ({ 
+                                                                ...p, 
+                                                                employeeName: selectedEmployee?.nombre || value,
+                                                                employeeId: selectedEmployee?.id || null
+                                                            }));
+                                                        }}
+                                                        options={employees}
+                                                        placeholder={loadingEmployees ? "Cargando empleados..." : "Seleccionar empleado"}
+                                                        emptyMessage="No se encontraron empleados"
                                                     />
                                                 </div>
                                             </div>
@@ -420,32 +519,89 @@ export function RoomDetailModal({
 
                                     {/* Lista de mantenimientos */}
                                     {room.maintenances.length === 0 ? (
-                                        <p className="py-4 text-center text-sm text-slate-400">Sin registros de mantenimiento.</p>
-                                    ) : (
-                                        [...room.maintenances].reverse().map((m) => (
-                                            <div key={m.id} className="rounded-xl border border-slate-200 bg-white p-3 space-y-1.5">
-                                                <div className="flex items-center justify-between">
-                                                    <p className="text-sm font-semibold text-slate-900">{m.repairDescription}</p>
-                                                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${m.completed ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
-                                                        }`}>
-                                                        {m.completed ? "Completado" : "Pendiente"}
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs text-slate-500">{m.date} · {m.employeeName}</p>
-                                                {m.furnitureUpdate && (
-                                                    <p className="text-xs text-slate-600">
-                                                        <span className="font-medium">Mobiliario actualizado:</span>{" "}
-                                                        {m.furnitureDetail ?? "Sí"}
-                                                    </p>
-                                                )}
-                                                {m.recommendedRepairs && (
-                                                    <p className="text-xs text-amber-600">
-                                                        <span className="font-medium">Recomendado:</span>{" "}
-                                                        {m.recommendedRepairs}
-                                                    </p>
-                                                )}
+                                        <div className="py-8 text-center">
+                                            <div className="mx-auto w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mb-3">
+                                                <Wrench className="w-6 h-6 text-amber-400" />
                                             </div>
-                                        ))
+                                            <p className="text-sm text-slate-400">Sin registros de mantenimiento</p>
+                                            <p className="text-xs text-slate-300 mt-1">Los registros aparecerán aquí cuando se registren mantenimientos</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between px-1">
+                                                <h4 className="text-xs font-medium text-slate-600">Historial de mantenimientos</h4>
+                                                <span className="text-xs text-slate-400">{room.maintenances.length} registros</span>
+                                            </div>
+                                            {[...room.maintenances].reverse().map((m, index) => (
+                                                <div key={m.id} className="rounded-xl border border-slate-200 bg-white p-4 hover:shadow-sm transition-shadow">
+                                                    <div className="flex items-start justify-between mb-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                                                                <Wrench className="w-4 h-4 text-amber-600" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-semibold text-slate-900 line-clamp-2">{m.repairDescription}</p>
+                                                                <p className="text-xs text-slate-500">Registro #{room.maintenances.length - index}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <div className={`w-2 h-2 rounded-full ${m.completed ? "bg-green-400" : "bg-amber-400"}`}></div>
+                                                            <span className={`text-xs font-medium ${m.completed ? "text-green-600" : "text-amber-600"}`}>
+                                                                {m.completed ? "Completado" : "Pendiente"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+                                                                <span className="text-xs text-slate-600 font-medium">P</span>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-xs font-medium text-slate-700">Personal responsable</p>
+                                                                <p className="text-sm text-slate-900">{m.employeeName}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center">
+                                                                <span className="text-xs text-blue-600 font-medium">F</span>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-xs font-medium text-slate-700">Fecha de registro</p>
+                                                                <p className="text-sm text-slate-900">{m.date}</p>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {m.furnitureUpdate && (
+                                                            <div className="flex items-start gap-2">
+                                                                <div className="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center mt-0.5">
+                                                                    <span className="text-xs text-purple-600 font-medium">M</span>
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <p className="text-xs font-medium text-slate-700">Actualización de mobiliario</p>
+                                                                    <p className="text-sm text-slate-600 bg-purple-50 rounded-lg p-2 mt-1">
+                                                                        {m.furnitureDetail || "Sí, se actualizó mobiliario"}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {m.recommendedRepairs && (
+                                                            <div className="flex items-start gap-2">
+                                                                <div className="w-6 h-6 rounded-full bg-orange-50 flex items-center justify-center mt-0.5">
+                                                                    <span className="text-xs text-orange-600 font-medium">R</span>
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <p className="text-xs font-medium text-slate-700">Reparaciones recomendadas</p>
+                                                                    <p className="text-sm text-slate-600 bg-orange-50 rounded-lg p-2 mt-1">{m.recommendedRepairs}</p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     )}
                                 </div>
                             )}

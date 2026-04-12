@@ -28,6 +28,7 @@ import type {
     PatientSpecialCare,
     PatientPackage,
 } from "@/src/types/patient";
+import { medicamentosService, type MedicamentoCatalogo } from "@/src/services/medicamentos.service";
 
 // ─── Opciones de selects ──────────────────────────────────────────────────────
 
@@ -196,6 +197,9 @@ export default function AddPatientDialog({
     const [careForm, setCareForm] = useState<CareForm>(initialCare);
     const [pkgForm, setPkgForm] = useState<PkgForm>(initialPkg);
 
+    // Opciones de medicamentos
+    const [medicamentosOptions, setMedicamentosOptions] = useState<any[]>([]);
+
     useEffect(() => {
         if (!open) {
             setActiveTab("basic");
@@ -210,6 +214,22 @@ export default function AddPatientDialog({
             setPkgForm(initialPkg);
         }
     }, [open]);
+
+    useEffect(() => {
+        // Cargar opciones de medicamentos cuando el diálogo se abre
+        if (open) {
+            loadMedicamentosOptions();
+        }
+    }, [open]);
+
+    async function loadMedicamentosOptions() {
+        try {
+            const options = await medicamentosService.getMedicamentosOptions();
+            setMedicamentosOptions(options);
+        } catch (error) {
+            console.error('Error al cargar opciones de medicamentos:', error);
+        }
+    }
 
     const generatedCode = useMemo(() => buildCode(nextPatientNumber), [nextPatientNumber]);
     const generatedDate = formatToday();
@@ -254,6 +274,28 @@ export default function AddPatientDialog({
             notes: medForm.notes.trim() || undefined,
         }]);
         setMedForm(initialMed);
+    }
+
+    function handleMedicamentoSelect(value: string) {
+        if (value === "all") {
+            setMedForm(initialMed);
+            return;
+        }
+
+        // Buscar el medicamento seleccionado
+        const selectedOption = medicamentosOptions.find(opt => opt.value === value);
+        if (selectedOption?.data) {
+            const medicamento: MedicamentoCatalogo = selectedOption.data;
+            setMedForm({
+                name: medicamento.nombre,
+                dose: medicamento.dosis || '',
+                frequency: medicamento.frecuencia || '',
+                schedule: '',
+                notes: medicamento.indicaciones || ''
+            });
+        } else {
+            setMedForm(prev => ({ ...prev, name: value }));
+        }
     }
 
     function addCare() {
@@ -572,8 +614,15 @@ export default function AddPatientDialog({
                                     <p className="text-xs font-medium text-slate-600">Agregar medicamento</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-1">
-                                            <Label className="text-[11px] text-slate-400">Nombre</Label>
-                                            <Input value={medForm.name} onChange={(e) => setMedForm((p) => ({ ...p, name: e.target.value }))} placeholder="Ej. Metformina" className="h-9 rounded-xl border-slate-200 bg-white text-sm" />
+                                            <Label className="text-[11px] text-slate-400">Medicamento</Label>
+                                            <FilterCombobox
+                                                value={medForm.name}
+                                                onChange={handleMedicamentoSelect}
+                                                options={medicamentosOptions}
+                                                placeholder="Seleccionar medicamento"
+                                                searchPlaceholder="Buscar medicamento..."
+                                                emptyMessage="No se encontraron medicamentos."
+                                            />
                                         </div>
                                         <div className="space-y-1">
                                             <Label className="text-[11px] text-slate-400">Dosis</Label>

@@ -3,9 +3,11 @@
 import { useMemo, useState } from "react";
 
 import AddEmployeeDialog from "@/src/components/employees/add-employee-dialog";
+import { EditEmployeeDialog } from "@/src/components/employees/edit-employee-dialog";
 import EmployeesFilters from "@/src/components/employees/employees-filters";
 import EmployeesHeader from "@/src/components/employees/employees-header";
 import EmployeesTable from "@/src/components/employees/employees-table";
+import { createEmployee, deleteEmployee, updateEmployeeStatus } from "@/src/services/employees.service";
 import type { EmployeeItem, EmployeesData, EmployeeStatus } from "@/src/types/employee";
 
 interface EmployeesViewProps {
@@ -26,6 +28,8 @@ export default function EmployeesView({ data }: EmployeesViewProps) {
     const [department, setDepartment] = useState("all");
     const [profile, setProfile] = useState("all");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editingEmployee, setEditingEmployee] = useState<EmployeeItem | null>(null);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
 
     // ── Filtrado ──────────────────────────────────────────────────────────────
 
@@ -42,7 +46,7 @@ export default function EmployeesView({ data }: EmployeesViewProps) {
                 normalize(emp.idNumber).includes(q);
 
             const matchDept = department === "all" || emp.department === department;
-            const matchProfile = profile === "all" || emp.profile === profile;
+            const matchProfile = profile === "all" || emp.role === profile;
 
             return matchSearch && matchDept && matchProfile;
         });
@@ -54,18 +58,24 @@ export default function EmployeesView({ data }: EmployeesViewProps) {
      * Agregar empleado.
      * Backend: POST /api/employees
      */
-    function handleAdd(newEmployee: EmployeeItem) {
-        setEmployees((prev) => [newEmployee, ...prev]);
+    async function handleAdd(newEmployee: EmployeeItem) {
+        try {
+            const createdEmployee = await createEmployee(newEmployee);
+            setEmployees((prev) => [createdEmployee, ...prev]);
+            console.log("[handleAdd] Empleado creado:", createdEmployee);
+        } catch (error) {
+            console.error('Error creating employee:', error);
+            // TODO: Mostrar mensaje de error al usuario
+        }
     }
 
     /**
      * Editar empleado.
      * Backend: PUT /api/employees/:id
-     * Por ahora abre el mismo dialog de agregar reutilizando los datos.
-     * TODO: implementar EditEmployeeDialog cuando el backend esté listo.
      */
     function handleEdit(employee: EmployeeItem) {
-        // TODO: abrir dialog de edición con datos precargados
+        setEditingEmployee(employee);
+        setEditDialogOpen(true);
         console.log("[handleEdit] Empleado a editar:", employee);
     }
 
@@ -73,22 +83,46 @@ export default function EmployeesView({ data }: EmployeesViewProps) {
      * Eliminar empleado.
      * Backend: DELETE /api/employees/:id
      */
-    function handleDelete(id: string) {
-        setEmployees((prev) => prev.filter((emp) => emp.id !== id));
-        // TODO: await deleteEmployee(id)
+    async function handleDelete(id: string) {
+        try {
+            await deleteEmployee(id);
+            setEmployees((prev) => prev.filter((emp) => emp.id !== id));
+            console.log("[handleDelete] Empleado eliminado:", id);
+        } catch (error) {
+            console.error('Error deleting employee:', error);
+            // TODO: Mostrar mensaje de error al usuario
+        }
     }
 
     /**
      * Activar / desactivar empleado.
      * Backend: PATCH /api/employees/:id/status  { status: newStatus }
      */
-    function handleToggleStatus(id: string, newStatus: EmployeeStatus) {
+    async function handleToggleStatus(id: string, newStatus: EmployeeStatus) {
+        try {
+            const updatedEmployee = await updateEmployeeStatus(id, newStatus);
+            setEmployees((prev) =>
+                prev.map((emp) =>
+                    emp.id === id ? updatedEmployee : emp
+                )
+            );
+            console.log("[handleToggleStatus] Estado actualizado:", id, newStatus);
+        } catch (error) {
+            console.error('Error updating employee status:', error);
+            // TODO: Mostrar mensaje de error al usuario
+        }
+    }
+
+    /**
+     * Manejar actualización de empleado después de editar
+     */
+    function handleEmployeeUpdated(updatedEmployee: EmployeeItem) {
         setEmployees((prev) =>
             prev.map((emp) =>
-                emp.id === id ? { ...emp, status: newStatus } : emp
+                emp.id === updatedEmployee.id ? updatedEmployee : emp
             )
         );
-        // TODO: await updateEmployeeStatus(id, newStatus)
+        console.log("[handleEmployeeUpdated] Empleado actualizado en la lista:", updatedEmployee);
     }
 
     // ── Render ────────────────────────────────────────────────────────────────
@@ -124,6 +158,13 @@ export default function EmployeesView({ data }: EmployeesViewProps) {
                 onOpenChange={setIsDialogOpen}
                 onSubmit={handleAdd}
                 nextEmployeeNumber={employees.length + 1}
+            />
+
+            <EditEmployeeDialog
+                open={editDialogOpen}
+                onOpenChange={setEditDialogOpen}
+                employee={editingEmployee}
+                onEmployeeUpdated={handleEmployeeUpdated}
             />
         </>
     );

@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { RoomsHeader } from "@/src/components/rooms/rooms-header";
 import { RoomsStatusSummary } from "@/src/components/rooms/rooms-status-summary";
 import { RoomsGrid } from "@/src/components/rooms/rooms-grid";
+import { getRoomsData, createRoom, updateRoomStatus, deleteRoom } from "@/src/services/rooms.service";
+import { roomCleaningService, roomMaintenanceService } from "@/src/services/room-operations.service";
 import AddRoomDialog from "@/src/components/rooms/add-room-dialog";
 import type {
     Room, RoomCleaning, RoomMaintenance,
@@ -36,57 +38,94 @@ export default function RoomsView({ data }: RoomsViewProps) {
      * Agregar habitación.
      * Backend: POST /api/rooms
      */
-    function handleAdd(newRoom: Room) {
-        setRooms((prev) => [...prev, newRoom]);
-        // TODO: await createRoom(newRoom)
+    async function handleAdd(newRoom: Room) {
+        try {
+            // Llamar al backend para crear la habitación
+            const createdRoom = await createRoom({
+                roomNumber: newRoom.roomNumber,
+                floor: newRoom.floor,
+                type: newRoom.type,
+                capacity: newRoom.capacity,
+                status: newRoom.status,
+                observations: newRoom.observations
+            });
+            
+            // Agregar la habitación creada al estado local
+            setRooms((prev) => [...prev, createdRoom]);
+        } catch (error) {
+            console.error('Error al crear habitación:', error);
+            // Aquí podrías mostrar un toast o notificación de error
+        }
     }
 
     /**
      * Cambiar estado.
      * Backend: PATCH /api/rooms/:id/status  { status }
      */
-    function handleChangeStatus(id: string, status: RoomStatus) {
-        setRooms((prev) => prev.map((r) => r.id === id ? { ...r, status } : r));
-        // TODO: await updateRoomStatus(id, status)
+    async function handleChangeStatus(id: string, status: RoomStatus) {
+        try {
+            // Actualizar en el backend
+            const updatedRoom = await updateRoomStatus(id, status);
+            
+            // Actualizar estado local con la respuesta del backend
+            setRooms((prev) => prev.map((r) => r.id === id ? updatedRoom : r));
+        } catch (error) {
+            console.error('Error al cambiar estado de habitación:', error);
+            // Aquí podrías mostrar un toast o notificación de error
+        }
     }
 
     /**
      * Eliminar habitación.
      * Backend: DELETE /api/rooms/:id
      */
-    function handleDelete(id: string) {
-        setRooms((prev) => prev.filter((r) => r.id !== id));
-        // TODO: await deleteRoom(id)
+    async function handleDelete(id: string) {
+        try {
+            // Eliminar en el backend
+            await deleteRoom(id);
+            
+            // Eliminar del estado local
+            setRooms((prev) => prev.filter((r) => r.id !== id));
+        } catch (error) {
+            console.error('Error al eliminar habitación:', error);
+            // Aquí podrías mostrar un toast o notificación de error
+        }
     }
 
     /**
      * Registrar limpieza (enunciado b.i y b.ii).
-     * Backend: POST /api/rooms/:id/cleanings
+     * Backend: POST /api/limpiezas
      */
-    function handleAddCleaning(roomId: string, cleaning: RoomCleaning) {
-        setRooms((prev) =>
-            prev.map((r) =>
-                r.id === roomId
-                    ? { ...r, cleanings: [...r.cleanings, cleaning] }
+    async function handleAddCleaning(roomId: string, cleaning: RoomCleaning) {
+        try {
+            // La limpieza ya se guardó en el backend en el modal
+            // Solo actualizamos el estado local
+            setRooms((prev) => prev.map((r) => 
+                r.id === roomId 
+                    ? { ...r, cleanings: [cleaning, ...r.cleanings] }
                     : r
-            )
-        );
-        // TODO: await createCleaning(roomId, cleaning)
+            ));
+        } catch (error) {
+            console.error('Error al agregar limpieza:', error);
+        }
     }
 
     /**
-     * Registrar mantenimiento (enunciado c.i, c.ii y c.iii).
-     * Backend: POST /api/rooms/:id/maintenances
+     * Registrar mantenimiento (enunciado c.i, c.ii, c.iii).
+     * Backend: POST /api/mantenimientos
      */
-    function handleAddMaintenance(roomId: string, maintenance: RoomMaintenance) {
-        setRooms((prev) =>
-            prev.map((r) =>
-                r.id === roomId
-                    ? { ...r, maintenances: [...r.maintenances, maintenance] }
+    async function handleAddMaintenance(roomId: string, maintenance: RoomMaintenance) {
+        try {
+            // El mantenimiento ya se guardó en el backend en el modal
+            // Solo actualizamos el estado local
+            setRooms((prev) => prev.map((r) => 
+                r.id === roomId 
+                    ? { ...r, maintenances: [maintenance, ...r.maintenances] }
                     : r
-            )
-        );
-        // TODO: await createMaintenance(roomId, maintenance)
+            ));
+        } catch (error) {
+            console.error('Error al agregar mantenimiento:', error);
+        }
     }
 
     // ── Render ────────────────────────────────────────────────────────────────

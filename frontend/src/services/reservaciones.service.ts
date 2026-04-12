@@ -5,10 +5,14 @@ export interface Reservacion {
   Paciente_idPaciente: number;
   Habitacion_idHabitacion: number;
   Fecha_Inicio: string;
-  Fecha_Fin: string;
-  idCatalogo_Estado_Reservacion: number;
-  Costo_Total: number;
+  Fecha_Fin: string | null;
+  Indefinido: boolean;
+  Observaciones: string | null;
+  Fecha_Registro: string;
   Activo: boolean;
+  Catalogo_Tipo_Estancia_idEstancia: number;
+  idCatalogo_Estado_Reservacion: number;
+  Empleado_idEmpleado_Registra: number;
   Paciente?: {
     idPaciente: number;
     Nombre: string;
@@ -17,10 +21,24 @@ export interface Reservacion {
   Habitacion?: {
     idHabitacion: number;
     Numero_Habitacion: string;
+    Tipo?: {
+      idCatalogo_Tipo_Habitacion: number;
+      Descripcion_Tipo: string;
+    };
   };
-  Estado_Reservacion?: {
+  Tipo_Estancia?: {
+    idCatalogo_Tipo_Estancia: number;
+    Descripcion_Estancia: string;
+    Hora_Inicio: string;
+    Hora_Fin: string;
+  };
+  Estado?: {
     idCatalogo_Estado_Reservacion: number;
     Descripcion_Estado: string;
+  };
+  Empleado_Registra?: {
+    idEmpleado: number;
+    Nombre: string;
   };
 }
 

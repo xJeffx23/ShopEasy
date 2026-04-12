@@ -3,21 +3,26 @@ import api from './api';
 export interface Habitacion {
   idHabitacion: number;
   Numero_Habitacion: string;
-  idCatalogo_Tipo_Habitacion: number;
-  idCatalogo_Estado_Habitacion: number;
-  Activo: boolean;
   Piso: number;
-  Capacidad_Maxima: number;
-  Tipo_Habitacion?: {
+  Capacidad: number;
+  Observaciones?: string;
+  Catalogo_Tipo_Habitacion_idTipo: number;
+  Catalogo_Estado_Habitacion_idEstado: number;
+  Tipo?: {
     idCatalogo_Tipo_Habitacion: number;
     Nombre_Tipo: string;
     Descripcion: string;
-    Costo_Por_Dia: number;
+    Costo_Por_Dia: string;
+    Activo: boolean;
   };
-  Estado_Habitacion?: {
+  Estado?: {
     idCatalogo_Estado_Habitacion: number;
     Descripcion_Estado: string;
+    Activo: boolean;
   };
+  Limpiezas?: any[];
+  Mantenimientos?: any[];
+  Reservaciones?: any[];
 }
 
 export const habitacionesService = {
@@ -42,6 +47,15 @@ export const habitacionesService = {
   },
 
   async delete(id: number): Promise<void> {
+    await api.delete(`/habitaciones/${id}`);
+  },
+
+  async updateStatus(id: number, statusId: number): Promise<Habitacion> {
+    const response = await api.patch<Habitacion>(`/habitaciones/${id}/status`, { statusId });
+    return response.data;
+  },
+
+  async remove(id: number): Promise<void> {
     await api.delete(`/habitaciones/${id}`);
   }
 };

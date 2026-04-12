@@ -23,10 +23,10 @@ export async function getDashboardData(): Promise<DashboardData> {
       totalPacientes: pacientes.length,
       pacientesActivos: pacientes.filter((p: any) => p.Activo).length,
       totalHabitaciones: habitaciones.length,
-      habitacionesDisponibles: habitaciones.filter((h: any) => h.idCatalogo_Estado_Habitacion === 1).length,
-      habitacionesOcupadas: habitaciones.filter((h: any) => h.idCatalogo_Estado_Habitacion === 2).length,
+      habitacionesDisponibles: habitaciones.filter((h: any) => h.Catalogo_Estado_Habitacion_idEstado === 1).length,
+      habitacionesOcupadas: habitaciones.filter((h: any) => h.Catalogo_Estado_Habitacion_idEstado === 2).length,
       totalReservaciones: reservaciones.length,
-      reservacionesActivas: reservaciones.filter((r: any) => r.idCatalogo_Estado_Reservacion === 1).length
+      reservacionesActivas: reservaciones.filter((r: any) => r.Catalogo_Estado_Reservacion_idEstado === 1).length
     };
 
     return {
@@ -98,18 +98,18 @@ export async function getDashboardData(): Promise<DashboardData> {
       roomStatus: [
         { name: "Disponibles", value: stats.habitacionesDisponibles, color: "#10b981" },
         { name: "Ocupadas", value: stats.habitacionesOcupadas, color: "#3b82f6" },
-        { name: "Mantenimiento", value: habitaciones.filter((h: any) => h.idCatalogo_Estado_Habitacion === 3).length, color: "#f59e0b" }
+        { name: "Mantenimiento", value: habitaciones.filter((h: any) => h.Catalogo_Estado_Habitacion_idEstado === 3).length, color: "#f59e0b" }
       ],
       careLevels: [
-        { level: "Asistencia básica", count: pacientes.filter((p: any) => p.idCatalogo_Nivel_Asistencia === 1).length, color: "#10b981" },
-        { level: "Movilidad", count: pacientes.filter((p: any) => p.idCatalogo_Nivel_Asistencia === 2).length, color: "#3b82f6" },
-        { level: "Alimentación", count: pacientes.filter((p: any) => p.idCatalogo_Nivel_Asistencia === 3).length, color: "#f59e0b" },
-        { level: "Baño", count: pacientes.filter((p: any) => p.idCatalogo_Nivel_Asistencia === 4).length, color: "#ef4444" },
-        { level: "Completa", count: pacientes.filter((p: any) => p.idCatalogo_Nivel_Asistencia === 5).length, color: "#8b5cf6" }
+        { level: "Asistencia básica", count: pacientes.filter((p: any) => p.Catalogo_Nivel_Asistencia_idNivel === 1).length, color: "#10b981" },
+        { level: "Movilidad", count: pacientes.filter((p: any) => p.Catalogo_Nivel_Asistencia_idNivel === 2).length, color: "#3b82f6" },
+        { level: "Alimentación", count: pacientes.filter((p: any) => p.Catalogo_Nivel_Asistencia_idNivel === 3).length, color: "#f59e0b" },
+        { level: "Baño", count: pacientes.filter((p: any) => p.Catalogo_Nivel_Asistencia_idNivel === 4).length, color: "#ef4444" },
+        { level: "Completa", count: pacientes.filter((p: any) => p.Catalogo_Nivel_Asistencia_idNivel === 5).length, color: "#8b5cf6" }
       ],
       quickSummary: {
         occupancyRate: Math.round((stats.habitacionesOcupadas / stats.totalHabitaciones) * 100),
-        roomsInMaintenance: habitaciones.filter((h: any) => h.idCatalogo_Estado_Habitacion === 3).length,
+        roomsInMaintenance: habitaciones.filter((h: any) => h.Catalogo_Estado_Habitacion_idEstado === 3).length,
         staffPerPatient: Math.round((stats.totalEmpleados / stats.totalPacientes) * 10) / 10
       }
     };

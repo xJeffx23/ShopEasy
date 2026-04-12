@@ -70,5 +70,15 @@ export const authService = {
       return userStr ? JSON.parse(userStr) : null;
     }
     return null;
+  },
+
+  // Verificar si el usuario tiene permiso para crear admisiones
+  canCreateAdmission(): boolean {
+    const user = this.getUser();
+    if (!user || !user.perfil) return false;
+    
+    // Roles que pueden crear admisiones
+    const allowedRoles = ['Recepción', 'Gestión de Pacientes', 'Gerencia'];
+    return allowedRoles.includes(user.perfil);
   }
 };

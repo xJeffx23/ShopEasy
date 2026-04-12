@@ -41,10 +41,7 @@ const profileOptions = [
 ];
 
 const statusOptions = [
-    { label: "Seleccionar estado", value: "all" },
     { label: "Activo", value: "activo" },
-    { label: "De permiso", value: "de permiso" },
-    { label: "En capacitación", value: "en capacitación" },
     { label: "Inactivo", value: "inactivo" },
 ];
 

@@ -86,19 +86,17 @@ export default function AddRoomDialog({ open, onOpenChange, onSubmit }: AddRoomD
         e.preventDefault();
         if (!validate()) return;
 
-        const newRoom: Room = {
-            id: crypto.randomUUID(),
+        // Crear objeto con los datos del formulario (sin ID, el backend lo generará)
+        const roomData = {
             roomNumber: form.roomNumber.trim(),
             floor: Number(form.floor),
             type: form.type as RoomType,
             capacity: Number(form.capacity),
             status: form.status,
             observations: form.observations.trim() || undefined,
-            cleanings: [],
-            maintenances: [],
         };
 
-        onSubmit(newRoom);
+        onSubmit(roomData as Room);
         onOpenChange(false);
     }
 

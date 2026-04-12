@@ -6,6 +6,7 @@ import { PatientsStats } from "@/src/components/patients/patients-stats";
 import { PatientsFilters } from "@/src/components/patients/patients-filters";
 import { PatientsTable } from "@/src/components/patients/patients-table";
 import AddPatientDialog from "@/src/components/patients/add-patient-dialog";
+import EditPatientDialog from "@/src/components/patients/EditPatientDialog";
 import { createPatient, updatePatient, deletePatient, updatePatientStatus } from "@/src/services/patients.service";
 import type { Patient, PatientsData, PatientStats, PatientStatus } from "@/src/types/patient";
 
@@ -34,6 +35,8 @@ export default function PatientsView({ data }: PatientsViewProps) {
     const [assistanceFilter, setAssist] = useState("all");
     const [statusFilter, setStatus] = useState("all");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
 
     // ── Filtrado ──────────────────────────────────────────────────────────────
 
@@ -87,16 +90,23 @@ export default function PatientsView({ data }: PatientsViewProps) {
      * Backend: PUT /api/patients/:id
      */
     async function handleEdit(patient: Patient) {
+        setEditingPatient(patient);
+        setEditDialogOpen(true);
+    }
+
+    /**
+     * Manejar la actualización del paciente desde el diálogo
+     */
+    async function handleUpdatePatient(updatedPatient: any) {
         try {
-            const updatedPatient = await updatePatient(patient.id, patient);
+            const updated = await updatePatient(editingPatient!.id, updatedPatient);
             setPatients((prev) =>
-                prev.map((p) => p.id === patient.id ? updatedPatient : p)
+                prev.map((p) => p.id === editingPatient!.id ? updated : p)
             );
-            // TODO: abrir EditPatientDialog con datos precargados
-            console.log("[handleEdit] Paciente actualizado:", patient);
+            setEditDialogOpen(false);
+            setEditingPatient(null);
         } catch (error) {
             console.error('Error updating patient:', error);
-            // TODO: Mostrar mensaje de error al usuario
         }
     }
 
@@ -166,6 +176,13 @@ export default function PatientsView({ data }: PatientsViewProps) {
                 onOpenChange={setIsDialogOpen}
                 onSubmit={handleAdd}
                 nextPatientNumber={patients.length + 1}
+            />
+
+            <EditPatientDialog
+                patient={editingPatient!}
+                open={editDialogOpen}
+                onOpenChange={setEditDialogOpen}
+                onPatientUpdated={handleUpdatePatient}
             />
         </>
     );

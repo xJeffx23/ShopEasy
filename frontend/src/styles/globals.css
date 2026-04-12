@@ -1,0 +1,570 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables CSS para tema oscuro */
+:root {
+  --bg-primary: 255 255 255;
+  --bg-secondary: 248 250 252;
+  --bg-tertiary: 241 245 249;
+  --text-primary: 15 23 42;
+  --text-secondary: 71 85 105;
+  --text-tertiary: 100 116 139;
+  --border-primary: 226 232 240;
+  --border-secondary: 203 213 225;
+  --accent: 59 130 246;
+  --accent-hover: 37 99 235;
+}
+
+.dark {
+  --bg-primary: 15 23 42;
+  --bg-secondary: 30 41 59;
+  --bg-tertiary: 51 65 85;
+  --text-primary: 248 250 252;
+  --text-secondary: 203 213 225;
+  --text-tertiary: 148 163 184;
+  --border-primary: 51 65 85;
+  --border-secondary: 71 85 105;
+  --accent: 96 165 250;
+  --accent-hover: 59 130 246;
+}
+
+/* Estilos base */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  html.dark {
+    color-scheme: dark;
+  }
+}
+
+/* Estilos de tema oscuro con máxima especificidad */
+@layer utilities {
+  /* Fondo principal del body */
+  html.dark body,
+  .dark body {
+    background-color: rgb(15 23 42) !important;
+    color: rgb(248 250 252) !important;
+  }
+  
+  /* Fondos */
+  html.dark .bg-slate-50,
+  .dark .bg-slate-50 {
+    background-color: rgb(15 23 42) !important;
+  }
+  
+  html.dark .bg-slate-100,
+  .dark .bg-slate-100 {
+    background-color: rgb(30 41 59) !important;
+  }
+  
+  html.dark .bg-white,
+  .dark .bg-white {
+    background-color: rgb(30 41 59) !important;
+  }
+  
+  html.dark .bg-slate-900,
+  .dark .bg-slate-900 {
+    background-color: rgb(15 23 42) !important;
+  }
+  
+  html.dark .bg-slate-800,
+  .dark .bg-slate-800 {
+    background-color: rgb(30 41 59) !important;
+  }
+  
+  html.dark .bg-slate-700,
+  .dark .bg-slate-700 {
+    background-color: rgb(51 65 85) !important;
+  }
+  
+  /* Textos */
+  html.dark .text-slate-900,
+  .dark .text-slate-900 {
+    color: rgb(248 250 252) !important;
+  }
+  
+  html.dark .text-slate-800,
+  .dark .text-slate-800 {
+    color: rgb(241 245 249) !important;
+  }
+  
+  html.dark .text-slate-700,
+  .dark .text-slate-700 {
+    color: rgb(203 213 225) !important;
+  }
+  
+  html.dark .text-slate-600,
+  .dark .text-slate-600 {
+    color: rgb(148 163 184) !important;
+  }
+  
+  html.dark .text-slate-500,
+  .dark .text-slate-500 {
+    color: rgb(148 163 184) !important;
+  }
+  
+  html.dark .text-slate-400,
+  .dark .text-slate-400 {
+    color: rgb(100 116 139) !important;
+  }
+  
+  html.dark .text-slate-300,
+  .dark .text-slate-300 {
+    color: rgb(71 85 105) !important;
+  }
+  
+  /* Bordes */
+  html.dark .border-slate-200,
+  .dark .border-slate-200 {
+    border-color: rgb(51 65 85) !important;
+  }
+  
+  html.dark .border-slate-300,
+  .dark .border-slate-300 {
+    border-color: rgb(71 85 105) !important;
+  }
+  
+  html.dark .border-slate-400,
+  .dark .border-slate-400 {
+    border-color: rgb(100 116 139) !important;
+  }
+  
+  /* Hover states */
+  html.dark .hover\:bg-slate-50:hover,
+  .dark .hover\:bg-slate-50:hover {
+    background-color: rgb(30 41 59) !important;
+  }
+  
+  html.dark .hover\:bg-slate-100:hover,
+  .dark .hover\:bg-slate-100:hover {
+    background-color: rgb(51 65 85) !important;
+  }
+  
+  html.dark .hover\:bg-white:hover,
+  .dark .hover\:bg-white:hover {
+    background-color: rgb(51 65 85) !important;
+  }
+  
+  html.dark .hover\:text-slate-900:hover,
+  .dark .hover\:text-slate-900:hover {
+    color: rgb(248 250 252) !important;
+  }
+  
+  html.dark .hover\:text-slate-800:hover,
+  .dark .hover\:text-slate-800:hover {
+    color: rgb(241 245 249) !important;
+  }
+  
+  html.dark .hover\:text-slate-700:hover,
+  .dark .hover\:text-slate-700:hover {
+    color: rgb(203 213 225) !important;
+  }
+  
+  /* Botones */
+  html.dark .bg-blue-600,
+  .dark .bg-blue-600 {
+    background-color: rgb(96 165 250) !important;
+  }
+  
+  html.dark .hover\:bg-blue-700:hover,
+  .dark .hover\:bg-blue-700:hover {
+    background-color: rgb(59 130 246) !important;
+  }
+  
+  html.dark .bg-gray-100,
+  .dark .bg-gray-100 {
+    background-color: rgb(30 41 59) !important;
+  }
+  
+  html.dark .bg-gray-50,
+  .dark .bg-gray-50 {
+    background-color: rgb(15 23 42) !important;
+  }
+  
+  /* Componentes específicos */
+  html.dark .card,
+  .dark .card {
+    background-color: rgb(30 41 59) !important;
+    border-color: rgb(51 65 85) !important;
+  }
+  
+  html.dark .input,
+  .dark .input {
+    background-color: rgb(30 41 59) !important;
+    border-color: rgb(71 85 105) !important;
+    color: rgb(248 250 252) !important;
+  }
+  
+  html.dark .input:focus,
+  .dark .input:focus {
+    border-color: rgb(96 165 250) !important;
+  }
+  
+  /* Sidebar específico */
+  html.dark .bg-slate-900,
+  .dark .bg-slate-900 {
+    background-color: rgb(15 23 42) !important;
+  }
+  
+  /* Overlay de modales */
+  html.dark .bg-black\/50,
+  .dark .bg-black\/50 {
+    background-color: rgb(0 0 0 / 0.5) !important;
+  }
+  
+  /* Scrollbar */
+  html.dark ::-webkit-scrollbar-track,
+  .dark ::-webkit-scrollbar-track {
+    background: rgb(30 41 59) !important;
+  }
+  
+  html.dark ::-webkit-scrollbar-thumb,
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgb(71 85 105) !important;
+    border-radius: 4px !important;
+  }
+  
+  html.dark ::-webkit-scrollbar-thumb:hover,
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgb(100 116 139) !important;
+  }
+}
+
+/* Estilos de accesibilidad - Tamaño de fuente */
+@layer utilities {
+  html.text-small,
+  .text-small {
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+  }
+  
+  html.text-medium,
+  .text-medium {
+    font-size: 1rem !important;
+    line-height: 1.5rem !important;
+  }
+  
+  html.text-large,
+  .text-large {
+    font-size: 1.125rem !important;
+    line-height: 1.75rem !important;
+  }
+  
+  html.text-extra-large,
+  .text-extra-large {
+    font-size: 1.25rem !important;
+    line-height: 1.75rem !important;
+  }
+  
+  /* Aplicar a todos los elementos con máxima especificidad */
+  html.text-small *,
+  .text-small *,
+  html.text-small body *,
+  .text-small body * {
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+  
+  html.text-medium *,
+  .text-medium *,
+  html.text-medium body *,
+  .text-medium body * {
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+  
+  html.text-large *,
+  .text-large *,
+  html.text-large body *,
+  .text-large body * {
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+  
+  html.text-extra-large *,
+  .text-extra-large *,
+  html.text-extra-large body *,
+  .text-extra-large body * {
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+  
+  /* Forzar tamaño en elementos comunes */
+  html.text-small p,
+  html.text-small span,
+  html.text-small div,
+  html.text-small h1,
+  html.text-small h2,
+  html.text-small h3,
+  html.text-small h4,
+  html.text-small h5,
+  html.text-small h6,
+  html.text-small button,
+  html.text-small input,
+  html.text-small label,
+  html.text-small textarea,
+  .text-small p,
+  .text-small span,
+  .text-small div,
+  .text-small h1,
+  .text-small h2,
+  .text-small h3,
+  .text-small h4,
+  .text-small h5,
+  .text-small h6,
+  .text-small button,
+  .text-small input,
+  .text-small label,
+  .text-small textarea {
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+}
+
+/* Estilos de accesibilidad - Contraste */
+@layer utilities {
+  /* Contraste alto - Forzar colores con máxima especificidad */
+  html.contrast-high,
+  .contrast-high {
+    /* Forzar colores de fondo */
+    --bg-primary: 255 255 255 !important;
+    --bg-secondary: 248 250 252 !important;
+    --bg-tertiary: 241 245 249 !important;
+    
+    /* Forzar colores de texto */
+    --text-primary: 0 0 0 !important;
+    --text-secondary: 15 23 42 !important;
+    --text-tertiary: 30 41 59 !important;
+    
+    /* Forzar colores de bordes */
+    --border-primary: 0 0 0 !important;
+    --border-secondary: 15 23 42 !important;
+  }
+  
+  /* Aplicar colores forzados con máxima especificidad */
+  html.contrast-high body,
+  .contrast-high body {
+    background-color: rgb(255 255 255) !important;
+    color: rgb(0 0 0) !important;
+  }
+  
+  /* Fondos en contraste alto */
+  html.contrast-high .bg-white,
+  .contrast-high .bg-white,
+  html.contrast-high .bg-slate-50,
+  .contrast-high .bg-slate-50,
+  html.contrast-high .bg-slate-100,
+  .contrast-high .bg-slate-100,
+  html.contrast-high .bg-gray-50,
+  .contrast-high .bg-gray-50,
+  html.contrast-high .bg-gray-100,
+  .contrast-high .bg-gray-100 {
+    background-color: rgb(255 255 255) !important;
+  }
+  
+  html.contrast-high .bg-slate-200,
+  .contrast-high .bg-slate-200,
+  html.contrast-high .bg-gray-200,
+  .contrast-high .bg-gray-200 {
+    background-color: rgb(248 250 252) !important;
+  }
+  
+  /* Textos en contraste alto - negro puro para máxima legibilidad */
+  html.contrast-high *,
+  .contrast-high * {
+    color: rgb(0 0 0) !important;
+  }
+  
+  /* Excepciones para elementos que deben mantener su color */
+  html.contrast-high .bg-blue-600,
+  .contrast-high .bg-blue-600,
+  html.contrast-high .bg-blue-500,
+  .contrast-high .bg-blue-500,
+  html.contrast-high .text-blue-600,
+  .contrast-high .text-blue-600,
+  html.contrast-high .text-blue-500,
+  .contrast-high .text-blue-500 {
+    color: rgb(255 255 255) !important;
+  }
+  
+  /* Bordes en contraste alto - negros y gruesos */
+  html.contrast-high .border,
+  .contrast-high .border,
+  html.contrast-high [class*="border-"],
+  .contrast-high [class*="border-"] {
+    border-color: rgb(0 0 0) !important;
+    border-width: 2px !important;
+  }
+  
+  /* Tema oscuro con contraste alto */
+  html.dark.contrast-high,
+  .dark.contrast-high {
+    --bg-primary: 0 0 0 !important;
+    --bg-secondary: 15 23 42 !important;
+    --bg-tertiary: 30 41 59 !important;
+    
+    --text-primary: 255 255 255 !important;
+    --text-secondary: 248 250 252 !important;
+    --text-tertiary: 241 245 249 !important;
+    
+    --border-primary: 255 255 255 !important;
+    --border-secondary: 248 250 252 !important;
+  }
+  
+  html.dark.contrast-high body,
+  .dark.contrast-high body {
+    background-color: rgb(0 0 0) !important;
+    color: rgb(255 255 255) !important;
+  }
+  
+  /* Fondos oscuros en contraste alto */
+  html.dark.contrast-high .bg-slate-900,
+  .dark.contrast-high .bg-slate-900,
+  html.dark.contrast-high .bg-slate-800,
+  .dark.contrast-high .bg-slate-800 {
+    background-color: rgb(0 0 0) !important;
+  }
+  
+  html.dark.contrast-high .bg-slate-700,
+  .dark.contrast-high .bg-slate-700 {
+    background-color: rgb(15 23 42) !important;
+  }
+  
+  /* Textos en tema oscuro con contraste alto - blanco puro */
+  html.dark.contrast-high *,
+  .dark.contrast-high * {
+    color: rgb(255 255 255) !important;
+  }
+  
+  /* Bordes en tema oscuro con contraste alto - blancos */
+  html.dark.contrast-high .border,
+  .dark.contrast-high .border,
+  html.dark.contrast-high [class*="border-"],
+  .dark.contrast-high [class*="border-"] {
+    border-color: rgb(255 255 255) !important;
+    border-width: 2px !important;
+  }
+  
+  /* Forzar peso de fuente en contraste alto */
+  html.contrast-high .text-slate-900,
+  .contrast-high .text-slate-900,
+  html.contrast-high .text-slate-800,
+  .contrast-high .text-slate-800,
+  html.contrast-high .text-slate-700,
+  .contrast-high .text-slate-700,
+  html.dark.contrast-high .text-slate-100,
+  .dark.contrast-high .text-slate-100,
+  html.dark.contrast-high .text-slate-200,
+  .dark.contrast-high .text-slate-200,
+  html.dark.contrast-high .text-slate-300,
+  .dark.contrast-high .text-slate-300 {
+    font-weight: 700 !important;
+  }
+  
+  html.contrast-high .text-slate-600,
+  .contrast-high .text-slate-600,
+  html.contrast-high .text-slate-500,
+  .contrast-high .text-slate-500,
+  html.contrast-high .text-slate-400,
+  .contrast-high .text-slate-400,
+  html.dark.contrast-high .text-slate-400,
+  .dark.contrast-high .text-slate-400,
+  html.dark.contrast-high .text-slate-500,
+  .dark.contrast-high .text-slate-500,
+  html.dark.contrast-high .text-slate-600,
+  .dark.contrast-high .text-slate-600 {
+    font-weight: 600 !important;
+  }
+}
+
+/* Estilos de accesibilidad - Movimiento reducido */
+@layer utilities {
+  .reduce-motion *,
+  .reduce-motion *::before,
+  .reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .reduce-motion [data-motion] {
+    transition: none !important;
+  }
+}
+
+/* Estilos específicos para componentes */
+@layer components {
+  /* Cards */
+  .card {
+    @apply bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700;
+  }
+  
+  /* Inputs */
+  .input {
+    @apply bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 
+           text-slate-900 dark:text-slate-100 
+           placeholder:text-slate-500 dark:placeholder:text-slate-400;
+  }
+  
+  .input:focus {
+    @apply border-blue-500 dark:border-blue-400 
+           ring-1 ring-blue-500 dark:ring-blue-400;
+  }
+  
+  /* Botones */
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 
+           dark:bg-blue-500 dark:hover:bg-blue-600 
+           text-white;
+  }
+  
+  .btn-secondary {
+    @apply bg-slate-100 hover:bg-slate-200 
+           dark:bg-slate-700 dark:hover:bg-slate-600 
+           text-slate-900 dark:text-slate-100;
+  }
+  
+  .btn-outline {
+    @apply border-slate-300 dark:border-slate-600 
+           text-slate-700 dark:text-slate-300 
+           hover:bg-slate-50 dark:hover:bg-slate-800;
+  }
+}
+
+/* Transiciones suaves para cambios de tema */
+@layer utilities {
+  * {
+    transition: background-color 0.2s ease, 
+                border-color 0.2s ease, 
+                color 0.2s ease;
+  }
+}
+
+/* Scrollbar personalizada para tema oscuro */
+@layer utilities {
+  .dark ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .dark ::-webkit-scrollbar-track {
+    background: rgb(var(--bg-secondary));
+  }
+  
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgb(var(--border-secondary));
+    border-radius: 4px;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--text-tertiary));
+  }
+}

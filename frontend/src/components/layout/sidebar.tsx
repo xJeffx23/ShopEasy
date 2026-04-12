@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -14,6 +15,7 @@ import {
     CircleHelp,
     PlusCircle,
 } from "lucide-react";
+import { authService } from "@/src/services/auth.service";
 
 const menuItems = [
     { label: "Dashboard", href: "/sistema/dashboard", icon: LayoutDashboard },
@@ -31,6 +33,12 @@ const bottomItems = [
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const [canCreateAdmission, setCanCreateAdmission] = React.useState(false);
+
+    // Verificar permisos al montar el componente
+    React.useEffect(() => {
+        setCanCreateAdmission(authService.canCreateAdmission());
+    }, []);
 
     return (
         <aside className="flex h-screen w-[220px] shrink-0 flex-col border-r border-slate-100 bg-white px-3 py-5">
@@ -89,14 +97,16 @@ export default function Sidebar() {
 
             {/* Parte inferior */}
             <div className="mt-4 space-y-3">
-                {/* CTA principal */}
-                <Link
-                    href="/sistema/reservations/new"
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98]"
-                >
-                    <PlusCircle size={15} />
-                    Nueva admisión
-                </Link>
+                {/* CTA principal - Solo visible para roles autorizados */}
+                {canCreateAdmission && (
+                    <Link
+                        href="/sistema/reservations"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98]"
+                    >
+                        <PlusCircle size={15} />
+                        Nueva admisión
+                    </Link>
+                )}
 
                 {/* Configuración y ayuda */}
                 <div className="space-y-0.5">

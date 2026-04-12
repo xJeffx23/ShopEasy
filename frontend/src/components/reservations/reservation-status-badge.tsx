@@ -7,15 +7,15 @@ interface ReservationStatusBadgeProps {
 function getConfig(status: ReservationStatus) {
     switch (status) {
         case "activa":
-            return { label: "Activa", badge: "bg-emerald-100 text-emerald-700" };
+            return { label: "Activa", badge: "bg-green-100 text-green-800 border border-green-200 font-medium" };
         case "pendiente":
-            return { label: "Pendiente", badge: "bg-amber-100 text-amber-700" };
+            return { label: "Pendiente", badge: "bg-yellow-100 text-yellow-800 border border-yellow-200 font-medium" };
         case "finalizada":
-            return { label: "Finalizada", badge: "bg-slate-100 text-slate-500" };
+            return { label: "Finalizada", badge: "bg-gray-100 text-gray-700 border border-gray-200 font-medium" };
         case "cancelada":
-            return { label: "Cancelada", badge: "bg-red-100 text-red-600" };
+            return { label: "Cancelada", badge: "bg-red-100 text-red-800 border border-red-200 font-medium" };
         default:
-            return { label: "Desconocido", badge: "bg-gray-100 text-gray-600" };
+            return { label: "Desconocido", badge: "bg-gray-100 text-gray-700 border border-gray-200 font-medium" };
     }
 }
 

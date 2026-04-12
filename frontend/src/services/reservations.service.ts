@@ -5,30 +5,64 @@ export async function getReservationsData(): Promise<ReservationsData> {
   try {
     const reservaciones = await reservacionesService.getAll();
     
-    // Transformar los datos del backend al formato del frontend
+    // Función para mapear tipo de estancia desde ID
+function mapStaySchedule(scheduleId: number): string {
+  const scheduleMapping: Record<number, string> = {
+    1: 'Día (8am - 5pm)',
+    2: 'Mañana (8am - 2pm)',
+    3: 'Tarde (2pm - 6pm)',
+    4: 'Full estancia'
+  };
+  return scheduleMapping[scheduleId] || 'Full estancia';
+}
+
+// Función para mapear tipo de habitación desde ID
+function mapRoomType(roomTypeId: number): string {
+  const roomTypeMapping: Record<number, string> = {
+    1: 'Compartida',
+    2: 'Individual',
+    3: 'Individual cama matrimonial',
+    4: 'Cuidados especiales'
+  };
+  return roomTypeMapping[roomTypeId] || 'Individual';
+}
+
+// Función para mapear estado de reservación desde ID
+function mapReservationStatus(statusId: number): ReservationStatus {
+  const statusMapping: Record<number, ReservationStatus> = {
+    1: 'activa',
+    2: 'pendiente',
+    3: 'finalizada',
+    4: 'cancelada'
+  };
+  return statusMapping[statusId] || 'pendiente';
+}
+
+// Transformar los datos del backend al formato del frontend
     const reservations: Reservation[] = reservaciones.map(reservacion => ({
       id: reservacion.idReservacion.toString(),
       patientId: reservacion.Paciente_idPaciente.toString(),
       patientName: reservacion.Paciente?.Nombre || 'Paciente no encontrado',
       roomId: reservacion.Habitacion_idHabitacion.toString(),
       roomNumber: reservacion.Habitacion?.Numero_Habitacion || 'No asignada',
-      roomType: 'Individual' as const, // TODO: Obtener desde tipo de habitación
+      roomType: mapRoomType(reservacion.Habitacion?.Tipo?.idCatalogo_Tipo_Habitacion || 1) as ReservationRoomType,
       startDate: new Date(reservacion.Fecha_Inicio).toLocaleDateString('es-CR'),
-      endDate: new Date(reservacion.Fecha_Fin).toLocaleDateString('es-CR'),
-      indefinite: false, // TODO: Determinar desde lógica de negocio
-      schedule: 'Full estancia' as const, // TODO: Obtener desde tipo de estancia
-      status: mapReservationStatus(reservacion.idCatalogo_Estado_Reservacion),
-      createdBy: 'Sistema', // TODO: Obtener desde empleado que creó
-      observations: '' // TODO: Obtener desde campo de observaciones
+      endDate: reservacion.Fecha_Fin ? new Date(reservacion.Fecha_Fin).toLocaleDateString('es-CR') : '',
+      indefinite: reservacion.Indefinido || false,
+      schedule: mapStaySchedule(reservacion.Catalogo_Tipo_Estancia_idEstancia || 4) as StaySchedule,
+      status: reservacion.Estado?.Descripcion_Estado?.toLowerCase() as ReservationStatus || 'pendiente',
+      createdBy: reservacion.Empleado_Registra?.Nombre || 'Sistema',
+      observations: reservacion.Observaciones || ''
     }));
 
     // Calcular estadísticas
     const stats: ReservationStats = {
       active: reservations.filter(r => r.status === 'activa').length,
-      permanent: reservations.filter(r => r.indefinite).length,
-      respite: reservations.filter(r => !r.indefinite).length
+      permanent: reservations.filter(r => r.indefinite === true).length,
+      respite: reservations.filter(r => r.indefinite === false).length
     };
-
+    
+    
     return {
       title: "Gestión de Reservaciones",
       subtitle: "Administra las reservaciones y ocupación de habitaciones",
@@ -83,6 +117,16 @@ function mapStayType(stayTypeId: number): StaySchedule {
     4: 'Full estancia'
   };
   return mapping[stayTypeId] || 'Full estancia';
+}
+
+function mapStayTypeToId(schedule: StaySchedule): number {
+  const mapping: Record<StaySchedule, number> = {
+    'Día (8am - 5pm)': 1,
+    'Mañana (8am - 2pm)': 2,
+    'Tarde (2pm - 6pm)': 3,
+    'Full estancia': 4
+  };
+  return mapping[schedule] || 4;
 }
 
 // CRUD Functions
@@ -160,8 +204,9 @@ export async function updateReservation(id: string, reservationData: any): Promi
       Habitacion_idHabitacion: reservationData.roomId ? parseInt(reservationData.roomId) : undefined,
       Fecha_Inicio: startDate ? startDate.toISOString() : undefined,
       Fecha_Fin: endDate ? endDate.toISOString() : null,
+      Catalogo_Tipo_Estancia_idEstancia: reservationData.schedule ? mapStayTypeToId(reservationData.schedule) : undefined,
       Catalogo_Estado_Reservacion_idEstado: reservationData.status ? mapStatusToId(reservationData.status) : undefined,
-      Costo_Total: reservationData.totalCost,
+      Observaciones: reservationData.observations,
       Activo: true
     };
     
@@ -212,14 +257,14 @@ export async function updateReservationStatus(id: string, status: ReservationSta
       patientName: response.Paciente?.Nombre || 'Paciente',
       roomId: response.Habitacion_idHabitacion.toString(),
       roomNumber: response.Habitacion?.Numero_Habitacion || 'No asignada',
-      roomType: 'Individual' as const,
+      roomType: mapRoomType(response.Habitacion?.Tipo?.idCatalogo_Tipo_Habitacion || 1) as ReservationRoomType,
       startDate: new Date(response.Fecha_Inicio).toLocaleDateString('es-CR'),
-      endDate: response.Fecha_Fin ? new Date(response.Fecha_Fin).toLocaleDateString('es-CR') : undefined,
-      indefinite: !response.Fecha_Fin,
-      schedule: 'Full estancia' as const,
-      status: mapReservationStatus(response.idCatalogo_Estado_Reservacion),
-      createdBy: 'Sistema',
-      observations: ''
+      endDate: response.Fecha_Fin ? new Date(response.Fecha_Fin).toLocaleDateString('es-CR') : '',
+      indefinite: response.Indefinido || false,
+      schedule: mapStaySchedule(response.Catalogo_Tipo_Estancia_idEstancia || 4) as StaySchedule,
+      status: response.Estado?.Descripcion_Estado?.toLowerCase() as ReservationStatus || 'pendiente',
+      createdBy: response.Empleado_Registra?.Nombre || 'Sistema',
+      observations: response.Observaciones || ''
     };
   } catch (error) {
     console.error('Error updating reservation status:', error);

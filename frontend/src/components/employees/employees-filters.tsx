@@ -25,7 +25,7 @@ const departmentOptions = [
 const profileOptions = [
     { label: "Todos los perfiles", value: "all" },
     { label: "Gerencia", value: "Gerencia" },
-    { label: "Gestión de pacientes", value: "Gestión de pacientes" },
+    { label: "Gestión de Pacientes", value: "Gestión de Pacientes" },
     { label: "Mantenimiento", value: "Mantenimiento" },
     { label: "Recepción", value: "Recepción" },
 ];

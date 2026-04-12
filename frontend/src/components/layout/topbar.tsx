@@ -1,15 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
-import { Badge } from "@/src/components/ui/badge";
 
 // TODO: Reemplazar con datos reales del contexto de autenticación
 const MOCK_USER = {
     name: "Administrador",
     initials: "AD",
-    notificationCount: 3,
 };
 
 export default function Topbar() {
@@ -35,23 +33,6 @@ export default function Topbar() {
 
                 {/* Acciones derecha */}
                 <div className="flex items-center gap-3">
-                    {/* Notificaciones */}
-                    <button
-                        type="button"
-                        className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-                        aria-label="Notificaciones"
-                    >
-                        <Bell size={17} strokeWidth={2} />
-                        {MOCK_USER.notificationCount > 0 && (
-                            <Badge className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-semibold text-white">
-                                {MOCK_USER.notificationCount}
-                            </Badge>
-                        )}
-                    </button>
-
-                    {/* Separador visual */}
-                    <div className="h-6 w-px bg-slate-200" />
-
                     {/* Perfil */}
                     <div className="flex items-center gap-2.5">
                         <Avatar className="h-8 w-8 ring-1 ring-slate-200">

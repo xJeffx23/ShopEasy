@@ -18,10 +18,10 @@ interface ReservationsTableProps {
 
 function getScheduleBadge(schedule: Reservation["schedule"]) {
     switch (schedule) {
-        case "Full estancia": return "bg-blue-100 text-blue-700";
-        case "Día (8am - 5pm)": return "bg-amber-100 text-amber-700";
-        case "Mañana (8am - 2pm)": return "bg-emerald-100 text-emerald-700";
-        case "Tarde (2pm - 6pm)": return "bg-violet-100 text-violet-700";
+        case "Full estancia": return "bg-indigo-100 text-indigo-800 border border-indigo-200";
+        case "Día (8am - 5pm)": return "bg-orange-100 text-orange-800 border border-orange-200";
+        case "Mañana (8am - 2pm)": return "bg-green-100 text-green-800 border border-green-200";
+        case "Tarde (2pm - 6pm)": return "bg-purple-100 text-purple-800 border border-purple-200";
     }
 }
 

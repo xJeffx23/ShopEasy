@@ -18,9 +18,9 @@ export async function getReportsData(): Promise<ReportsData> {
 
     // Calcular estadísticas requeridas por el proyecto
     const totalPacientesRegistrados = pacientes.length;
-    const pacientesAlojados = reservaciones.filter(r => r.idCatalogo_Estado_Reservacion === 1).length;
+    const pacientesAlojados = reservaciones.filter((r: any) => r.Estado?.Descripcion_Estado === 'Activa').length;
     const pacientesPorDia = reservaciones.length; // Simplificado - debería agrupar por día
-    const habitacionesReservadas = reservaciones.filter(r => r.idCatalogo_Estado_Reservacion === 1).length;
+    const habitacionesReservadas = reservaciones.filter((r: any) => r.Estado?.Descripcion_Estado === 'Activa').length;
     const habitacionesTotales = habitaciones.length;
 
     return {
@@ -30,7 +30,7 @@ export async function getReportsData(): Promise<ReportsData> {
         reservedRooms: habitacionesReservadas,
         totalRooms: habitacionesTotales,
         activeEmployees: empleados.filter((e: any) => e.Activo).length,
-        activeReservations: reservaciones.filter((r: any) => r.idCatalogo_Estado_Reservacion === 1).length
+        activeReservations: reservaciones.filter((r: any) => r.Estado?.Descripcion_Estado === 'Activa').length
       },
       patientsByDay: [
         { day: "Lun", patients: Math.floor(pacientesPorDia / 5) },
@@ -48,16 +48,16 @@ export async function getReportsData(): Promise<ReportsData> {
         { month: "Abr", occupancy: Math.round((habitacionesReservadas / habitacionesTotales) * 100) }
       ],
       roomStatusDist: [
-        { name: "Disponibles", value: habitaciones.filter((h: any) => h.idCatalogo_Estado_Habitacion === 1).length, color: "#10b981" },
+        { name: "Disponibles", value: habitaciones.filter((h: any) => h.Estado?.Descripcion_Estado === 'Disponible').length, color: "#10b981" },
         { name: "Ocupadas", value: habitacionesReservadas, color: "#3b82f6" },
-        { name: "Mantenimiento", value: habitaciones.filter((h: any) => h.idCatalogo_Estado_Habitacion === 3).length, color: "#f59e0b" }
+        { name: "Mantenimiento", value: habitaciones.filter((h: any) => h.Estado?.Descripcion_Estado === 'Mantenimiento').length, color: "#f59e0b" }
       ],
       assistanceLevelDist: [
-        { level: "Básica", count: pacientes.filter((p: any) => p.idCatalogo_Nivel_Asistencia === 1).length, color: "#10b981" },
-        { level: "Movilidad", count: pacientes.filter((p: any) => p.idCatalogo_Nivel_Asistencia === 2).length, color: "#3b82f6" },
-        { level: "Alimentación", count: pacientes.filter((p: any) => p.idCatalogo_Nivel_Asistencia === 3).length, color: "#f59e0b" },
-        { level: "Baño", count: pacientes.filter((p: any) => p.idCatalogo_Nivel_Asistencia === 4).length, color: "#ef4444" },
-        { level: "Completa", count: pacientes.filter((p: any) => p.idCatalogo_Nivel_Asistencia === 5).length, color: "#8b5cf6" }
+        { level: "Asistencia básica", count: pacientes.filter((p: any) => p.Nivel_Asistencia?.Descripcion_Nivel === 'Asistencia básica').length, color: "#10b981" },
+        { level: "Asistencia para movilidad", count: pacientes.filter((p: any) => p.Nivel_Asistencia?.Descripcion_Nivel === 'Asistencia para movilidad').length, color: "#3b82f6" },
+        { level: "Asistencia para alimentación", count: pacientes.filter((p: any) => p.Nivel_Asistencia?.Descripcion_Nivel === 'Asistencia para alimentación').length, color: "#f59e0b" },
+        { level: "Asistencia para baño", count: pacientes.filter((p: any) => p.Nivel_Asistencia?.Descripcion_Nivel === 'Asistencia para baño').length, color: "#ef4444" },
+        { level: "Asistencia completa", count: pacientes.filter((p: any) => p.Nivel_Asistencia?.Descripcion_Nivel === 'Asistencia completa').length, color: "#8b5cf6" }
       ],
       patientMovement: [
         { month: "Ene", ingresos: 2, egresos: 1 },

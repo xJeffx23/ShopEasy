@@ -9,7 +9,7 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import AnimatedAuthBackground from "@/src/components/login/AnimatedAuthBackground";
-import { login } from "@/src/lib/auth/auth-service";
+import { authService } from "@/src/services/auth.service";
 
 export default function LoginView() {
     const router = useRouter();
@@ -26,23 +26,25 @@ export default function LoginView() {
         setLoading(true);
 
         try {
-            const result = await login({ username, password });
-
-            if (!result.success) {
-                setError(result.message);
-                return;
-            }
+            const result = await authService.login({
+                Nombre_usuario: username,
+                Contrasena: password
+            });
 
             // Si es el primer login, redirigir al cambio de contraseña obligatorio
-            if (result.mustChangePassword) {
+            if (result.Cambio_Contrasena) {
                 router.push("/auth/change-password");
                 return;
             }
 
             router.push("/sistema/dashboard");
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error al iniciar sesión:", err);
-            setError("Ocurrió un error inesperado al iniciar sesión.");
+            if (err.response?.status === 401) {
+                setError("Usuario o contraseña incorrectos");
+            } else {
+                setError("Ocurrió un error inesperado al iniciar sesión.");
+            }
         } finally {
             setLoading(false);
         }

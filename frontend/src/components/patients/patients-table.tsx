@@ -4,9 +4,9 @@ import { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { Eye, MoreHorizontal, Pencil, Trash2, UserCheck, UserX } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
-import { Patient, PatientStatus, AssistanceLevel } from "@/src/types/patient";
-import { PatientDetailModal } from "@/src/components/patients/patient-detail-modal";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Patient, PatientStatus, AssistanceLevel } from "@/types/patient";
+import { PatientDetailModal } from "@/components/patients/patient-detail-modal";
 
 interface PatientsTableProps {
     patients: Patient[];

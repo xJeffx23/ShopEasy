@@ -5,7 +5,7 @@ export interface Reservacion {
   Paciente_idPaciente: number;
   Habitacion_idHabitacion: number;
   Fecha_Inicio: string;
-  Fecha_Fin: string;
+  Fecha_Fin: string | null;
   idCatalogo_Estado_Reservacion: number;
   Costo_Total: number;
   Activo: boolean;
@@ -24,6 +24,18 @@ export interface Reservacion {
   };
 }
 
+export interface CreateReservacionDto {
+  Paciente_idPaciente: number;
+  Habitacion_idHabitacion: number;
+  Fecha_Inicio: string;
+  Fecha_Fin?: string | null;
+  Catalogo_Tipo_Estancia_idEstancia?: number;
+  Catalogo_Estado_Reservacion_idEstado?: number;
+  Empleado_idEmpleado_Registra?: number;
+  Costo_Total?: number;
+  Activo?: boolean;
+}
+
 export const reservacionesService = {
   async getAll(): Promise<Reservacion[]> {
     const response = await api.get<Reservacion[]>('/reservaciones');
@@ -35,12 +47,12 @@ export const reservacionesService = {
     return response.data;
   },
 
-  async create(reservacion: Omit<Reservacion, 'idReservacion'>): Promise<Reservacion> {
+  async create(reservacion: CreateReservacionDto): Promise<Reservacion> {
     const response = await api.post<Reservacion>('/reservaciones', reservacion);
     return response.data;
   },
 
-  async update(id: number, reservacion: Partial<Reservacion>): Promise<Reservacion> {
+  async update(id: number, reservacion: Partial<CreateReservacionDto>): Promise<Reservacion> {
     const response = await api.patch<Reservacion>(`/reservaciones/${id}`, reservacion);
     return response.data;
   },

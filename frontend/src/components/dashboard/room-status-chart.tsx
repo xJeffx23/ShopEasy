@@ -8,8 +8,8 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/src/components/ui/card";
-import { RoomStatusData } from "@/src/types/dashboard";
+} from "@/components/ui/card";
+import { RoomStatusData } from "@/types/dashboard";
 
 interface RoomStatusChartProps {
     data?: RoomStatusData[];

@@ -8,14 +8,14 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/src/components/ui/card";
+} from "@/components/ui/card";
 import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
     type ChartConfig,
-} from "@/src/components/ui/chart";
-import { CapacityDataPoint } from "@/src/types/dashboard";
+} from "@/components/ui/chart";
+import { CapacityDataPoint } from "@/types/dashboard";
 
 interface CapacityTrendProps {
     occupancyRate?: number;

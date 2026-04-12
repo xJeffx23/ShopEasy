@@ -3,10 +3,10 @@
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { BedDouble, Brush, Plus, Save, Wrench, X } from "lucide-react";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
-import { Button } from "@/src/components/ui/button";
-import { Room, RoomCleaning, RoomMaintenance } from "@/src/types/room";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Room, RoomCleaning, RoomMaintenance } from "@/types/room";
 
 interface RoomDetailModalProps {
     room: Room | null;

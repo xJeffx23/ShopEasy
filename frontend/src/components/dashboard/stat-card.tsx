@@ -1,6 +1,6 @@
-import { dashboardIcons } from "@/src/lib/dashboard-icons";
-import { Card, CardContent } from "@/src/components/ui/card";
-import { DashboardStat, StatAccent } from "@/src/types/dashboard";
+import { dashboardIcons } from "@/lib/dashboard-icons";
+import { Card, CardContent } from "@/components/ui/card";
+import { DashboardStat, StatAccent } from "@/types/dashboard";
 
 interface StatCardProps {
     stat: DashboardStat;

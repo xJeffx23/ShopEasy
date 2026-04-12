@@ -4,8 +4,8 @@ import { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { MoreHorizontal, Pencil, Trash2, XCircle } from "lucide-react";
-import { Reservation, ReservationStatus } from "@/src/types/reservation";
-import { ReservationStatusBadge } from "@/src/components/reservations/reservation-status-badge";
+import { Reservation, ReservationStatus } from "@/types/reservation";
+import { ReservationStatusBadge } from "@/components/reservations/reservation-status-badge";
 
 interface ReservationsTableProps {
     reservations: Reservation[];

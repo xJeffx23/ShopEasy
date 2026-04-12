@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PatientsHeader } from "@/src/components/patients/patients-header";
-import { PatientsStats } from "@/src/components/patients/patients-stats";
-import { PatientsFilters } from "@/src/components/patients/patients-filters";
-import { PatientsTable } from "@/src/components/patients/patients-table";
-import AddPatientDialog from "@/src/components/patients/add-patient-dialog";
-import type { Patient, PatientsData, PatientStats, PatientStatus } from "@/src/types/patient";
+import { PatientsHeader } from "@/components/patients/patients-header";
+import { PatientsStats } from "@/components/patients/patients-stats";
+import { PatientsFilters } from "@/components/patients/patients-filters";
+import { PatientsTable } from "@/components/patients/patients-table";
+import AddPatientDialog from "@/components/patients/add-patient-dialog";
+import type { Patient, PatientsData, PatientStats, PatientStatus } from "@/types/patient";
 
 interface PatientsViewProps {
     data: PatientsData;

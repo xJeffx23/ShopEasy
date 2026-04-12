@@ -7,12 +7,12 @@ import {
     KeyRound, MoreHorizontal, Pencil,
     ShieldCheck, Trash2, UserCheck, UserX,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     EmployeeItem, EmployeeStatus,
     EmployeeDepartment, EmployeeProfile,
-} from "@/src/types/employee";
-import CreateUserAccessDialog from "@/src/components/employees/create-user-access-dialog";
+} from "@/types/employee";
+import CreateUserAccessDialog from "@/components/employees/create-user-access-dialog";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 

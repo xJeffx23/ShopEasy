@@ -1,10 +1,10 @@
 import { empleadosService } from './empleados.service';
-import { EmployeesData, EmployeeItem, EmployeeStatus } from '@/src/types/employee';
+import { EmployeesData, EmployeeItem, EmployeeStatus } from '@/types/employee';
 
 export async function getEmployeesData(): Promise<EmployeesData> {
   try {
     const empleados = await empleadosService.getAll();
-    
+
     // Transformar los datos del backend al formato del frontend
     const employees: EmployeeItem[] = empleados.map(emp => ({
       id: emp.idEmpleado.toString(),
@@ -52,9 +52,9 @@ export async function createEmployee(employeeData: any): Promise<EmployeeItem> {
       Catalogo_Perfil_Usuario_idPerfil: mapProfileToId(employeeData.role || 'Empleado'),
       Activo: true
     };
-    
+
     const response = await empleadosService.create(backendData);
-    
+
     return {
       id: response.idEmpleado.toString(),
       fullName: `${response.Nombre || ''} ${response.Apellidos || ''}`,
@@ -88,9 +88,9 @@ export async function updateEmployee(id: string, employeeData: any): Promise<Emp
       Catalogo_Perfil_Usuario_idPerfil: mapProfileToId(employeeData.role),
       Activo: employeeData.status !== 'inactivo'
     };
-    
+
     const response = await empleadosService.update(parseInt(id), backendData);
-    
+
     return {
       id: response.idEmpleado.toString(),
       fullName: `${response.Nombre || ''} ${response.Apellidos || ''}`,
@@ -124,7 +124,7 @@ export async function deleteEmployee(id: string): Promise<void> {
 export async function updateEmployeeStatus(id: string, status: EmployeeStatus): Promise<EmployeeItem> {
   try {
     const response = await empleadosService.updateStatus(parseInt(id), status === 'activo');
-    
+
     return {
       id: response.idEmpleado.toString(),
       fullName: `${response.Nombre || ''} ${response.Apellidos || ''}`,
@@ -168,12 +168,13 @@ function mapDepartmentToId(department: string): number {
 
 function mapProfile(profileName: string): EmployeeItem['profile'] {
   const mapping: Record<string, EmployeeItem['profile']> = {
-    'Gerencia': 'Gerente',
-    'Gestión de Pacientes': 'Administrativo',
-    'Mantenimiento': 'Técnico',
-    'Recepción': 'Recepcionista'
+    'Gerencia': 'Gerencia',
+    'Gestión de Pacientes': 'Gestión de pacientes',
+    'Gestión de pacientes': 'Gestión de pacientes',
+    'Mantenimiento': 'Mantenimiento',
+    'Recepción': 'Recepción'
   };
-  return mapping[profileName] || 'Empleado';
+  return mapping[profileName] || 'Recepción';
 }
 
 function mapProfileToId(profile: string): number {

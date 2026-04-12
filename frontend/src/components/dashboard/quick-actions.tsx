@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
-import { dashboardIcons } from "@/src/lib/dashboard-icons";
-import { Button } from "@/src/components/ui/button";
-import { QuickActionItem } from "@/src/types/dashboard";
+import { dashboardIcons } from "@/lib/dashboard-icons";
+import { Button } from "@/components/ui/button";
+import { QuickActionItem } from "@/types/dashboard";
 
 interface QuickActionsProps {
     actions: QuickActionItem[];

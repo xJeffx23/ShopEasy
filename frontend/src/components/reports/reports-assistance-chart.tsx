@@ -4,8 +4,8 @@ import { ClipboardList } from "lucide-react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
     Card, CardContent, CardDescription, CardHeader, CardTitle,
-} from "@/src/components/ui/card";
-import { AssistanceLevelDistribution } from "@/src/types/report";
+} from "@/components/ui/card";
+import { AssistanceLevelDistribution } from "@/types/report";
 
 interface ReportsAssistanceChartProps {
     data: AssistanceLevelDistribution[];

@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Room, RoomCleaning, RoomMaintenance, RoomStatus, RoomType } from "@/src/types/room";
-import { RoomCard } from "@/src/components/rooms/room-card";
-import { RoomDetailModal } from "@/src/components/rooms/room-detail-modal";
-import FilterCombobox from "@/src/components/ui/filter-combobox";
+import { Room, RoomCleaning, RoomMaintenance, RoomStatus, RoomType } from "@/types/room";
+import { RoomCard } from "@/components/rooms/room-card";
+import { RoomDetailModal } from "@/components/rooms/room-detail-modal";
+import FilterCombobox from "@/components/ui/filter-combobox";
 
 interface RoomsGridProps {
     rooms: Room[];

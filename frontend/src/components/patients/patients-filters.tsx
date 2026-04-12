@@ -1,7 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-import FilterCombobox from "@/src/components/ui/filter-combobox";
+import FilterCombobox from "@/components/ui/filter-combobox";
 
 interface PatientsFiltersProps {
     search: string;

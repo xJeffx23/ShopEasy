@@ -4,8 +4,8 @@ import { BedDouble } from "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import {
     Card, CardContent, CardDescription, CardHeader, CardTitle,
-} from "@/src/components/ui/card";
-import { RoomStatusDistribution, ReportSummary } from "@/src/types/report";
+} from "@/components/ui/card";
+import { RoomStatusDistribution, ReportSummary } from "@/types/report";
 
 interface ReportsRoomsChartProps {
     distribution: RoomStatusDistribution[];

@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from "react";
 
-import AddEmployeeDialog from "@/src/components/employees/add-employee-dialog";
-import EmployeesFilters from "@/src/components/employees/employees-filters";
-import EmployeesHeader from "@/src/components/employees/employees-header";
-import EmployeesTable from "@/src/components/employees/employees-table";
-import type { EmployeeItem, EmployeesData, EmployeeStatus } from "@/src/types/employee";
+import AddEmployeeDialog from "@/components/employees/add-employee-dialog";
+import EmployeesFilters from "@/components/employees/employees-filters";
+import EmployeesHeader from "@/components/employees/employees-header";
+import EmployeesTable from "@/components/employees/employees-table";
+import type { EmployeeItem, EmployeesData, EmployeeStatus } from "@/types/employee";
 
 interface EmployeesViewProps {
     data: EmployeesData;

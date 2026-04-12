@@ -1,8 +1,8 @@
 import { Activity } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
-import { DashboardPulse } from "@/src/types/dashboard";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DashboardPulse } from "@/types/dashboard";
 
 interface PatientPulseProps {
     pulse: DashboardPulse;

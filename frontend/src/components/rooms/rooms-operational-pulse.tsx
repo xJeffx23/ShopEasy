@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/src/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface RoomsOperationalPulseProps {
     occupancyPercentage: number;

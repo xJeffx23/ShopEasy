@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Bell, Search } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
-import { Badge } from "@/src/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 // TODO: Reemplazar con datos reales del contexto de autenticación
 const MOCK_USER = {

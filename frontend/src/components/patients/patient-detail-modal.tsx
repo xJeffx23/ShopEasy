@@ -3,7 +3,7 @@
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Package, Pill, ShieldAlert, X } from "lucide-react";
-import { Patient } from "@/src/types/patient";
+import { Patient } from "@/types/patient";
 
 interface PatientDetailModalProps {
     patient: Patient | null;

@@ -4,11 +4,11 @@ import { Users } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
     Card, CardContent, CardDescription, CardHeader, CardTitle,
-} from "@/src/components/ui/card";
+} from "@/components/ui/card";
 import {
     ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig,
-} from "@/src/components/ui/chart";
-import { PatientsByDay } from "@/src/types/report";
+} from "@/components/ui/chart";
+import { PatientsByDay } from "@/types/report";
 
 interface ReportsPatientsByDayProps {
     data: PatientsByDay[];

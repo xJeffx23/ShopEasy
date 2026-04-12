@@ -7,17 +7,17 @@ import {
     Settings2, ShieldAlert, Trash2, UserPlus, X,
 } from "lucide-react";
 
-import FilterCombobox from "@/src/components/ui/filter-combobox";
-import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
+import FilterCombobox from "@/components/ui/filter-combobox";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from "@/src/components/ui/dialog";
+} from "@/components/ui/dialog";
 import type {
     Patient,
     AssistanceLevel,
@@ -27,7 +27,7 @@ import type {
     PatientMedication,
     PatientSpecialCare,
     PatientPackage,
-} from "@/src/types/patient";
+} from "@/types/patient";
 
 // ─── Opciones de selects ──────────────────────────────────────────────────────
 

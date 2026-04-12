@@ -1,6 +1,6 @@
 import { BedDouble, Activity, Users } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/src/components/ui/card";
-import { QuickSummaryData } from "@/src/types/dashboard";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { QuickSummaryData } from "@/types/dashboard";
 
 interface QuickSummaryProps {
     data?: QuickSummaryData;

@@ -1,9 +1,8 @@
 import api from './api';
-import { ReportsData } from '@/src/types/report';
+import { ReportsData } from '@/types/report';
 
 export async function getReportsData(): Promise<ReportsData> {
   try {
-    // Obtener datos reales de los endpoints
     const [empleadosResponse, pacientesResponse, habitacionesResponse, reservacionesResponse] = await Promise.all([
       api.get('/empleados'),
       api.get('/pacientes'),
@@ -11,16 +10,15 @@ export async function getReportsData(): Promise<ReportsData> {
       api.get('/reservaciones')
     ]);
 
-    const empleados = empleadosResponse.data;
-    const pacientes = pacientesResponse.data;
-    const habitaciones = habitacionesResponse.data;
-    const reservaciones = reservacionesResponse.data;
+    const empleados: any[] = empleadosResponse.data;
+    const pacientes: any[] = pacientesResponse.data;
+    const habitaciones: any[] = habitacionesResponse.data;
+    const reservaciones: any[] = reservacionesResponse.data;
 
-    // Calcular estadísticas requeridas por el proyecto
     const totalPacientesRegistrados = pacientes.length;
-    const pacientesAlojados = reservaciones.filter(r => r.idCatalogo_Estado_Reservacion === 1).length;
-    const pacientesPorDia = reservaciones.length; // Simplificado - debería agrupar por día
-    const habitacionesReservadas = reservaciones.filter(r => r.idCatalogo_Estado_Reservacion === 1).length;
+    const pacientesAlojados = reservaciones.filter((r: any) => r.idCatalogo_Estado_Reservacion === 1).length;
+    const pacientesPorDia = reservaciones.length;
+    const habitacionesReservadas = reservaciones.filter((r: any) => r.idCatalogo_Estado_Reservacion === 1).length;
     const habitacionesTotales = habitaciones.length;
 
     return {
@@ -45,7 +43,7 @@ export async function getReportsData(): Promise<ReportsData> {
         { month: "Ene", occupancy: 75 },
         { month: "Feb", occupancy: 80 },
         { month: "Mar", occupancy: 85 },
-        { month: "Abr", occupancy: Math.round((habitacionesReservadas / habitacionesTotales) * 100) }
+        { month: "Abr", occupancy: habitacionesTotales > 0 ? Math.round((habitacionesReservadas / habitacionesTotales) * 100) : 0 }
       ],
       roomStatusDist: [
         { name: "Disponibles", value: habitaciones.filter((h: any) => h.idCatalogo_Estado_Habitacion === 1).length, color: "#10b981" },
@@ -68,7 +66,6 @@ export async function getReportsData(): Promise<ReportsData> {
     };
   } catch (error) {
     console.error('Error fetching reports data:', error);
-    // Retornar datos vacíos en caso de error
     return {
       summary: {
         totalPatients: 0,

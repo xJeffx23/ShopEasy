@@ -1,12 +1,12 @@
 import { Download } from "lucide-react";
-import { Button } from "@/src/components/ui/button";
-import { ReportsSummaryCards } from "@/src/components/reports/reports-summary-cards";
-import { ReportsPatientsByDay } from "@/src/components/reports/reports-patients-by-day";
-import { ReportsOccupancyTrend } from "@/src/components/reports/reports-occupancy-trend";
-import { ReportsRoomsChart } from "@/src/components/reports/reports-rooms-chart";
-import { ReportsMovementChart } from "@/src/components/reports/reports-movement-chart";
-import { ReportsAssistanceChart } from "@/src/components/reports/reports-assistance-chart";
-import { ReportsData } from "@/src/types/report";
+import { Button } from "@/components/ui/button";
+import { ReportsSummaryCards } from "@/components/reports/reports-summary-cards";
+import { ReportsPatientsByDay } from "@/components/reports/reports-patients-by-day";
+import { ReportsOccupancyTrend } from "@/components/reports/reports-occupancy-trend";
+import { ReportsRoomsChart } from "@/components/reports/reports-rooms-chart";
+import { ReportsMovementChart } from "@/components/reports/reports-movement-chart";
+import { ReportsAssistanceChart } from "@/components/reports/reports-assistance-chart";
+import { ReportsData } from "@/types/report";
 
 interface ReportsViewProps {
     data: ReportsData;

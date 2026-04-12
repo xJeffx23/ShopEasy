@@ -7,10 +7,10 @@ import {
     CalendarPlus, CheckCircle2, Clock, History,
     UserRound, XCircle,
 } from "lucide-react";
-import { Button } from "@/src/components/ui/button";
-import AddReservationDialog from "@/src/components/reservations/add-reservation-dialog";
-import type { PatientPanelData } from "@/src/types/patient-panel";
-import type { Reservation } from "@/src/types/reservation";
+import { Button } from "@/components/ui/button";
+import AddReservationDialog from "@/components/reservations/add-reservation-dialog";
+import type { PatientPanelData } from "@/types/patient-panel";
+import type { Reservation } from "@/types/reservation";
 
 interface PatientPanelViewProps {
     data: PatientPanelData;

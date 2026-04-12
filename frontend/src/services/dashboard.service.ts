@@ -1,5 +1,5 @@
 import api from './api';
-import { DashboardData } from "@/src/types/dashboard";
+import { DashboardData } from "@/types/dashboard";
 
 export async function getDashboardData(): Promise<DashboardData> {
   try {

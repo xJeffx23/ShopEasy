@@ -8,8 +8,8 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/src/components/ui/card";
-import { CareLevel } from "@/src/types/dashboard";
+} from "@/components/ui/card";
+import { CareLevel } from "@/types/dashboard";
 
 interface CareLevelChartProps {
     data?: CareLevel[];

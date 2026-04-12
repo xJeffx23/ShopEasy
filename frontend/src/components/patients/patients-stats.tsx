@@ -1,4 +1,4 @@
-import { PatientStats } from "@/src/types/patient";
+import { PatientStats } from "@/types/patient";
 
 interface PatientsStatsProps {
     stats: PatientStats;

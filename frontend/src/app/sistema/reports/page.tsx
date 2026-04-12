@@ -1,5 +1,6 @@
-import ReportsView from "@/src/components/reports/reports-view";
-import { getReportsData } from "@/src/services/reports.service";
+export const dynamic = "force-dynamic";
+import ReportsView from "@/components/reports/reports-view";
+import { getReportsData } from "@/services/reports.service";
 
 export const metadata = {
     title: "Reportes | Patitos del Retiro",

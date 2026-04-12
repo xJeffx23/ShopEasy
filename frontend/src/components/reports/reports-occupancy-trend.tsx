@@ -4,11 +4,11 @@ import { TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
     Card, CardContent, CardDescription, CardHeader, CardTitle,
-} from "@/src/components/ui/card";
+} from "@/components/ui/card";
 import {
     ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig,
-} from "@/src/components/ui/chart";
-import { OccupancyTrend } from "@/src/types/report";
+} from "@/components/ui/chart";
+import { OccupancyTrend } from "@/types/report";
 
 interface ReportsOccupancyTrendProps {
     data: OccupancyTrend[];

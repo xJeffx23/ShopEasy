@@ -1,5 +1,5 @@
-import StatCard from "@/src/components/dashboard/stat-card";
-import { DashboardStat } from "@/src/types/dashboard";
+import StatCard from "@/components/dashboard/stat-card";
+import { DashboardStat } from "@/types/dashboard";
 
 interface StatsGridProps {
     stats: DashboardStat[];

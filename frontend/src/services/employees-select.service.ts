@@ -6,20 +6,20 @@ export interface EmployeeOption {
   id: number;
   nombre: string;
   email: string;
-  departamento: string;
+  perfil: string;
 }
 
 export async function getEmployeesForSelect(): Promise<EmployeeOption[]> {
   try {
     const empleados = await empleadosService.getAll();
-    
+
     return empleados.map(empleado => ({
-      label: `${empleado.Nombre} (${empleado.Email})`,
+      label: `${empleado.Nombre} ${empleado.Apellidos} (${empleado.Email})`,
       value: empleado.idEmpleado.toString(),
       id: empleado.idEmpleado,
       nombre: empleado.Nombre,
       email: empleado.Email,
-      departamento: empleado.Departamento?.Nombre_Departamento || 'Sin departamento'
+      perfil: empleado.Perfil?.Nombre_Perfil || 'Sin perfil'
     }));
   } catch (error) {
     console.error('Error loading employees for select:', error);

@@ -7,7 +7,7 @@ import {
     BedDouble, CalendarCheck, CheckCircle2,
     Eye, MoreHorizontal, Pencil, Trash2, Wrench, XCircle,
 } from "lucide-react";
-import { Room, RoomStatus } from "@/src/types/room";
+import { Room, RoomStatus } from "@/types/room";
 
 interface RoomCardProps {
     room: Room;

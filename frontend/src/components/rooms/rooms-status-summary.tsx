@@ -1,5 +1,5 @@
 import { BedDouble, CalendarCheck, CheckCircle2, Wrench, XCircle } from "lucide-react";
-import { RoomStats } from "@/src/types/room";
+import { RoomStats } from "@/types/room";
 
 interface RoomsStatusSummaryProps {
     stats: RoomStats;

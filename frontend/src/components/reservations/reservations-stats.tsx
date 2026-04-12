@@ -1,5 +1,5 @@
 import { CalendarCheck, CalendarClock, CalendarDays } from "lucide-react";
-import { ReservationStats } from "@/src/types/reservation";
+import { ReservationStats } from "@/types/reservation";
 
 interface ReservationsStatsProps {
     stats: ReservationStats;

@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, KeyRound, Lock, ShieldCheck } from "lucide-react";
 
-import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
-import { changePassword } from "@/src/lib/auth/auth-service";
-import { getSession, markPasswordChanged } from "@/src/lib/auth/auth-storage";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { changePassword } from "@/lib/auth/auth-service";
+import { getSession, markPasswordChanged } from "@/lib/auth/auth-storage";
 
 export default function ChangePasswordView() {
     const router = useRouter();

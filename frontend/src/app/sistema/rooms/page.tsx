@@ -1,5 +1,6 @@
-import RoomsView from "@/src/components/rooms/rooms-view";
-import { getRoomsData } from "@/src/services/rooms.service";
+export const dynamic = "force-dynamic";
+import RoomsView from "@/components/rooms/rooms-view";
+import { getRoomsData } from "@/services/rooms.service";
 
 export const metadata = {
     title: "Habitaciones | Patitos del Retiro",

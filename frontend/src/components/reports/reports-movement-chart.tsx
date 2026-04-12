@@ -4,12 +4,12 @@ import { ArrowDownUp } from "lucide-react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import {
     Card, CardContent, CardDescription, CardHeader, CardTitle,
-} from "@/src/components/ui/card";
+} from "@/components/ui/card";
 import {
     ChartContainer, ChartLegend, ChartLegendContent,
     ChartTooltip, ChartTooltipContent, type ChartConfig,
-} from "@/src/components/ui/chart";
-import { PatientMovement } from "@/src/types/report";
+} from "@/components/ui/chart";
+import { PatientMovement } from "@/types/report";
 
 interface ReportsMovementChartProps {
     data: PatientMovement[];

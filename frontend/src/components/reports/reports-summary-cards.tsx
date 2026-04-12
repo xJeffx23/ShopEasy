@@ -2,7 +2,7 @@ import {
     BedDouble, CalendarCheck, Users, UserCheck,
     type LucideIcon,
 } from "lucide-react";
-import { ReportSummary } from "@/src/types/report";
+import { ReportSummary } from "@/types/report";
 
 interface ReportsSummaryCardsProps {
     summary: ReportSummary;

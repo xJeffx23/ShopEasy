@@ -2,9 +2,9 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Button } from "@/src/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
-import { ActivityItem } from "@/src/types/dashboard";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ActivityItem } from "@/types/dashboard";
 
 interface RecentActivityProps {
     items: ActivityItem[];

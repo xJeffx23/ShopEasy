@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { RoomsHeader } from "@/src/components/rooms/rooms-header";
-import { RoomsStatusSummary } from "@/src/components/rooms/rooms-status-summary";
-import { RoomsGrid } from "@/src/components/rooms/rooms-grid";
-import AddRoomDialog from "@/src/components/rooms/add-room-dialog";
+import { RoomsHeader } from "@/components/rooms/rooms-header";
+import { RoomsStatusSummary } from "@/components/rooms/rooms-status-summary";
+import { RoomsGrid } from "@/components/rooms/rooms-grid";
+import AddRoomDialog from "@/components/rooms/add-room-dialog";
 import type {
     Room, RoomCleaning, RoomMaintenance,
     RoomsData, RoomStats, RoomStatus,
-} from "@/src/types/room";
+} from "@/types/room";
 
 interface RoomsViewProps {
     data: RoomsData;

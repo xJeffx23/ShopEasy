@@ -1,4 +1,4 @@
-import { ReservationStatus } from "@/src/types/reservation";
+import { ReservationStatus } from "@/types/reservation";
 
 interface ReservationStatusBadgeProps {
     status: ReservationStatus;

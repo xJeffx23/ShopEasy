@@ -4,18 +4,18 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CalendarDays, Save, X } from "lucide-react";
 
-import FilterCombobox from "@/src/components/ui/filter-combobox";
-import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
+import FilterCombobox from "@/components/ui/filter-combobox";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
     Dialog, DialogContent, DialogDescription,
     DialogHeader, DialogTitle,
-} from "@/src/components/ui/dialog";
+} from "@/components/ui/dialog";
 import type {
     Reservation, ReservationRoomType,
     ReservationStatus, StaySchedule,
-} from "@/src/types/reservation";
+} from "@/types/reservation";
 
 // ─── Opciones ─────────────────────────────────────────────────────────────────
 

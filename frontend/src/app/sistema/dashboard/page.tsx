@@ -1,5 +1,6 @@
-import DashboardView from "@/src/components/dashboard/dashboardView";
-import { getDashboardData } from "@/src/services/dashboard.service";
+export const dynamic = "force-dynamic";
+import DashboardView from "@/components/dashboard/dashboardView";
+import { getDashboardData } from "@/services/dashboard.service";
 
 export const metadata = {
     title: "Dashboard | Patitos del Retiro",

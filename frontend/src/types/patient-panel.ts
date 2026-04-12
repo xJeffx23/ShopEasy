@@ -1,4 +1,4 @@
-import { Reservation } from "@/src/types/reservation";
+import { Reservation } from "@/types/reservation";
 
 export interface PatientPanelData {
     patient: {

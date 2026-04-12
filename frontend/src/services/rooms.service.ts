@@ -1,5 +1,5 @@
 import { habitacionesService } from './habitaciones.service';
-import { RoomsData, Room, RoomStatus, RoomType, RoomStats } from '@/src/types/room';
+import { RoomsData, Room, RoomStatus, RoomType, RoomStats } from '@/types/room';
 
 export async function getRoomsData(): Promise<RoomsData> {
   try {

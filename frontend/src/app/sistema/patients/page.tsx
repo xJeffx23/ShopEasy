@@ -1,5 +1,6 @@
-import PatientsView from "@/src/components/patients/patientsView";
-import { getPatientsData } from "@/src/services/patients.service";
+export const dynamic = "force-dynamic";
+import PatientsView from "@/components/patients/patientsView";
+import { getPatientsData } from "@/services/patients.service";
 
 export const metadata = {
     title: "Pacientes | Patitos del Retiro",

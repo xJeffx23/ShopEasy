@@ -1,15 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ReservationsHeader } from "@/src/components/reservations/reservations-header";
-import { ReservationsStats } from "@/src/components/reservations/reservations-stats";
-import { ReservationsFilters } from "@/src/components/reservations/reservations-filters";
-import { ReservationsTable } from "@/src/components/reservations/reservations-table";
-import AddReservationDialog from "@/src/components/reservations/add-reservation-dialog";
+import { ReservationsHeader } from "@/components/reservations/reservations-header";
+import { ReservationsStats } from "@/components/reservations/reservations-stats";
+import { ReservationsFilters } from "@/components/reservations/reservations-filters";
+import { ReservationsTable } from "@/components/reservations/reservations-table";
+import AddReservationDialog from "@/components/reservations/add-reservation-dialog";
 import type {
     Reservation, ReservationsData,
     ReservationStats, ReservationStatus,
-} from "@/src/types/reservation";
+} from "@/types/reservation";
 
 interface ReservationsViewProps {
     data: ReservationsData;

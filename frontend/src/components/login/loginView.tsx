@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
-import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
-import AnimatedAuthBackground from "@/src/components/login/AnimatedAuthBackground";
-import { authService } from "@/src/services/auth.service";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import AnimatedAuthBackground from "@/components/login/AnimatedAuthBackground";
+import { authService } from "@/services/auth.service";
 
 export default function LoginView() {
     const router = useRouter();

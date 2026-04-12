@@ -1,5 +1,5 @@
 import { UserPlus } from "lucide-react";
-import { Button } from "@/src/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 interface EmployeesHeaderProps {
     title: string;

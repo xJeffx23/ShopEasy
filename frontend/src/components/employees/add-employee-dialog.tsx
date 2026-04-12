@@ -4,23 +4,23 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { CreditCard, Mail, Phone, Save, Settings2, UserPlus, X } from "lucide-react";
 
-import FilterCombobox from "@/src/components/ui/filter-combobox";
-import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
+import FilterCombobox from "@/components/ui/filter-combobox";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from "@/src/components/ui/dialog";
+} from "@/components/ui/dialog";
 import type {
     EmployeeItem,
     EmployeeDepartment,
     EmployeeProfile,
     EmployeeStatus,
-} from "@/src/types/employee";
+} from "@/types/employee";
 
 // ─── Opciones ─────────────────────────────────────────────────────────────────
 

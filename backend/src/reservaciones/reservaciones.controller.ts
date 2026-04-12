@@ -8,21 +8,34 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @Controller('reservaciones')
 export class ReservacionesController {
-  constructor(private readonly reservacionesService: ReservacionesService) {}
+  constructor(private readonly reservacionesService: ReservacionesService) { }
 
   @Get()
   @ApiOperation({ summary: 'Obtener todas las reservaciones' })
-  @ApiResponse({ status: 200, description: 'Lista de reservaciones obtenida exitosamente' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
   findAll() {
     return this.reservacionesService.findAll();
   }
 
+  @Get('pacientes-disponibles')
+  @ApiOperation({ summary: 'Obtener pacientes disponibles para reservar' })
+  getPacientesDisponibles() {
+    return this.reservacionesService.getPacientesDisponibles();
+  }
+
+  @Get('habitaciones-disponibles')
+  @ApiOperation({ summary: 'Obtener habitaciones disponibles para reservar' })
+  getHabitacionesDisponibles() {
+    return this.reservacionesService.getHabitacionesDisponibles();
+  }
+
+  @Get('empleados-activos')
+  @ApiOperation({ summary: 'Obtener empleados activos' })
+  getEmpleadosActivos() {
+    return this.reservacionesService.getEmpleadosActivos();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Obtener una reservación por ID' })
-  @ApiResponse({ status: 200, description: 'Reservación encontrada exitosamente' })
-  @ApiResponse({ status: 404, description: 'Reservación no encontrada' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
   findOne(@Param('id') id: string) {
     return this.reservacionesService.findOne(+id);
   }
@@ -30,34 +43,21 @@ export class ReservacionesController {
   @Post()
   @ApiOperation({ summary: 'Crear una nueva reservación' })
   @ApiResponse({ status: 201, description: 'Reservación creada exitosamente' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 400, description: 'Validación fallida' })
   create(@Body() createReservacionDto: any) {
     return this.reservacionesService.create(createReservacionDto);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar una reservación' })
-  @ApiResponse({ status: 200, description: 'Reservación actualizada exitosamente' })
-  @ApiResponse({ status: 404, description: 'Reservación no encontrada' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 200, description: 'Reservación actualizada' })
+  @ApiResponse({ status: 400, description: 'Validación fallida' })
   update(@Param('id') id: string, @Body() updateReservacionDto: any) {
     return this.reservacionesService.update(+id, updateReservacionDto);
   }
 
-  @Patch(':id/status')
-  @ApiOperation({ summary: 'Actualizar estado de una reservación' })
-  @ApiResponse({ status: 200, description: 'Estado de reservación actualizado exitosamente' })
-  @ApiResponse({ status: 404, description: 'Reservación no encontrada' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
-  updateStatus(@Param('id') id: string, @Body() statusDto: { idCatalogo_Estado_Reservacion: number }) {
-    return this.reservacionesService.update(+id, statusDto);
-  }
-
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar una reservación' })
-  @ApiResponse({ status: 200, description: 'Reservación eliminada exitosamente' })
-  @ApiResponse({ status: 404, description: 'Reservación no encontrada' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
   remove(@Param('id') id: string) {
     return this.reservacionesService.remove(+id);
   }

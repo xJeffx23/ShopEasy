@@ -13,16 +13,21 @@ export class HabitacionesController {
   @Get()
   @ApiOperation({ summary: 'Obtener todas las habitaciones' })
   @ApiResponse({ status: 200, description: 'Lista de habitaciones obtenida exitosamente' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
   findAll() {
     return this.habitacionesService.findAll();
+  }
+
+  @Get('disponibles')
+  @ApiOperation({ summary: 'Obtener habitaciones disponibles para reservar' })
+  @ApiResponse({ status: 200, description: 'Lista de habitaciones disponibles' })
+  findDisponibles() {
+    return this.habitacionesService.findDisponibles();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener una habitación por ID' })
   @ApiResponse({ status: 200, description: 'Habitación obtenida exitosamente' })
   @ApiResponse({ status: 404, description: 'Habitación no encontrada' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
   findOne(@Param('id') id: string) {
     return this.habitacionesService.findOne(parseInt(id));
   }
@@ -31,7 +36,6 @@ export class HabitacionesController {
   @ApiOperation({ summary: 'Crear una nueva habitación' })
   @ApiResponse({ status: 201, description: 'Habitación creada exitosamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
   create(@Body() createRoomDto: any) {
     return this.habitacionesService.create(createRoomDto);
   }
@@ -40,8 +44,7 @@ export class HabitacionesController {
   @ApiOperation({ summary: 'Actualizar una habitación' })
   @ApiResponse({ status: 200, description: 'Habitación actualizada exitosamente' })
   @ApiResponse({ status: 404, description: 'Habitación no encontrada' })
-  @ApiResponse({ status: 400, description: 'Datos inválidos' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 400, description: 'Operación no permitida por reglas de negocio' })
   update(@Param('id') id: string, @Body() updateRoomDto: any) {
     return this.habitacionesService.update(parseInt(id), updateRoomDto);
   }
@@ -49,18 +52,15 @@ export class HabitacionesController {
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar una habitación' })
   @ApiResponse({ status: 200, description: 'Habitación eliminada exitosamente' })
-  @ApiResponse({ status: 404, description: 'Habitación no encontrada' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 400, description: 'No se puede eliminar - tiene reservaciones' })
   remove(@Param('id') id: string) {
     return this.habitacionesService.remove(parseInt(id));
   }
 
   @Patch(':id/status')
   @ApiOperation({ summary: 'Cambiar estado de una habitación' })
-  @ApiResponse({ status: 200, description: 'Estado de la habitación actualizado exitosamente' })
-  @ApiResponse({ status: 404, description: 'Habitación no encontrada' })
-  @ApiResponse({ status: 400, description: 'Datos inválidos' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 200, description: 'Estado actualizado exitosamente' })
+  @ApiResponse({ status: 400, description: 'Cambio de estado no permitido' })
   updateStatus(@Param('id') id: string, @Body() statusDto: { statusId: number }) {
     return this.habitacionesService.updateStatus(parseInt(id), statusDto.statusId);
   }

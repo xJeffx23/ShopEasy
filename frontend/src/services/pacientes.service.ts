@@ -10,14 +10,42 @@ export interface Paciente {
   Nombre_Contacto_Emergencia: string;
   Activo: boolean;
   Catalogo_Nivel_Asistencia_idNivel: number;
-  Apellidos?: string;
-  Telefono?: string;
-  Email?: string;
-  Direccion?: string;
   Nivel_Asistencia?: {
     idCatalogo_Nivel_Asistencia: number;
     Descripcion_Nivel: string;
   };
+  Reservaciones?: {
+    idReservacion: number;
+    Activo: boolean;
+    Catalogo_Estado_Reservacion_idEstado: number;
+    Habitacion?: {
+      idHabitacion: number;
+      Numero_Habitacion: string;
+    };
+  }[];
+  Medicamentos?: {
+    idPaciente_Medicamento: number;
+    Nombre_Medicamento: string;
+    Dosis: string;
+    Frecuencia: string;
+    Indicaciones: string;
+    Activo: boolean;
+  }[];
+  Cuidados?: {
+    idPaciente_Cuidado: number;
+    Detalle: string;
+    Tipo_Cuidado?: {
+      Descripcion_Cuidado: string;
+    };
+  }[];
+  Paquetes?: {
+    idPaciente_Paquete: number;
+    Fecha_Asignacion: string;
+    Activo: boolean;
+    Paquete?: {
+      Descripcion_Paquete: string;
+    };
+  }[];
 }
 
 export interface CreatePacienteDto {

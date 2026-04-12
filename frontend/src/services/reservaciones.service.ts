@@ -6,21 +6,34 @@ export interface Reservacion {
   Habitacion_idHabitacion: number;
   Fecha_Inicio: string;
   Fecha_Fin: string | null;
-  idCatalogo_Estado_Reservacion: number;
-  Costo_Total: number;
+  Indefinido: boolean;
+  Observaciones?: string;
+  Catalogo_Estado_Reservacion_idEstado: number;
+  Catalogo_Tipo_Estancia_idEstancia: number;
+  Empleado_idEmpleado_Registra: number;
   Activo: boolean;
   Paciente?: {
     idPaciente: number;
     Nombre: string;
-    Apellidos: string;
   };
   Habitacion?: {
     idHabitacion: number;
     Numero_Habitacion: string;
+    Tipo?: {
+      Nombre_Tipo: string;
+    };
   };
-  Estado_Reservacion?: {
+  Estado?: {
     idCatalogo_Estado_Reservacion: number;
     Descripcion_Estado: string;
+  };
+  Tipo_Estancia?: {
+    idCatalogo_Tipo_Estancia: number;
+    Descripcion_Estancia: string;
+  };
+  Empleado?: {
+    idEmpleado: number;
+    Nombre: string;
   };
 }
 
@@ -29,10 +42,11 @@ export interface CreateReservacionDto {
   Habitacion_idHabitacion: number;
   Fecha_Inicio: string;
   Fecha_Fin?: string | null;
-  Catalogo_Tipo_Estancia_idEstancia?: number;
-  Catalogo_Estado_Reservacion_idEstado?: number;
-  Empleado_idEmpleado_Registra?: number;
-  Costo_Total?: number;
+  Indefinido?: boolean;
+  Observaciones?: string;
+  Catalogo_Tipo_Estancia_idEstancia: number;
+  Catalogo_Estado_Reservacion_idEstado: number;
+  Empleado_idEmpleado_Registra: number;
   Activo?: boolean;
 }
 

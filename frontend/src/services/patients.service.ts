@@ -5,25 +5,49 @@ export async function getPatientsData(): Promise<PatientsData> {
   try {
     const pacientes = await pacientesService.getAll();
 
-    const patients: Patient[] = pacientes.map(paciente => ({
-      id: paciente.idPaciente.toString(),
-      patientCode: `PAT${paciente.idPaciente.toString().padStart(4, '0')}`,
-      fullName: `${paciente.Nombre} ${paciente.Apellidos || ''}`.trim(),
-      idNumber: paciente.idPaciente.toString(),
-      birthDate: new Date(paciente.Fecha_Nacimiento).toLocaleDateString('es-CR'),
-      age: calculateAge(new Date(paciente.Fecha_Nacimiento)),
-      admissionDate: new Date(paciente.Fecha_Ingreso).toLocaleDateString('es-CR'),
-      roomNumber: 'No asignada',
-      assistanceLevel: mapAssistanceLevel(paciente.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
-      status: paciente.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
-      emergencyContact: {
-        name: paciente.Nombre_Contacto_Emergencia || 'Contacto de emergencia',
-        phone: paciente.Telefono_Contacto_Emergencia || paciente.Telefono || 'N/A'
-      },
-      medications: [],
-      specialCares: [],
-      packages: []
-    }));
+    const patients: Patient[] = pacientes.map(paciente => {
+      // Buscar reservación activa para obtener la habitación
+      const reservacionActiva = paciente.Reservaciones?.find(
+        (r: any) => r.Activo && r.Catalogo_Estado_Reservacion_idEstado === 1
+      );
+      const habitacion = reservacionActiva?.Habitacion?.Numero_Habitacion || 'No asignada';
+
+      return {
+        id: paciente.idPaciente.toString(),
+        patientCode: `PAT${paciente.idPaciente.toString().padStart(4, '0')}`,
+        fullName: paciente.Nombre,
+        idNumber: paciente.Numero_Cedula || paciente.idPaciente.toString(),
+        birthDate: new Date(paciente.Fecha_Nacimiento).toLocaleDateString('es-CR'),
+        age: calculateAge(new Date(paciente.Fecha_Nacimiento)),
+        admissionDate: new Date(paciente.Fecha_Ingreso).toLocaleDateString('es-CR'),
+        roomNumber: habitacion,
+        assistanceLevel: mapAssistanceLevel(paciente.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
+        status: paciente.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
+        emergencyContact: {
+          name: paciente.Nombre_Contacto_Emergencia || 'Contacto de emergencia',
+          phone: paciente.Telefono_Contacto_Emergencia || 'N/A'
+        },
+        medications: paciente.Medicamentos?.map((med: any) => ({
+          id: med.idPaciente_Medicamento?.toString() || crypto.randomUUID(),
+          name: med.Nombre_Medicamento,
+          dose: med.Dosis,
+          frequency: med.Frecuencia,
+          schedule: med.Indicaciones || '',
+          notes: ''
+        })) || [],
+        specialCares: paciente.Cuidados?.map((care: any) => ({
+          id: care.idPaciente_Cuidado?.toString() || crypto.randomUUID(),
+          type: care.Tipo_Cuidado?.Descripcion_Cuidado || 'Cuidado especial',
+          detail: care.Detalle
+        })) || [],
+        packages: paciente.Paquetes?.map((pkg: any) => ({
+          id: pkg.idPaciente_Paquete?.toString() || crypto.randomUUID(),
+          type: pkg.Paquete?.Descripcion_Paquete || 'Paquete',
+          assignedDate: new Date(pkg.Fecha_Asignacion).toLocaleDateString('es-CR'),
+          active: pkg.Activo
+        })) || []
+      };
+    });
 
     const stats: PatientStats = {
       total: patients.length,
@@ -73,13 +97,11 @@ function calculateAge(birthDate: Date): number {
 function parseDateString(dateStr: string): Date {
   if (!dateStr) return new Date();
 
-  // Si viene en formato DD/MM/YYYY
   if (dateStr.includes('/')) {
     const [d, m, y] = dateStr.split('/');
     return new Date(`${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`);
   }
 
-  // Si viene en formato YYYY-MM-DD o ISO
   return new Date(dateStr);
 }
 
@@ -131,9 +153,6 @@ export async function updatePatient(id: string, patientData: any): Promise<Patie
       Nombre: patientData.fullName || undefined,
       Telefono_Contacto_Emergencia: patientData.emergencyContact?.phone || '',
       Nombre_Contacto_Emergencia: patientData.emergencyContact?.name || '',
-      Telefono: patientData.phone || '',
-      Email: patientData.email || '',
-      Direccion: patientData.address || '',
       Activo: patientData.status !== 'inactivo'
     };
 
@@ -143,20 +162,24 @@ export async function updatePatient(id: string, patientData: any): Promise<Patie
 
     const response = await pacientesService.update(parseInt(id), backendData);
 
+    const reservacionActiva = response.Reservaciones?.find(
+      (r: any) => r.Activo && r.Catalogo_Estado_Reservacion_idEstado === 1
+    );
+
     return {
       id: response.idPaciente.toString(),
-      fullName: `${response.Nombre} ${response.Apellidos || ''}`.trim(),
+      fullName: response.Nombre,
       idNumber: response.Numero_Cedula || response.idPaciente.toString(),
       patientCode: `PAT${response.idPaciente.toString().padStart(4, '0')}`,
       birthDate: new Date(response.Fecha_Nacimiento).toLocaleDateString('es-CR'),
       age: calculateAge(new Date(response.Fecha_Nacimiento)),
       admissionDate: new Date(response.Fecha_Ingreso).toLocaleDateString('es-CR'),
-      roomNumber: 'No asignada',
+      roomNumber: reservacionActiva?.Habitacion?.Numero_Habitacion || 'No asignada',
       assistanceLevel: mapAssistanceLevel(response.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
       status: response.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
       emergencyContact: {
         name: response.Nombre_Contacto_Emergencia || 'Contacto',
-        phone: response.Telefono_Contacto_Emergencia || response.Telefono || 'N/A'
+        phone: response.Telefono_Contacto_Emergencia || 'N/A'
       },
       medications: [],
       specialCares: [],
@@ -182,20 +205,24 @@ export async function updatePatientStatus(id: string, status: PatientStatus): Pr
     const backendData = { Activo: status === 'activo' };
     const response = await pacientesService.update(parseInt(id), backendData);
 
+    const reservacionActiva = response.Reservaciones?.find(
+      (r: any) => r.Activo && r.Catalogo_Estado_Reservacion_idEstado === 1
+    );
+
     return {
       id: response.idPaciente.toString(),
-      fullName: `${response.Nombre} ${response.Apellidos || ''}`.trim(),
+      fullName: response.Nombre,
       idNumber: response.Numero_Cedula || response.idPaciente.toString(),
       patientCode: `PAT${response.idPaciente.toString().padStart(4, '0')}`,
       birthDate: new Date(response.Fecha_Nacimiento).toLocaleDateString('es-CR'),
       age: calculateAge(new Date(response.Fecha_Nacimiento)),
       admissionDate: new Date(response.Fecha_Ingreso).toLocaleDateString('es-CR'),
-      roomNumber: 'No asignada',
+      roomNumber: reservacionActiva?.Habitacion?.Numero_Habitacion || 'No asignada',
       assistanceLevel: mapAssistanceLevel(response.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
       status: response.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
       emergencyContact: {
         name: response.Nombre_Contacto_Emergencia || 'Contacto',
-        phone: response.Telefono_Contacto_Emergencia || response.Telefono || 'N/A'
+        phone: response.Telefono_Contacto_Emergencia || 'N/A'
       },
       medications: [],
       specialCares: [],

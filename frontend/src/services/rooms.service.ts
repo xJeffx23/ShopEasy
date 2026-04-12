@@ -8,11 +8,11 @@ export async function getRoomsData(): Promise<RoomsData> {
     const rooms: Room[] = habitaciones.map(habitacion => ({
       id: habitacion.idHabitacion.toString(),
       roomNumber: habitacion.Numero_Habitacion,
-      type: mapRoomType(habitacion.Tipo_Habitacion?.Nombre_Tipo || 'Individual'),
-      status: mapRoomStatus(habitacion.idCatalogo_Estado_Habitacion),
-      capacity: habitacion.Capacidad_Maxima,
+      type: mapRoomType(habitacion.Tipo?.Nombre_Tipo || 'Individual'),
+      status: mapRoomStatus(habitacion.Catalogo_Estado_Habitacion_idEstado),
+      capacity: habitacion.Capacidad,
       floor: habitacion.Piso,
-      observations: '',
+      observations: habitacion.Observaciones || '',
       cleanings: [],
       maintenances: []
     }));
@@ -45,43 +45,39 @@ export async function getRoomsData(): Promise<RoomsData> {
 export async function createRoom(roomData: any): Promise<Room> {
   const backendData = {
     Numero_Habitacion: roomData.roomNumber,
-    idCatalogo_Tipo_Habitacion: mapRoomTypeToId(roomData.type),
-    idCatalogo_Estado_Habitacion: mapRoomStatusToId(roomData.status || 'disponible'),
+    Catalogo_Tipo_Habitacion_idTipo: mapRoomTypeToId(roomData.type),
+    Catalogo_Estado_Habitacion_idEstado: mapRoomStatusToId(roomData.status || 'disponible'),
     Piso: roomData.floor || 1,
-    Capacidad_Maxima: roomData.capacity || 1,
-    Activo: true
+    Capacidad: roomData.capacity || 1
   };
 
-  const response = await habitacionesService.create(backendData as any);
+  const response = await habitacionesService.create(backendData);
 
   return {
     id: response.idHabitacion.toString(),
     roomNumber: response.Numero_Habitacion,
-    type: mapRoomType(response.Tipo_Habitacion?.Nombre_Tipo || 'Individual'),
-    status: mapRoomStatus(response.idCatalogo_Estado_Habitacion),
-    capacity: response.Capacidad_Maxima,
+    type: mapRoomType(response.Tipo?.Nombre_Tipo || 'Individual'),
+    status: mapRoomStatus(response.Catalogo_Estado_Habitacion_idEstado),
+    capacity: response.Capacidad,
     floor: response.Piso,
-    observations: '',
+    observations: response.Observaciones || '',
     cleanings: [],
     maintenances: []
   };
 }
 
 export async function updateRoomStatus(id: string, status: RoomStatus): Promise<Room> {
-  const backendData = {
-    idCatalogo_Estado_Habitacion: mapRoomStatusToId(status)
-  };
-
-  const response = await habitacionesService.update(parseInt(id), backendData);
+  const statusId = mapRoomStatusToId(status);
+  const response = await habitacionesService.updateStatus(parseInt(id), statusId);
 
   return {
     id: response.idHabitacion.toString(),
     roomNumber: response.Numero_Habitacion,
-    type: mapRoomType(response.Tipo_Habitacion?.Nombre_Tipo || 'Individual'),
-    status: mapRoomStatus(response.idCatalogo_Estado_Habitacion),
-    capacity: response.Capacidad_Maxima,
+    type: mapRoomType(response.Tipo?.Nombre_Tipo || 'Individual'),
+    status: mapRoomStatus(response.Catalogo_Estado_Habitacion_idEstado),
+    capacity: response.Capacidad,
     floor: response.Piso,
-    observations: '',
+    observations: response.Observaciones || '',
     cleanings: [],
     maintenances: []
   };

@@ -51,9 +51,11 @@ export default function RoomsView({ data }: RoomsViewProps) {
         try {
             await updateRoomStatus(id, status);
             setRooms((prev) => prev.map((r) => r.id === id ? { ...r, status } : r));
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error updating room status:", error);
-            alert("Error al actualizar estado");
+            // Mostrar mensaje del backend si existe
+            const mensaje = error.response?.data?.message || "Error al actualizar estado";
+            alert(mensaje);
         } finally {
             setIsLoading(false);
         }
@@ -66,9 +68,10 @@ export default function RoomsView({ data }: RoomsViewProps) {
         try {
             await deleteRoom(id);
             setRooms((prev) => prev.filter((r) => r.id !== id));
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error deleting room:", error);
-            alert("Error al eliminar habitación");
+            const mensaje = error.response?.data?.message || "Error al eliminar habitación";
+            alert(mensaje);
         } finally {
             setIsLoading(false);
         }

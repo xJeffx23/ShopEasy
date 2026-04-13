@@ -16,9 +16,9 @@ interface CareLevelChartProps {
 }
 
 const FALLBACK_DATA: CareLevel[] = [
-    { level: "Bajo", count: 1, color: "#eab308" },
-    { level: "Medio", count: 2, color: "#38bdf8" },
-    { level: "Alto", count: 2, color: "#92400e" },
+    { level: "Básica", count: 1, color: "#10b981" },
+    { level: "Movilidad", count: 2, color: "#3b82f6" },
+    { level: "Completa", count: 2, color: "#8b5cf6" },
 ];
 
 export default function CareLevelChart({ data = FALLBACK_DATA }: CareLevelChartProps) {
@@ -41,21 +41,22 @@ export default function CareLevelChart({ data = FALLBACK_DATA }: CareLevelChartP
                     <BarChart
                         data={data}
                         layout="vertical"
-                        margin={{ left: 8, right: 16, top: 4, bottom: 0 }}
+                        margin={{ left: 0, right: 16, top: 4, bottom: 0 }}
                     >
                         <XAxis
                             type="number"
                             tickLine={false}
                             axisLine={false}
                             tick={{ fontSize: 12, fill: "#94a3b8" }}
+                            allowDecimals={false}
                         />
                         <YAxis
                             dataKey="level"
                             type="category"
                             tickLine={false}
                             axisLine={false}
-                            tick={{ fontSize: 13, fill: "#64748b" }}
-                            width={40}
+                            tick={{ fontSize: 12, fill: "#64748b" }}
+                            width={85}
                         />
                         <Tooltip
                             formatter={(value: number) => [`${value} paciente(s)`, "Cantidad"]}
@@ -65,7 +66,7 @@ export default function CareLevelChart({ data = FALLBACK_DATA }: CareLevelChartP
                                 fontSize: "13px",
                             }}
                         />
-                        <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={32}>
+                        <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={28}>
                             {data.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}

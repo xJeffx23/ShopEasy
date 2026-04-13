@@ -4,7 +4,6 @@ import CapacityTrend from "@/src/components/dashboard/capacity-trend";
 import RoomStatusChart from "@/src/components/dashboard/room-status-chart";
 import CareLevelChart from "@/src/components/dashboard/care-level-chart";
 import QuickSummary from "@/src/components/dashboard/quick-summary";
-import RecentActivity from "@/src/components/dashboard/recent-activity";
 import { DashboardData } from "@/src/types/dashboard";
 
 interface DashboardViewProps {
@@ -34,9 +33,6 @@ export default function DashboardView({ data }: DashboardViewProps) {
                 <CareLevelChart data={data.careLevels} />
                 <QuickSummary data={data.quickSummary} />
             </div>
-
-            {/* Fila 4: Actividad reciente (ancho completo) */}
-            <RecentActivity items={data.recentActivity} />
         </section>
     );
 }

@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PacientesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async findAll() {
     return this.prisma.paciente.findMany({
@@ -45,7 +45,7 @@ export class PacientesService {
   async create(createPatientDto: any) {
     try {
       console.log('Creating patient with data:', createPatientDto);
-      
+
       // Mapear y filtrar solo los campos que existen en el modelo de la base de datos
       const patientData = {
         Nombre: createPatientDto.Nombre,
@@ -100,34 +100,77 @@ export class PacientesService {
       return result;
     } catch (error) {
       console.error('Error creating patient:', error);
-      
+
       // Manejo específico para error de constraint único
       if (error.code === 'P2002' && error.meta?.target?.includes('Numero_Cedula')) {
         throw new Error('Ya existe un paciente con este número de cédula');
       }
-      
+
       throw error;
     }
   }
 
   async update(id: number, updatePatientDto: any) {
-    return this.prisma.paciente.update({
-      where: { idPaciente: id },
-      data: updatePatientDto,
-      include: {
-        Nivel_Asistencia: true,
-        Medicamentos: { where: { Activo: true } },
-        Cuidados: { include: { Tipo_Cuidado: true } },
-        Paquetes: {
-          where: { Activo: true },
-          include: { Paquete: true },
+    try {
+      // Construir objeto de datos limpio, convirtiendo fechas
+      const updateData: any = {};
+
+      if (updatePatientDto.Nombre !== undefined) {
+        updateData.Nombre = updatePatientDto.Nombre;
+      }
+
+      if (updatePatientDto.Numero_Cedula !== undefined) {
+        updateData.Numero_Cedula = updatePatientDto.Numero_Cedula;
+      }
+
+      if (updatePatientDto.Fecha_Nacimiento !== undefined) {
+        // Convertir fecha a formato ISO-8601 DateTime
+        updateData.Fecha_Nacimiento = new Date(updatePatientDto.Fecha_Nacimiento);
+      }
+
+      if (updatePatientDto.Fecha_Ingreso !== undefined) {
+        updateData.Fecha_Ingreso = new Date(updatePatientDto.Fecha_Ingreso);
+      }
+
+      if (updatePatientDto.Telefono_Contacto_Emergencia !== undefined) {
+        updateData.Telefono_Contacto_Emergencia = updatePatientDto.Telefono_Contacto_Emergencia;
+      }
+
+      if (updatePatientDto.Nombre_Contacto_Emergencia !== undefined) {
+        updateData.Nombre_Contacto_Emergencia = updatePatientDto.Nombre_Contacto_Emergencia;
+      }
+
+      if (updatePatientDto.Catalogo_Nivel_Asistencia_idNivel !== undefined) {
+        updateData.Catalogo_Nivel_Asistencia_idNivel = parseInt(updatePatientDto.Catalogo_Nivel_Asistencia_idNivel);
+      }
+
+      if (updatePatientDto.Activo !== undefined) {
+        updateData.Activo = updatePatientDto.Activo;
+      }
+
+      console.log('Updating patient with data:', updateData);
+
+      return this.prisma.paciente.update({
+        where: { idPaciente: id },
+        data: updateData,
+        include: {
+          Nivel_Asistencia: true,
+          Medicamentos: { where: { Activo: true } },
+          Cuidados: { include: { Tipo_Cuidado: true } },
+          Paquetes: {
+            where: { Activo: true },
+            include: { Paquete: true },
+          },
+          Reservaciones: {
+            where: { Activo: true },
+            include: { Habitacion: true },
+          },
         },
-        Reservaciones: {
-          where: { Activo: true },
-          include: { Habitacion: true },
-        },
-      },
-    });
+      });
+    } catch (error) {
+      console.error('Error updating patient:', error);
+      throw error;
+    }
   }
 
   async remove(id: number) {

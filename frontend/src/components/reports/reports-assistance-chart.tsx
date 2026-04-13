@@ -30,7 +30,7 @@ export function ReportsAssistanceChart({ data }: ReportsAssistanceChartProps) {
                     <BarChart
                         data={data}
                         layout="vertical"
-                        margin={{ left: 8, right: 24, top: 4, bottom: 0 }}
+                        margin={{ left: 0, right: 24, top: 4, bottom: 0 }}
                     >
                         <XAxis
                             type="number"
@@ -44,14 +44,14 @@ export function ReportsAssistanceChart({ data }: ReportsAssistanceChartProps) {
                             type="category"
                             tickLine={false}
                             axisLine={false}
-                            tick={{ fontSize: 13, fill: "#64748b" }}
-                            width={40}
+                            tick={{ fontSize: 12, fill: "#64748b" }}
+                            width={85}
                         />
                         <Tooltip
                             formatter={(value: number) => [`${value} paciente(s)`, "Cantidad"]}
                             contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "13px" }}
                         />
-                        <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={32}>
+                        <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={28}>
                             {data.map((entry, i) => (
                                 <Cell key={i} fill={entry.color} />
                             ))}

@@ -4,48 +4,34 @@ import type { Reservation, ReservationStats, ReservationStatus, ReservationRoomT
 export async function getReservationsData(): Promise<ReservationsData> {
   try {
     const reservaciones = await reservacionesService.getAll();
-    
-    // Función para mapear tipo de estancia desde ID
-function mapStaySchedule(scheduleId: number): string {
-  const scheduleMapping: Record<number, string> = {
-    1: 'Día (8am - 5pm)',
-    2: 'Mañana (8am - 2pm)',
-    3: 'Tarde (2pm - 6pm)',
-    4: 'Full estancia'
-  };
-  return scheduleMapping[scheduleId] || 'Full estancia';
-}
 
-// Función para mapear tipo de habitación desde ID
-function mapRoomType(roomTypeId: number): string {
-  const roomTypeMapping: Record<number, string> = {
-    1: 'Compartida',
-    2: 'Individual',
-    3: 'Individual cama matrimonial',
-    4: 'Cuidados especiales'
-  };
-  return roomTypeMapping[roomTypeId] || 'Individual';
-}
+    function mapStaySchedule(scheduleId: number): string {
+      const scheduleMapping: Record<number, string> = {
+        1: 'Día (8am - 5pm)',
+        2: 'Mañana (8am - 2pm)',
+        3: 'Tarde (2pm - 6pm)',
+        4: 'Full estancia'
+      };
+      return scheduleMapping[scheduleId] || 'Full estancia';
+    }
 
-// Función para mapear estado de reservación desde ID
-function mapReservationStatus(statusId: number): ReservationStatus {
-  const statusMapping: Record<number, ReservationStatus> = {
-    1: 'activa',
-    2: 'pendiente',
-    3: 'finalizada',
-    4: 'cancelada'
-  };
-  return statusMapping[statusId] || 'pendiente';
-}
+    function mapRoomTypeFromId(roomTypeId: number): string {
+      const roomTypeMapping: Record<number, string> = {
+        1: 'Compartida',
+        2: 'Individual',
+        3: 'Individual cama matrimonial',
+        4: 'Cuidados especiales'
+      };
+      return roomTypeMapping[roomTypeId] || 'Individual';
+    }
 
-// Transformar los datos del backend al formato del frontend
     const reservations: Reservation[] = reservaciones.map(reservacion => ({
       id: reservacion.idReservacion.toString(),
       patientId: reservacion.Paciente_idPaciente.toString(),
       patientName: reservacion.Paciente?.Nombre || 'Paciente no encontrado',
       roomId: reservacion.Habitacion_idHabitacion.toString(),
       roomNumber: reservacion.Habitacion?.Numero_Habitacion || 'No asignada',
-      roomType: mapRoomType(reservacion.Habitacion?.Tipo?.idCatalogo_Tipo_Habitacion || 1) as ReservationRoomType,
+      roomType: mapRoomTypeFromId(reservacion.Habitacion?.Tipo?.idCatalogo_Tipo_Habitacion || 1) as ReservationRoomType,
       startDate: new Date(reservacion.Fecha_Inicio).toLocaleDateString('es-CR'),
       endDate: reservacion.Fecha_Fin ? new Date(reservacion.Fecha_Fin).toLocaleDateString('es-CR') : '',
       indefinite: reservacion.Indefinido || false,
@@ -55,14 +41,12 @@ function mapReservationStatus(statusId: number): ReservationStatus {
       observations: reservacion.Observaciones || ''
     }));
 
-    // Calcular estadísticas
     const stats: ReservationStats = {
       active: reservations.filter(r => r.status === 'activa').length,
       permanent: reservations.filter(r => r.indefinite === true).length,
       respite: reservations.filter(r => r.indefinite === false).length
     };
-    
-    
+
     return {
       title: "Gestión de Reservaciones",
       subtitle: "Administra las reservaciones y ocupación de habitaciones",
@@ -71,7 +55,6 @@ function mapReservationStatus(statusId: number): ReservationStatus {
     };
   } catch (error) {
     console.error('Error fetching reservations:', error);
-    // Retornar datos vacíos en caso de error
     return {
       title: "Gestión de Reservaciones",
       subtitle: "Administra las reservaciones y ocupación de habitaciones",
@@ -98,9 +81,13 @@ function mapReservationStatus(statusId: number): ReservationStatus {
 function mapStatusToId(status: string): number {
   const mapping: { [key: string]: number } = {
     'activa': 1,
+    '1': 1,
     'finalizada': 2,
+    '2': 2,
     'cancelada': 3,
-    'pendiente': 4
+    '3': 3,
+    'pendiente': 4,
+    '4': 4
   };
   return mapping[status] || 4;
 }
@@ -119,41 +106,99 @@ function mapStayType(stayTypeId: number): StaySchedule {
   return mapping[stayTypeId] || 'Full estancia';
 }
 
-function mapStayTypeToId(schedule: StaySchedule): number {
-  const mapping: Record<StaySchedule, number> = {
+function mapStayTypeToId(schedule: StaySchedule | string): number {
+  const mapping: Record<string, number> = {
     'Día (8am - 5pm)': 1,
     'Mañana (8am - 2pm)': 2,
     'Tarde (2pm - 6pm)': 3,
-    'Full estancia': 4
+    'Full estancia': 4,
+    '1': 1,
+    '2': 2,
+    '3': 3,
+    '4': 4
   };
   return mapping[schedule] || 4;
+}
+
+/**
+ * Parsea una fecha en formato YYYY-MM-DD de forma segura
+ * Evita problemas con zonas horarias
+ */
+function parseLocalDate(dateString: string): Date {
+  if (!dateString) {
+    throw new Error('Fecha vacía');
+  }
+
+  // Formato esperado: YYYY-MM-DD (de input type="date")
+  const parts = dateString.split('-');
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Los meses en JS son 0-indexed
+    const day = parseInt(parts[2], 10);
+
+    // Validar que los valores sean razonables
+    if (year < 1900 || year > 2100) {
+      throw new Error(`Año inválido: ${year}`);
+    }
+
+    const date = new Date(year, month, day, 12, 0, 0); // Usar mediodía para evitar problemas de zona horaria
+
+    if (isNaN(date.getTime())) {
+      throw new Error(`Fecha inválida: ${dateString}`);
+    }
+
+    return date;
+  }
+
+  // Fallback: intentar parsear directamente
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    throw new Error(`Formato de fecha no reconocido: ${dateString}`);
+  }
+
+  return date;
+}
+
+/**
+ * Convierte una fecha a formato ISO para enviar al backend
+ */
+function toISODateString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}T12:00:00.000Z`;
 }
 
 // CRUD Functions
 export async function createReservation(reservationData: any): Promise<Reservation> {
   try {
-    // Validar y formatear las fechas - formato DATE para SQL Server
-    const startDate = new Date(reservationData.startDate);
-    const endDate = reservationData.endDate && reservationData.endDate !== '' ? new Date(reservationData.endDate) : null;
-    
-    // Validar que las fechas sean válidas
-    if (isNaN(startDate.getTime())) {
-      throw new Error('Fecha de inicio inválida');
+    console.log('Raw reservation data:', reservationData);
+
+    // Parsear fechas de forma segura
+    const startDate = parseLocalDate(reservationData.startDate);
+    let endDate: Date | null = null;
+
+    if (reservationData.endDate && reservationData.endDate !== '' && !reservationData.indefinite) {
+      endDate = parseLocalDate(reservationData.endDate);
     }
-    
+
     const backendData = {
       Paciente_idPaciente: parseInt(reservationData.patientId),
       Habitacion_idHabitacion: parseInt(reservationData.roomId),
-      Fecha_Inicio: startDate.toISOString(), // Formato ISO-8601 DateTime para Prisma
-      Fecha_Fin: endDate && !isNaN(endDate.getTime()) ? endDate.toISOString() : null,
-      Catalogo_Tipo_Estancia_idEstancia: parseInt(reservationData.stayType) || 4, // Default: Full Estancia
+      Fecha_Inicio: toISODateString(startDate),
+      Fecha_Fin: endDate ? toISODateString(endDate) : null,
+      Indefinido: reservationData.indefinite || false,
+      Catalogo_Tipo_Estancia_idEstancia: parseInt(reservationData.stayType) || 4,
       Catalogo_Estado_Reservacion_idEstado: mapStatusToId(reservationData.status || 'pendiente'),
-      Empleado_idEmpleado_Registra: 1, // Default: Carlos Méndez (ID 1)
+      Empleado_idEmpleado_Registra: reservationData.createdBy ? parseInt(reservationData.createdBy) : 1,
+      Observaciones: reservationData.observations || null,
       Activo: true
     };
-    
+
+    console.log('Backend data to send:', backendData);
+
     const response = await reservacionesService.create(backendData as any);
-    
+
     return {
       id: response.idReservacion.toString(),
       patientId: response.Paciente_idPaciente.toString(),
@@ -163,11 +208,11 @@ export async function createReservation(reservationData: any): Promise<Reservati
       roomType: mapRoomType('Individual'),
       startDate: new Date(response.Fecha_Inicio).toLocaleDateString('es-CR'),
       endDate: response.Fecha_Fin ? new Date(response.Fecha_Fin).toLocaleDateString('es-CR') : undefined,
-      indefinite: !response.Fecha_Fin,
-      schedule: mapStayType(4), // Default: Full estancia
-      status: mapReservationStatus(4), // Default: pendiente
-      createdBy: 'Sistema',
-      observations: ''
+      indefinite: response.Indefinido || !response.Fecha_Fin,
+      schedule: mapStayType(response.Catalogo_Tipo_Estancia_idEstancia || 4),
+      status: mapReservationStatus(response.idCatalogo_Estado_Reservacion || 4),
+      createdBy: response.Empleado_Registra?.Nombre || 'Sistema',
+      observations: response.Observaciones || ''
     };
   } catch (error) {
     console.error('Error creating reservation:', error);
@@ -177,41 +222,45 @@ export async function createReservation(reservationData: any): Promise<Reservati
 
 export async function updateReservation(id: string, reservationData: any): Promise<Reservation> {
   try {
-    // Validar y formatear las fechas (manejar formato DD/MM/YYYY)
-    let startDate: Date | null = null;
-    let endDate: Date | null = null;
-    
-    if (reservationData.startDate) {
-      // Los inputs type="date" ya entregan formato yyyy-MM-DD
-      startDate = new Date(reservationData.startDate);
-      
-      if (isNaN(startDate.getTime())) {
-        throw new Error('Fecha de inicio inválida');
-      }
-    }
-    
-    if (reservationData.endDate) {
-      // Los inputs type="date" ya entregan formato yyyy-MM-DD
-      endDate = new Date(reservationData.endDate);
-      
-      if (isNaN(endDate.getTime())) {
-        throw new Error('Fecha de fin inválida');
-      }
-    }
-    
-    const backendData = {
-      Paciente_idPaciente: reservationData.patientId ? parseInt(reservationData.patientId) : undefined,
-      Habitacion_idHabitacion: reservationData.roomId ? parseInt(reservationData.roomId) : undefined,
-      Fecha_Inicio: startDate ? startDate.toISOString() : undefined,
-      Fecha_Fin: endDate ? endDate.toISOString() : null,
-      Catalogo_Tipo_Estancia_idEstancia: reservationData.schedule ? mapStayTypeToId(reservationData.schedule) : undefined,
-      Catalogo_Estado_Reservacion_idEstado: reservationData.status ? mapStatusToId(reservationData.status) : undefined,
-      Observaciones: reservationData.observations,
+    const backendData: any = {
       Activo: true
     };
-    
+
+    if (reservationData.patientId) {
+      backendData.Paciente_idPaciente = parseInt(reservationData.patientId);
+    }
+
+    if (reservationData.roomId) {
+      backendData.Habitacion_idHabitacion = parseInt(reservationData.roomId);
+    }
+
+    if (reservationData.startDate) {
+      const startDate = parseLocalDate(reservationData.startDate);
+      backendData.Fecha_Inicio = toISODateString(startDate);
+    }
+
+    if (reservationData.endDate) {
+      const endDate = parseLocalDate(reservationData.endDate);
+      backendData.Fecha_Fin = toISODateString(endDate);
+    } else if (reservationData.indefinite) {
+      backendData.Fecha_Fin = null;
+      backendData.Indefinido = true;
+    }
+
+    if (reservationData.schedule) {
+      backendData.Catalogo_Tipo_Estancia_idEstancia = mapStayTypeToId(reservationData.schedule);
+    }
+
+    if (reservationData.status) {
+      backendData.Catalogo_Estado_Reservacion_idEstado = mapStatusToId(reservationData.status);
+    }
+
+    if (reservationData.observations !== undefined) {
+      backendData.Observaciones = reservationData.observations;
+    }
+
     const response = await reservacionesService.update(parseInt(id), backendData);
-    
+
     return {
       id: response.idReservacion.toString(),
       patientId: response.Paciente_idPaciente.toString(),
@@ -221,11 +270,11 @@ export async function updateReservation(id: string, reservationData: any): Promi
       roomType: 'Individual' as const,
       startDate: new Date(response.Fecha_Inicio).toLocaleDateString('es-CR'),
       endDate: response.Fecha_Fin ? new Date(response.Fecha_Fin).toLocaleDateString('es-CR') : undefined,
-      indefinite: !response.Fecha_Fin,
+      indefinite: response.Indefinido || !response.Fecha_Fin,
       schedule: 'Full estancia' as const,
-      status: mapReservationStatus(response.idCatalogo_Estado_Reservacion),
+      status: mapReservationStatus(response.idCatalogo_Estado_Reservacion || 4),
       createdBy: 'Sistema',
-      observations: ''
+      observations: response.Observaciones || ''
     };
   } catch (error) {
     console.error('Error updating reservation:', error);
@@ -248,16 +297,36 @@ export async function updateReservationStatus(id: string, status: ReservationSta
       Catalogo_Estado_Reservacion_idEstado: mapStatusToId(status),
       Activo: true
     };
-    
+
     const response = await reservacionesService.update(parseInt(id), backendData);
-    
+
+    function mapRoomTypeFromId(roomTypeId: number): string {
+      const roomTypeMapping: Record<number, string> = {
+        1: 'Compartida',
+        2: 'Individual',
+        3: 'Individual cama matrimonial',
+        4: 'Cuidados especiales'
+      };
+      return roomTypeMapping[roomTypeId] || 'Individual';
+    }
+
+    function mapStaySchedule(scheduleId: number): string {
+      const scheduleMapping: Record<number, string> = {
+        1: 'Día (8am - 5pm)',
+        2: 'Mañana (8am - 2pm)',
+        3: 'Tarde (2pm - 6pm)',
+        4: 'Full estancia'
+      };
+      return scheduleMapping[scheduleId] || 'Full estancia';
+    }
+
     return {
       id: response.idReservacion.toString(),
       patientId: response.Paciente_idPaciente.toString(),
       patientName: response.Paciente?.Nombre || 'Paciente',
       roomId: response.Habitacion_idHabitacion.toString(),
       roomNumber: response.Habitacion?.Numero_Habitacion || 'No asignada',
-      roomType: mapRoomType(response.Habitacion?.Tipo?.idCatalogo_Tipo_Habitacion || 1) as ReservationRoomType,
+      roomType: mapRoomTypeFromId(response.Habitacion?.Tipo?.idCatalogo_Tipo_Habitacion || 1) as ReservationRoomType,
       startDate: new Date(response.Fecha_Inicio).toLocaleDateString('es-CR'),
       endDate: response.Fecha_Fin ? new Date(response.Fecha_Fin).toLocaleDateString('es-CR') : '',
       indefinite: response.Indefinido || false,

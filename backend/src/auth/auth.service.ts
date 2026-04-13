@@ -14,7 +14,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async login(dto: LoginDto) {
     const usuario = await this.prisma.usuario.findUnique({
@@ -26,7 +26,7 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
 
     // Temporal: aceptar texto plano para pruebas
-    const passwordValido = dto.Contrasena === usuario.Contrasena;
+    const passwordValido = await bcrypt.compare(dto.Contrasena, usuario.Contrasena);
     if (!passwordValido)
       throw new UnauthorizedException('Credenciales inválidas');
 

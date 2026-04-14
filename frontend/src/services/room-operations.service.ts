@@ -142,7 +142,7 @@ export const roomMaintenanceService = {
       const backendData = {
         Fecha_Mantenimiento: convertDateToISO(maintenance.date),
         Descripcion_Reparacion: maintenance.repairDescription,
-        Actualizacion_Mobiliario: maintenance.furnitureUpdate ? maintenance.furnitureDetail || 'Sí' : null,
+        Actualizacion_Mobiliario: maintenance.furnitureUpdate ? maintenance.furnitureDetail || 'Sí' : undefined,
         Completado: maintenance.completed,
         Habitacion_idHabitacion: parseInt(roomId),
         Empleado_idEmpleado: maintenance.employeeId,
@@ -169,7 +169,7 @@ export const roomMaintenanceService = {
       }
       
       if (maintenance.furnitureUpdate !== undefined) {
-        backendData.Actualizacion_Mobiliario = maintenance.furnitureUpdate ? maintenance.furnitureDetail || 'Sí' : null;
+        backendData.Actualizacion_Mobiliario = maintenance.furnitureUpdate ? maintenance.furnitureDetail || 'Sí' : undefined;
       }
       
       if (maintenance.completed !== undefined) {

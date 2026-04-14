@@ -66,7 +66,7 @@ export const roomCleaningService = {
 
       const backendData = {
         Fecha_Limpieza: convertDateToISO(cleaning.date),
-        Observaciones: cleaning.notes || null,
+        Observaciones: cleaning.notes || undefined,
         Habitacion_idHabitacion: parseInt(roomId),
         Empleado_idEmpleado: cleaning.employeeId,
       };
@@ -88,7 +88,7 @@ export const roomCleaningService = {
       }
       
       if (cleaning.notes !== undefined) {
-        backendData.Observaciones = cleaning.notes || null;
+        backendData.Observaciones = cleaning.notes || undefined;
       }
 
       if (cleaning.employeeName) {

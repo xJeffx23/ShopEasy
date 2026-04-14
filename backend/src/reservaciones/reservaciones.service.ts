@@ -177,9 +177,25 @@ export class ReservacionesService {
         );
       }
 
-      // Crear la reservación
+      // Crear la reservación - extraer IDs para usar connect
+      const {
+        Paciente_idPaciente,
+        Habitacion_idHabitacion,
+        Catalogo_Tipo_Estancia_idEstancia,
+        Catalogo_Estado_Reservacion_idEstado,
+        Empleado_idEmpleado_Registra,
+        ...restData
+      } = data;
+
       const result = await this.prisma.reservacion.create({
-        data: data,
+        data: {
+          ...restData,
+          Paciente: { connect: { idPaciente: Paciente_idPaciente } },
+          Habitacion: { connect: { idHabitacion: Habitacion_idHabitacion } },
+          Tipo_Estancia: { connect: { idCatalogo_Tipo_Estancia: Catalogo_Tipo_Estancia_idEstancia } },
+          Estado: { connect: { idCatalogo_Estado_Reservacion: Catalogo_Estado_Reservacion_idEstado || 1 } },
+          Empleado: { connect: { idEmpleado: Empleado_idEmpleado_Registra } }
+        },
         include: {
           Paciente: true,
           Habitacion: {

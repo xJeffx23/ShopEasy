@@ -92,7 +92,7 @@ export const roomCleaningService = {
       }
 
       if (cleaning.employeeName) {
-        const employees = await employeesService.getAll();
+        const employees = await empleadosService.getAll();
         const employee = employees.find(emp => emp.Nombre === cleaning.employeeName);
         
         if (!employee) {
@@ -177,7 +177,7 @@ export const roomMaintenanceService = {
       }
 
       if (maintenance.employeeName) {
-        const employees = await employeesService.getAll();
+        const employees = await empleadosService.getAll();
         const employee = employees.find(emp => emp.Nombre === maintenance.employeeName);
         
         if (!employee) {

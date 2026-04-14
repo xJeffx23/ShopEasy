@@ -183,6 +183,7 @@ export class ReservacionesService {
         Habitacion_idHabitacion,
         Catalogo_Tipo_Estancia_idEstancia,
         Catalogo_Estado_Reservacion_idEstado,
+        idCatalogo_Estado_Reservacion, // también extraer nombre incorrecto del frontend
         Empleado_idEmpleado_Registra,
         ...restData
       } = data;

@@ -150,7 +150,7 @@ export function EditEmployeeDialog({
               value={form.fullName}
               onChange={(e) => set("fullName", e.target.value)}
               placeholder="Ingrese el nombre completo"
-              className="text-sm"
+              
             />
             {errors.fullName && <p className="text-[11px] text-red-500">{errors.fullName}</p>}
           </div>
@@ -164,7 +164,7 @@ export function EditEmployeeDialog({
               value={form.idNumber}
               onChange={(e) => set("idNumber", e.target.value)}
               placeholder="Ingrese el número de identificación"
-              className="text-sm"
+              
             />
             {errors.idNumber && <p className="text-[11px] text-red-500">{errors.idNumber}</p>}
           </div>
@@ -178,7 +178,7 @@ export function EditEmployeeDialog({
               value={form.phone}
               onChange={(e) => set("phone", e.target.value)}
               placeholder="Ingrese el teléfono"
-              className="text-sm"
+              
             />
             {errors.phone && <p className="text-[11px] text-red-500">{errors.phone}</p>}
           </div>
@@ -193,7 +193,7 @@ export function EditEmployeeDialog({
               value={form.email}
               onChange={(e) => set("email", e.target.value)}
               placeholder="Ingrese el email"
-              className="text-sm"
+              
             />
             {errors.email && <p className="text-[11px] text-red-500">{errors.email}</p>}
           </div>
@@ -208,7 +208,7 @@ export function EditEmployeeDialog({
               onChange={(value) => set("department", value)}
               options={departmentOptions}
               placeholder="Seleccione un departamento"
-              className="text-sm"
+              
             />
             {errors.department && <p className="text-[11px] text-red-500">{errors.department}</p>}
           </div>
@@ -223,7 +223,7 @@ export function EditEmployeeDialog({
               onChange={(value) => set("role", value)}
               options={profileOptions}
               placeholder="Seleccione un rol"
-              className="text-sm"
+              
             />
             {errors.role && <p className="text-[11px] text-red-500">{errors.role}</p>}
           </div>
@@ -238,7 +238,7 @@ export function EditEmployeeDialog({
               onChange={(value) => set("status", value)}
               options={statusOptions}
               placeholder="Seleccione un estado"
-              className="text-sm"
+              
             />
             {errors.status && <p className="text-[11px] text-red-500">{errors.status}</p>}
           </div>

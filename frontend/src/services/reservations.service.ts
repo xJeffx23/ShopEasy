@@ -173,7 +173,7 @@ export async function createReservation(reservationData: any): Promise<Reservati
       Fecha_Registro: now.toISOString(),
       Indefinido: reservationData.indefinite || false,
       Catalogo_Tipo_Estancia_idEstancia: parseInt(reservationData.stayType) || 4,
-      Catalogo_Estado_Reservacion_idEstado: mapStatusToId(reservationData.status || 'activa'),
+      idCatalogo_Estado_Reservacion: mapStatusToId(reservationData.status || 'activa'),
       Empleado_idEmpleado_Registra: reservationData.createdBy ? parseInt(reservationData.createdBy) : 1,
       Observaciones: reservationData.observations || null,
       Activo: true
@@ -194,7 +194,7 @@ export async function createReservation(reservationData: any): Promise<Reservati
       endDate: response.Fecha_Fin ? new Date(response.Fecha_Fin).toLocaleDateString('es-CR') : undefined,
       indefinite: response.Indefinido || !response.Fecha_Fin,
       schedule: mapStayType(response.Catalogo_Tipo_Estancia_idEstancia || 4),
-      status: mapReservationStatus(response.Catalogo_Estado_Reservacion_idEstado || 1),
+      status: mapReservationStatus(response.idCatalogo_Estado_Reservacion || 1),
       createdBy: response.Empleado_Registra?.Nombre || 'Sistema',
       observations: response.Observaciones || ''
     };
@@ -231,7 +231,7 @@ export async function updateReservation(id: string, reservationData: any): Promi
       backendData.Catalogo_Tipo_Estancia_idEstancia = mapStayTypeToId(reservationData.schedule);
     }
     if (reservationData.status) {
-      backendData.Catalogo_Estado_Reservacion_idEstado = mapStatusToId(reservationData.status);
+      backendData.idCatalogo_Estado_Reservacion = mapStatusToId(reservationData.status);
     }
     if (reservationData.observations !== undefined) {
       backendData.Observaciones = reservationData.observations;
@@ -250,7 +250,7 @@ export async function updateReservation(id: string, reservationData: any): Promi
       endDate: response.Fecha_Fin ? new Date(response.Fecha_Fin).toLocaleDateString('es-CR') : undefined,
       indefinite: response.Indefinido || !response.Fecha_Fin,
       schedule: 'Full estancia' as const,
-      status: mapReservationStatus(response.Catalogo_Estado_Reservacion_idEstado || 4),
+      status: mapReservationStatus(response.idCatalogo_Estado_Reservacion || 4),
       createdBy: 'Sistema',
       observations: response.Observaciones || ''
     };
@@ -272,7 +272,7 @@ export async function deleteReservation(id: string): Promise<void> {
 export async function updateReservationStatus(id: string, status: ReservationStatus): Promise<Reservation> {
   try {
     const backendData = {
-      Catalogo_Estado_Reservacion_idEstado: mapStatusToId(status),
+      idCatalogo_Estado_Reservacion: mapStatusToId(status),
       Activo: true
     };
 

@@ -147,7 +147,7 @@ export async function updateEmployeeStatus(id: string, status: EmployeeStatus): 
 function mapDepartment(profileName: string): EmployeeItem['department'] {
   const mapping: Record<string, EmployeeItem['department']> = {
     'Gerencia': 'Gerencia',
-    'Gestión de Pacientes': 'Administrativo',
+    'Gestión de Pacientes': 'Gestión de pacientes',
     'Mantenimiento': 'DTI',
     'Recepción': 'Financiero'
   };
@@ -166,12 +166,12 @@ function mapDepartmentToId(department: string): number {
 
 function mapProfile(profileName: string): EmployeeItem['profile'] {
   const mapping: Record<string, EmployeeItem['profile']> = {
-    'Gerencia': 'Gerente',
-    'Gestión de Pacientes': 'Administrativo',
-    'Mantenimiento': 'Técnico',
-    'Recepción': 'Recepcionista'
+    'Gerencia': 'Gerencia',
+    'Gestión de Pacientes': 'Gestión de pacientes',
+    'Mantenimiento': 'Mantenimiento',
+    'Recepción': 'Recepción'
   };
-  return mapping[profileName] || 'Empleado';
+  return mapping[profileName] || 'Gerencia';
 }
 
 function mapProfileToId(profile: string): number {

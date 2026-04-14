@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ReservacionesService } from './reservaciones.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -15,6 +15,29 @@ export class ReservacionesController {
   @ApiResponse({ status: 200, description: 'Lista de reservaciones obtenida exitosamente' })
   findAll() {
     return this.reservacionesService.findAll();
+  }
+
+  @Get('mis-reservaciones')
+  @ApiOperation({ summary: 'Obtener reservaciones del paciente autenticado' })
+  @ApiResponse({ status: 200, description: 'Lista de reservaciones del paciente' })
+  getMisReservaciones(@Request() req: any) {
+    const idPaciente = req.user.idPaciente;
+    if (!idPaciente) {
+      return [];
+    }
+    return this.reservacionesService.findByPaciente(idPaciente);
+  }
+
+  @Patch('mis-reservaciones/:id/cancelar')
+  @ApiOperation({ summary: 'Cancelar una reservación del paciente autenticado' })
+  @ApiResponse({ status: 200, description: 'Reservación cancelada exitosamente' })
+  @ApiResponse({ status: 400, description: 'No se puede cancelar la reservación' })
+  cancelarMiReservacion(@Request() req: any, @Param('id') id: string) {
+    const idPaciente = req.user.idPaciente;
+    if (!idPaciente) {
+      throw new Error('No se pudo identificar al paciente');
+    }
+    return this.reservacionesService.cancelarReservacionPaciente(idPaciente, parseInt(id));
   }
 
   @Get('disponibilidad')
@@ -45,6 +68,18 @@ export class ReservacionesController {
   @ApiResponse({ status: 400, description: 'Datos inválidos o habitación no disponible' })
   create(@Body() createReservacionDto: any) {
     return this.reservacionesService.create(createReservacionDto);
+  }
+
+  @Post('solicitar')
+  @ApiOperation({ summary: 'Solicitar una reservación (desde portal de paciente)' })
+  @ApiResponse({ status: 201, description: 'Solicitud de reservación creada exitosamente' })
+  @ApiResponse({ status: 400, description: 'El paciente ya tiene una reservación activa' })
+  solicitarReservacion(@Request() req: any, @Body() createReservacionDto: any) {
+    const idPaciente = req.user.idPaciente;
+    if (!idPaciente) {
+      throw new Error('No se pudo identificar al paciente');
+    }
+    return this.reservacionesService.crearSolicitudPaciente(idPaciente, createReservacionDto);
   }
 
   @Patch(':id')

@@ -25,9 +25,19 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (typeof window !== 'undefined' && error.response?.status === 401) {
-      // Token inválido o expirado, redirigir al login
+      // Token inválido o expirado
+      const userType = localStorage.getItem('userType');
+
       localStorage.removeItem('token');
-      window.location.href = '/auth/login';
+      localStorage.removeItem('user');
+      localStorage.removeItem('userType');
+
+      // Redirigir al login correspondiente
+      if (userType === 'paciente') {
+        window.location.href = '/auth/login-paciente';
+      } else {
+        window.location.href = '/auth/login';
+      }
     }
     return Promise.reject(error);
   }

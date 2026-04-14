@@ -3,7 +3,7 @@
 import { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
-import { MoreHorizontal, Pencil, Trash2, ShieldCheck, UserX, UserCheck } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Eye, ExternalLink, UserX, UserCheck } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
 import {
     EmployeeItem,
@@ -76,6 +76,11 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
     const isActive = employee.status === "activo";
     const nextStatus: EmployeeStatus = isActive ? "inactivo" : "activo";
 
+    const openEmployeePortal = () => {
+        // Abrir el portal de empleados en una nueva pestaña
+        window.open('/auth/login', '_blank');
+    };
+
     return (
         <>
             <DropdownMenu.Root>
@@ -92,7 +97,7 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
                     <DropdownMenu.Content
                         align="end"
                         sideOffset={4}
-                        className="z-[9999] min-w-[170px] overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg animate-in fade-in-0 zoom-in-95"
+                        className="z-[9999] min-w-[200px] overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg animate-in fade-in-0 zoom-in-95"
                     >
                         {/* Editar */}
                         <DropdownMenu.Item
@@ -103,7 +108,28 @@ function RowActions({ employee, onEdit, onDelete, onToggleStatus }: RowActionsPr
                             Editar información
                         </DropdownMenu.Item>
 
+                        {/* Ver portal */}
+                        <DropdownMenu.Item
+                            onSelect={openEmployeePortal}
+                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-blue-700 outline-none hover:bg-blue-50"
+                        >
+                            <ExternalLink className="h-3.5 w-3.5 text-blue-500" />
+                            Ver portal de empleado
+                        </DropdownMenu.Item>
+
                         <DropdownMenu.Separator className="my-1 h-px bg-slate-100" />
+
+                        {/* Toggle status */}
+                        <DropdownMenu.Item
+                            onSelect={() => onToggleStatus?.(employee.id, nextStatus)}
+                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100"
+                        >
+                            {isActive
+                                ? <UserX className="h-3.5 w-3.5 text-amber-500" />
+                                : <UserCheck className="h-3.5 w-3.5 text-emerald-500" />
+                            }
+                            {isActive ? "Desactivar empleado" : "Activar empleado"}
+                        </DropdownMenu.Item>
 
                         {/* Eliminar */}
                         <DropdownMenu.Item
@@ -259,11 +285,6 @@ export default function EmployeesTable({
                 <p className="text-xs text-slate-400">
                     Mostrando {employees.length} empleado{employees.length !== 1 ? "s" : ""}
                 </p>
-                <div className="flex items-center gap-1.5">
-                    <button className="h-7 min-w-7 rounded-lg bg-blue-600 px-2.5 text-xs font-medium text-white">1</button>
-                    <button className="h-7 min-w-7 rounded-lg px-2.5 text-xs text-slate-500 hover:bg-slate-100">2</button>
-                    <button className="h-7 min-w-7 rounded-lg px-2.5 text-xs text-slate-500 hover:bg-slate-100">3</button>
-                </div>
             </div>
         </div>
     );

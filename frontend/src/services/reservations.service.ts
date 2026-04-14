@@ -120,48 +120,31 @@ function mapStayTypeToId(schedule: StaySchedule | string): number {
   return mapping[schedule] || 4;
 }
 
-/**
- * Parsea una fecha en formato YYYY-MM-DD de forma segura
- * Evita problemas con zonas horarias
- */
 function parseLocalDate(dateString: string): Date {
   if (!dateString) {
     throw new Error('Fecha vacía');
   }
-
-  // Formato esperado: YYYY-MM-DD (de input type="date")
   const parts = dateString.split('-');
   if (parts.length === 3) {
     const year = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1; // Los meses en JS son 0-indexed
+    const month = parseInt(parts[1], 10) - 1;
     const day = parseInt(parts[2], 10);
-
-    // Validar que los valores sean razonables
     if (year < 1900 || year > 2100) {
       throw new Error(`Año inválido: ${year}`);
     }
-
-    const date = new Date(year, month, day, 12, 0, 0); // Usar mediodía para evitar problemas de zona horaria
-
+    const date = new Date(year, month, day, 12, 0, 0);
     if (isNaN(date.getTime())) {
       throw new Error(`Fecha inválida: ${dateString}`);
     }
-
     return date;
   }
-
-  // Fallback: intentar parsear directamente
   const date = new Date(dateString);
   if (isNaN(date.getTime())) {
     throw new Error(`Formato de fecha no reconocido: ${dateString}`);
   }
-
   return date;
 }
 
-/**
- * Convierte una fecha a formato ISO para enviar al backend
- */
 function toISODateString(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -169,12 +152,10 @@ function toISODateString(date: Date): string {
   return `${year}-${month}-${day}T12:00:00.000Z`;
 }
 
-// CRUD Functions
 export async function createReservation(reservationData: any): Promise<Reservation> {
   try {
     console.log('Raw reservation data:', reservationData);
 
-    // Parsear fechas de forma segura
     const startDate = parseLocalDate(reservationData.startDate);
     let endDate: Date | null = null;
 
@@ -182,14 +163,17 @@ export async function createReservation(reservationData: any): Promise<Reservati
       endDate = parseLocalDate(reservationData.endDate);
     }
 
+    const now = new Date();
+
     const backendData = {
       Paciente_idPaciente: parseInt(reservationData.patientId),
       Habitacion_idHabitacion: parseInt(reservationData.roomId),
       Fecha_Inicio: toISODateString(startDate),
       Fecha_Fin: endDate ? toISODateString(endDate) : null,
+      Fecha_Registro: now.toISOString(),
       Indefinido: reservationData.indefinite || false,
       Catalogo_Tipo_Estancia_idEstancia: parseInt(reservationData.stayType) || 4,
-      Catalogo_Estado_Reservacion_idEstado: mapStatusToId(reservationData.status || 'pendiente'),
+      Catalogo_Estado_Reservacion_idEstado: mapStatusToId(reservationData.status || 'activa'),
       Empleado_idEmpleado_Registra: reservationData.createdBy ? parseInt(reservationData.createdBy) : 1,
       Observaciones: reservationData.observations || null,
       Activo: true
@@ -210,7 +194,7 @@ export async function createReservation(reservationData: any): Promise<Reservati
       endDate: response.Fecha_Fin ? new Date(response.Fecha_Fin).toLocaleDateString('es-CR') : undefined,
       indefinite: response.Indefinido || !response.Fecha_Fin,
       schedule: mapStayType(response.Catalogo_Tipo_Estancia_idEstancia || 4),
-      status: mapReservationStatus(response.idCatalogo_Estado_Reservacion || 4),
+      status: mapReservationStatus(response.Catalogo_Estado_Reservacion_idEstado || 1),
       createdBy: response.Empleado_Registra?.Nombre || 'Sistema',
       observations: response.Observaciones || ''
     };
@@ -229,16 +213,13 @@ export async function updateReservation(id: string, reservationData: any): Promi
     if (reservationData.patientId) {
       backendData.Paciente_idPaciente = parseInt(reservationData.patientId);
     }
-
     if (reservationData.roomId) {
       backendData.Habitacion_idHabitacion = parseInt(reservationData.roomId);
     }
-
     if (reservationData.startDate) {
       const startDate = parseLocalDate(reservationData.startDate);
       backendData.Fecha_Inicio = toISODateString(startDate);
     }
-
     if (reservationData.endDate) {
       const endDate = parseLocalDate(reservationData.endDate);
       backendData.Fecha_Fin = toISODateString(endDate);
@@ -246,15 +227,12 @@ export async function updateReservation(id: string, reservationData: any): Promi
       backendData.Fecha_Fin = null;
       backendData.Indefinido = true;
     }
-
     if (reservationData.schedule) {
       backendData.Catalogo_Tipo_Estancia_idEstancia = mapStayTypeToId(reservationData.schedule);
     }
-
     if (reservationData.status) {
       backendData.Catalogo_Estado_Reservacion_idEstado = mapStatusToId(reservationData.status);
     }
-
     if (reservationData.observations !== undefined) {
       backendData.Observaciones = reservationData.observations;
     }
@@ -272,7 +250,7 @@ export async function updateReservation(id: string, reservationData: any): Promi
       endDate: response.Fecha_Fin ? new Date(response.Fecha_Fin).toLocaleDateString('es-CR') : undefined,
       indefinite: response.Indefinido || !response.Fecha_Fin,
       schedule: 'Full estancia' as const,
-      status: mapReservationStatus(response.idCatalogo_Estado_Reservacion || 4),
+      status: mapReservationStatus(response.Catalogo_Estado_Reservacion_idEstado || 4),
       createdBy: 'Sistema',
       observations: response.Observaciones || ''
     };

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
-import { Eye, MoreHorizontal, Pencil, Trash2, UserCheck, UserX } from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, Trash2, UserCheck, UserX, ExternalLink } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
 import { Patient, PatientStatus, AssistanceLevel } from "@/src/types/patient";
 import { PatientDetailModal } from "@/src/components/patients/patient-detail-modal";
@@ -14,8 +14,6 @@ interface PatientsTableProps {
     onDelete?: (id: string) => void;
     onToggleStatus?: (id: string, newStatus: PatientStatus) => void;
 }
-
-// ─── Badge helpers ────────────────────────────────────────────────────────────
 
 function getAssistanceBadge(level: AssistanceLevel) {
     switch (level) {
@@ -30,7 +28,6 @@ function getAssistanceBadge(level: AssistanceLevel) {
     }
 }
 
-// Etiqueta corta para la tabla
 function getAssistanceShort(level: AssistanceLevel) {
     switch (level) {
         case "Asistencia básica": return "Bajo";
@@ -46,8 +43,6 @@ function getInitials(name: string) {
         .slice(0, 2).map((p) => p[0]?.toUpperCase() ?? "").join("");
 }
 
-// ─── Menú de acciones ─────────────────────────────────────────────────────────
-
 interface RowActionsProps {
     patient: Patient;
     onView: (patient: Patient) => void;
@@ -60,6 +55,10 @@ function RowActions({ patient, onView, onEdit, onDelete, onToggleStatus }: RowAc
     const [confirmOpen, setConfirmOpen] = useState(false);
     const isActive = patient.status === "activo";
     const nextStatus: PatientStatus = isActive ? "inactivo" : "activo";
+
+    const openPatientPortal = () => {
+        window.open('/auth/login-paciente', '_blank');
+    };
 
     return (
         <>
@@ -74,7 +73,7 @@ function RowActions({ patient, onView, onEdit, onDelete, onToggleStatus }: RowAc
                     <DropdownMenu.Content
                         align="end"
                         sideOffset={4}
-                        className="z-[9999] min-w-[180px] overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg animate-in fade-in-0 zoom-in-95"
+                        className="z-[9999] min-w-[200px] overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg animate-in fade-in-0 zoom-in-95"
                     >
                         <DropdownMenu.Item
                             onSelect={() => onView(patient)}
@@ -93,6 +92,16 @@ function RowActions({ patient, onView, onEdit, onDelete, onToggleStatus }: RowAc
                         </DropdownMenu.Item>
 
                         <DropdownMenu.Item
+                            onSelect={openPatientPortal}
+                            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-teal-700 outline-none hover:bg-teal-50"
+                        >
+                            <ExternalLink className="h-3.5 w-3.5 text-teal-500" />
+                            Ver portal de paciente
+                        </DropdownMenu.Item>
+
+                        <DropdownMenu.Separator className="my-1 h-px bg-slate-100" />
+
+                        <DropdownMenu.Item
                             onSelect={() => onToggleStatus?.(patient.id, nextStatus)}
                             className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 outline-none hover:bg-slate-100"
                         >
@@ -102,8 +111,6 @@ function RowActions({ patient, onView, onEdit, onDelete, onToggleStatus }: RowAc
                             }
                             {isActive ? "Desactivar paciente" : "Activar paciente"}
                         </DropdownMenu.Item>
-
-                        <DropdownMenu.Separator className="my-1 h-px bg-slate-100" />
 
                         <DropdownMenu.Item
                             onSelect={() => setConfirmOpen(true)}
@@ -116,7 +123,6 @@ function RowActions({ patient, onView, onEdit, onDelete, onToggleStatus }: RowAc
                 </DropdownMenu.Portal>
             </DropdownMenu.Root>
 
-            {/* Confirmación de eliminación */}
             <AlertDialog.Root open={confirmOpen} onOpenChange={setConfirmOpen}>
                 <AlertDialog.Portal>
                     <AlertDialog.Overlay className="fixed inset-0 z-[9998] bg-black/40 animate-in fade-in-0" />
@@ -154,8 +160,6 @@ function RowActions({ patient, onView, onEdit, onDelete, onToggleStatus }: RowAc
     );
 }
 
-// ─── Tabla principal ──────────────────────────────────────────────────────────
-
 export function PatientsTable({
     patients,
     onEdit,
@@ -177,7 +181,6 @@ export function PatientsTable({
     return (
         <>
             <div className="overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-sm">
-                {/* Cabecera */}
                 <div className="grid grid-cols-[2fr_0.7fr_0.7fr_1.2fr_1fr_0.8fr_44px] px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
                     <span>Nombre</span>
                     <span>Edad</span>
@@ -188,13 +191,11 @@ export function PatientsTable({
                     <span />
                 </div>
 
-                {/* Filas */}
                 {patients.map((patient) => (
                     <div
                         key={patient.id}
                         className="grid grid-cols-[2fr_0.7fr_0.7fr_1.2fr_1fr_0.8fr_44px] items-center border-t border-slate-100 px-6 py-4 transition-colors hover:bg-slate-50/50"
                     >
-                        {/* Nombre */}
                         <div className="flex items-center gap-3">
                             <Avatar className="h-9 w-9 shrink-0">
                                 <AvatarFallback className="bg-blue-50 text-xs font-semibold text-blue-600">
@@ -209,25 +210,20 @@ export function PatientsTable({
                             </div>
                         </div>
 
-                        {/* Edad */}
                         <div className="text-sm text-slate-600">{patient.age} años</div>
 
-                        {/* Habitación */}
                         <div className="text-sm font-medium text-slate-700">
                             {patient.roomNumber}
                         </div>
 
-                        {/* Nivel de asistencia */}
                         <div>
                             <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getAssistanceBadge(patient.assistanceLevel)}`}>
                                 {getAssistanceShort(patient.assistanceLevel)}
                             </span>
                         </div>
 
-                        {/* Fecha de ingreso */}
                         <div className="text-sm text-slate-500">{patient.admissionDate}</div>
 
-                        {/* Estado */}
                         <div>
                             <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${patient.status === "activo"
                                     ? "bg-emerald-100 text-emerald-700"
@@ -239,7 +235,6 @@ export function PatientsTable({
                             </span>
                         </div>
 
-                        {/* Acciones */}
                         <div className="flex justify-end">
                             <RowActions
                                 patient={patient}
@@ -252,7 +247,6 @@ export function PatientsTable({
                     </div>
                 ))}
 
-                {/* Footer */}
                 <div className="border-t border-slate-100 px-6 py-3">
                     <p className="text-xs text-slate-400">
                         Mostrando {patients.length} paciente{patients.length !== 1 ? "s" : ""}
@@ -260,7 +254,6 @@ export function PatientsTable({
                 </div>
             </div>
 
-            {/* Modal de detalle */}
             <PatientDetailModal
                 patient={selectedPatient}
                 open={!!selectedPatient}

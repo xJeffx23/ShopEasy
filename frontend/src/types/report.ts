@@ -2,14 +2,16 @@
 // Enunciado a.ii — Cantidad de pacientes alojados
 // Enunciado a.iii — Cantidad de pacientes por día
 // Enunciado a.iv — Habitaciones reservadas vs totales
-
 export interface ReportSummary {
-    totalPatients: number;   // a.i  Pacientes registrados
-    hostedPatients: number;   // a.ii Pacientes alojados (activos)
-    reservedRooms: number;   // a.iv Habitaciones reservadas
-    totalRooms: number;   // a.iv Habitaciones totales
-    activeEmployees: number;   // Personal activo (extra útil)
-    activeReservations: number;   // Reservaciones activas
+    totalPatients: number;      // a.i  Pacientes registrados
+    activePatients?: number;    // Pacientes activos
+    hostedPatients: number;     // a.ii Pacientes alojados (activos)
+    reservedRooms: number;      // a.iv Habitaciones reservadas
+    totalRooms: number;         // a.iv Habitaciones totales
+    availableRooms?: number;    // Habitaciones disponibles
+    activeEmployees: number;    // Personal activo
+    activeReservations: number; // Reservaciones activas
+    occupancyRate?: number;     // Tasa de ocupación
 }
 
 // Enunciado a.iii — Pacientes por día
@@ -26,8 +28,10 @@ export interface OccupancyTrend {
 
 // Distribución de habitaciones por estado
 export interface RoomStatusDistribution {
-    name: string;
-    value: number;
+    status?: string;
+    name?: string;
+    value?: number;
+    count?: number;
     color: string;
 }
 
@@ -46,7 +50,6 @@ export interface PatientMovement {
 }
 
 // ─── Datos raíz ───────────────────────────────────────────────────────────────
-
 export interface ReportsData {
     summary: ReportSummary;
     patientsByDay: PatientsByDay[];

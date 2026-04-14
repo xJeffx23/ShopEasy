@@ -46,6 +46,15 @@ export interface Paciente {
       Costo_Adicional: number;
     };
   }>;
+  Reservaciones?: Array<{
+    idReservacion: number;
+    Catalogo_Estado_Reservacion_idEstado: number;
+    Activo: boolean;
+    Habitacion?: {
+      idHabitacion: number;
+      Numero_Habitacion: string;
+    };
+  }>;
 }
 
 export const pacientesService = {

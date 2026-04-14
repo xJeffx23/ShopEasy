@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import {
     LayoutDashboard,
     Users,
@@ -56,9 +57,13 @@ export default function Sidebar() {
         <aside className="flex h-screen w-[220px] shrink-0 flex-col border-r border-slate-100 bg-white px-3 py-5">
             {/* Logo */}
             <div className="mb-6 flex items-center gap-2.5 px-2">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-[13px] font-bold text-white">
-                    P
-                </div>
+                <Image
+                    src="/LogoPatitos.png"
+                    alt="Logo Patitos del Retiro"
+                    width={36}
+                    height={36}
+                    className="shrink-0 rounded-lg"
+                />
                 <div>
                     <p className="text-[13px] font-semibold leading-tight text-slate-900">
                         Patitos del Retiro

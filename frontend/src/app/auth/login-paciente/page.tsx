@@ -3,17 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Lock, Eye, EyeOff, Heart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
-import AnimatedAuthBackground from "@/src/components/login/AnimatedAuthBackground";
 import { authService } from "@/src/services/auth.service";
+import AnimatedAuthBackground from "@/src/components/login/AnimatedAuthBackground";
 
-export default function LoginView() {
+export default function LoginPacientePage() {
     const router = useRouter();
 
     const [mostrarContrasena, setMostrarContrasena] = useState(false);
@@ -28,12 +28,12 @@ export default function LoginView() {
         setLoading(true);
 
         try {
-            await authService.login({
+            await authService.loginPaciente({
                 Nombre_usuario: username,
                 Contrasena: password,
             });
 
-            router.push("/sistema/dashboard");
+            router.push("/paciente/dashboard");
         } catch (err: any) {
             console.error("Error al iniciar sesión:", err);
             setError(err.response?.data?.message || "Usuario o contraseña incorrectos");
@@ -44,15 +44,17 @@ export default function LoginView() {
 
     return (
         <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-            <aside className="hidden md:flex relative flex-col justify-center items-center bg-[#243C8F] text-white px-12 overflow-hidden">
+            {/* Panel izquierdo decorativo */}
+            <aside className="hidden md:flex relative flex-col justify-center items-center bg-gradient-to-br from-teal-600 to-teal-800 text-white px-12 overflow-hidden">
                 <AnimatedAuthBackground />
-
+                
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
                     className="relative z-10 max-w-md space-y-6"
                 >
+                    {/* Logo grande */}
                     <motion.div
                         animate={{ y: [0, -8, 0] }}
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -72,35 +74,38 @@ export default function LoginView() {
                         transition={{ duration: 3, repeat: Infinity }}
                         className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm backdrop-blur-sm"
                     >
-                        <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                        Sistema de Gestión Clínica
+                        <Heart className="h-4 w-4 text-red-300" />
+                        Portal de Pacientes
                     </motion.div>
 
                     <h1 className="text-4xl font-semibold leading-tight">
+                        Bienvenido a <br />
                         Patitos del <br />
                         Retiro
                     </h1>
 
                     <p className="text-white/80">
-                        Sistema integral para la gestión de pacientes, habitaciones,
-                        reservaciones y personal del asilo.
+                        Accede a tu portal personal para gestionar tus reservaciones
+                        y consultar tu historial de estancias.
                     </p>
 
-                    <div className="flex flex-col gap-2 text-sm text-white/70">
-                        <span>✔ Gestión de pacientes y empleados</span>
-                        <span>✔ Control de habitaciones y reservaciones</span>
-                        <span>✔ Reportes y estadísticas en tiempo real</span>
+                    <div className="flex flex-col gap-3 text-sm text-white/70">
+                        <span>✔ Consulta tu historial de reservaciones</span>
+                        <span>✔ Realiza nuevas reservaciones</span>
+                        <span>✔ Información actualizada de tus estancias</span>
                     </div>
                 </motion.div>
             </aside>
 
-            <main className="flex items-center justify-center bg-background px-6 py-12">
+            {/* Panel derecho - Formulario */}
+            <main className="flex items-center justify-center bg-gradient-to-br from-slate-50 to-teal-50 px-6 py-12">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.6 }}
                     className="w-full max-w-md space-y-8"
                 >
+                    {/* Logo pequeño + título */}
                     <div className="flex items-center gap-3">
                         <Image
                             src="/LogoPatitos.png"
@@ -110,65 +115,44 @@ export default function LoginView() {
                             className="rounded-xl"
                         />
                         <div>
-                            <h2 className="text-lg font-semibold">Patitos del Retiro</h2>
-                            <p className="text-sm text-muted-foreground">Portal de Empleados</p>
+                            <h2 className="text-lg font-semibold text-slate-800">Patitos del Retiro</h2>
+                            <p className="text-sm text-slate-500">Portal de Pacientes</p>
                         </div>
                     </div>
 
                     <div>
-                        <h3 className="text-2xl font-semibold">Bienvenido</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Inicia sesión para acceder al sistema
+                        <h3 className="text-2xl font-semibold text-slate-800">Iniciar Sesión</h3>
+                        <p className="text-sm text-slate-500">
+                            Ingresa tus credenciales para acceder a tu portal
                         </p>
                     </div>
 
-                    <motion.form
-                        onSubmit={manejarEnvio}
-                        className="space-y-5"
-                        initial="hidden"
-                        animate="visible"
-                        variants={{
-                            hidden: {},
-                            visible: {
-                                transition: { staggerChildren: 0.12 },
-                            },
-                        }}
-                    >
-                        <motion.div
-                            variants={{
-                                hidden: { opacity: 0, y: 20 },
-                                visible: { opacity: 1, y: 0 },
-                            }}
-                        >
-                            <Label htmlFor="username">Usuario</Label>
+                    <form onSubmit={manejarEnvio} className="space-y-5">
+                        <div>
+                            <Label htmlFor="username" className="text-slate-700">Usuario</Label>
                             <div className="relative mt-2">
-                                <User className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                                <User className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
                                 <Input
                                     id="username"
                                     type="text"
                                     placeholder="Ingresa tu usuario"
-                                    className="pl-10"
+                                    className="pl-10 border-slate-200 focus:border-teal-500 focus:ring-teal-500"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     required
                                 />
                             </div>
-                        </motion.div>
+                        </div>
 
-                        <motion.div
-                            variants={{
-                                hidden: { opacity: 0, y: 20 },
-                                visible: { opacity: 1, y: 0 },
-                            }}
-                        >
-                            <Label htmlFor="contrasena">Contraseña</Label>
+                        <div>
+                            <Label htmlFor="contrasena" className="text-slate-700">Contraseña</Label>
                             <div className="relative mt-2">
-                                <Lock className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                                <Lock className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
                                 <Input
                                     id="contrasena"
                                     type={mostrarContrasena ? "text" : "password"}
                                     placeholder="Ingresa tu contraseña"
-                                    className="pl-10 pr-10"
+                                    className="pl-10 pr-10 border-slate-200 focus:border-teal-500 focus:ring-teal-500"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
@@ -176,16 +160,12 @@ export default function LoginView() {
                                 <button
                                     type="button"
                                     onClick={() => setMostrarContrasena(!mostrarContrasena)}
-                                    className="absolute right-3 top-3.5 text-muted-foreground hover:text-foreground"
+                                    className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
                                 >
-                                    {mostrarContrasena ? (
-                                        <EyeOff className="h-4 w-4" />
-                                    ) : (
-                                        <Eye className="h-4 w-4" />
-                                    )}
+                                    {mostrarContrasena ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
                             </div>
-                        </motion.div>
+                        </div>
 
                         {error && (
                             <motion.div
@@ -197,27 +177,21 @@ export default function LoginView() {
                             </motion.div>
                         )}
 
-                        <motion.div
-                            variants={{
-                                hidden: { opacity: 0, y: 20 },
-                                visible: { opacity: 1, y: 0 },
-                            }}
+                        <Button
+                            type="submit"
+                            className="w-full bg-teal-600 hover:bg-teal-700"
+                            disabled={loading}
                         >
-                            <Button
-                                type="submit"
-                                className="w-full bg-[#243C8F] hover:bg-[#1f3277]"
-                                disabled={loading}
-                            >
-                                {loading ? "Iniciando sesión..." : "Iniciar sesión"}
-                            </Button>
-                        </motion.div>
-                    </motion.form>
+                            {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+                        </Button>
+                    </form>
 
+                    {/* Link al login de empleados */}
                     <div className="text-center pt-4 border-t border-slate-200">
-                        <p className="text-sm text-muted-foreground">
-                            ¿Eres paciente?{" "}
-                            <Link href="/auth/login-paciente" className="text-[#243C8F] hover:text-[#1f3277] font-medium">
-                                Ir al portal de pacientes
+                        <p className="text-sm text-slate-500">
+                            ¿Eres empleado?{" "}
+                            <Link href="/auth/login" className="text-teal-600 hover:text-teal-700 font-medium">
+                                Ir al portal de empleados
                             </Link>
                         </p>
                     </div>

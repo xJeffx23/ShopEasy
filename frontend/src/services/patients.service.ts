@@ -1,46 +1,56 @@
 import { pacientesService, Paciente } from './pacientes.service';
 import api from './api';
-import { PatientsData, Patient, PatientStatus, PatientStats } from '@/src/types/patient';
+import { PatientsData, Patient, PatientStatus, PatientStats, AssistanceLevel } from '@/src/types/patient';
 
 export async function getPatientsData(): Promise<PatientsData> {
   try {
     const pacientes = await pacientesService.getAll();
+    
+    const patients: Patient[] = pacientes.map(paciente => {
+      // Buscar reservación activa (estado 1 = Activa)
+      const reservacionActiva = paciente.Reservaciones?.find(
+        r => r.Catalogo_Estado_Reservacion_idEstado === 1 && r.Activo
+      );
+      
+      // Obtener número de habitación de la reservación activa
+      const roomNumber = reservacionActiva?.Habitacion?.Numero_Habitacion || 'Sin asignar';
 
-    const patients: Patient[] = pacientes.map(paciente => ({
-      id: paciente.idPaciente.toString(),
-      patientCode: `PAT${paciente.idPaciente.toString().padStart(4, '0')}`,
-      fullName: paciente.Nombre,
-      idNumber: paciente.Numero_Cedula || paciente.idPaciente.toString(),
-      birthDate: new Date(paciente.Fecha_Nacimiento).toLocaleDateString('es-CR'),
-      age: calculateAge(new Date(paciente.Fecha_Nacimiento)),
-      admissionDate: new Date(paciente.Fecha_Ingreso).toLocaleDateString('es-CR'),
-      roomNumber: 'No asignada',
-      assistanceLevel: mapAssistanceLevel(paciente.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
-      status: paciente.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
-      emergencyContact: {
-        name: paciente.Nombre_Contacto_Emergencia || 'Contacto de emergencia',
-        phone: paciente.Telefono_Contacto_Emergencia || 'N/A'
-      },
-      medications: paciente.Medicamentos?.map((med: any) => ({
-        id: med.idPaciente_Medicamento.toString(),
-        name: med.Nombre_Medicamento,
-        dose: med.Dosis,
-        frequency: med.Frecuencia,
-        schedule: '',
-        notes: med.Indicaciones || undefined
-      })) || [],
-      specialCares: paciente.Cuidados?.map((care: any) => ({
-        id: care.idPaciente_Cuidado.toString(),
-        type: care.Tipo_Cuidado?.Descripcion_Cuidado || 'Cuidado especial',
-        detail: care.Detalle
-      })) || [],
-      packages: paciente.Paquetes?.map((pkg: any) => ({
-        id: pkg.idPaciente_Paquete.toString(),
-        type: pkg.Paquete?.Nombre_Paquete || 'Paquete adicional',
-        assignedDate: new Date(pkg.Fecha_Asignacion).toLocaleDateString('es-CR'),
-        active: pkg.Activo
-      })) || []
-    }));
+      return {
+        id: paciente.idPaciente.toString(),
+        patientCode: `PAT${paciente.idPaciente.toString().padStart(4, '0')}`,
+        fullName: paciente.Nombre,
+        idNumber: paciente.Numero_Cedula || paciente.idPaciente.toString(),
+        birthDate: new Date(paciente.Fecha_Nacimiento).toLocaleDateString('es-CR'),
+        age: calculateAge(new Date(paciente.Fecha_Nacimiento)),
+        admissionDate: new Date(paciente.Fecha_Ingreso).toLocaleDateString('es-CR'),
+        roomNumber: roomNumber,
+        assistanceLevel: mapAssistanceLevel(paciente.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
+        status: paciente.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
+        emergencyContact: {
+          name: paciente.Nombre_Contacto_Emergencia || 'Contacto de emergencia',
+          phone: paciente.Telefono_Contacto_Emergencia || 'N/A'
+        },
+        medications: paciente.Medicamentos?.map((med: any) => ({
+          id: med.idPaciente_Medicamento.toString(),
+          name: med.Nombre_Medicamento,
+          dose: med.Dosis,
+          frequency: med.Frecuencia,
+          schedule: '',
+          notes: med.Indicaciones || undefined
+        })) || [],
+        specialCares: paciente.Cuidados?.map((care: any) => ({
+          id: care.idPaciente_Cuidado.toString(),
+          type: care.Tipo_Cuidado?.Descripcion_Cuidado || 'Cuidado especial',
+          detail: care.Detalle
+        })) || [],
+        packages: paciente.Paquetes?.map((pkg: any) => ({
+          id: pkg.idPaciente_Paquete.toString(),
+          type: pkg.Paquete?.Nombre_Paquete || 'Paquete adicional',
+          assignedDate: new Date(pkg.Fecha_Asignacion).toLocaleDateString('es-CR'),
+          active: pkg.Activo
+        })) || []
+      };
+    });
 
     const stats: PatientStats = {
       total: patients.length,
@@ -79,95 +89,90 @@ export async function getPatientById(id: string): Promise<Paciente> {
     const paciente = await pacientesService.getById(parseInt(id));
     return paciente;
   } catch (error) {
-    console.error('Error fetching patient by id:', error);
+    console.error('Error fetching patient by ID:', error);
     throw error;
   }
 }
 
-function mapAssistanceLevel(level: string): Patient['assistanceLevel'] {
-  const mapping: Record<string, Patient['assistanceLevel']> = {
-    'Asistencia básica': 'Asistencia básica',
-    'Asistencia para movilidad': 'Asistencia para movilidad',
-    'Asistencia para alimentación': 'Asistencia para alimentación',
-    'Asistencia para baño': 'Asistencia para baño',
-    'Asistencia completa': 'Asistencia completa'
-  };
-  return mapping[level] || 'Asistencia básica';
-}
-
-function calculateAge(birthDate: Date): number {
-  const today = new Date();
-  const age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    return age - 1;
-  }
-
-  return age;
-}
-
+/**
+ * Crear un nuevo paciente con medicamentos, cuidados y paquetes
+ */
 export async function createPatient(patientData: any): Promise<Patient> {
   try {
-    let fechaNacimiento: string;
-    if (patientData.birthDate) {
-      const date = new Date(patientData.birthDate);
-      if (isNaN(date.getTime())) {
-        fechaNacimiento = new Date().toISOString();
-      } else {
-        fechaNacimiento = date.toISOString();
-      }
-    } else {
-      fechaNacimiento = new Date().toISOString();
-    }
+    // Mapear medicamentos al formato del backend
+    const medicamentos = (patientData.medications || []).map((med: any) => ({
+      Nombre_Medicamento: med.name,
+      Dosis: med.dose,
+      Frecuencia: med.frequency,
+      Indicaciones: med.notes || med.schedule || '',
+      Activo: true
+    }));
+
+    // Mapear cuidados especiales al formato del backend
+    const cuidados = (patientData.specialCares || []).map((care: any) => ({
+      Detalle: care.detail,
+      Catalogo_Cuidado_Especial_idCuidado: mapCareTypeToId(care.type)
+    }));
+
+    // Mapear paquetes al formato del backend
+    const paquetes = (patientData.packages || []).map((pkg: any) => ({
+      Fecha_Asignacion: new Date().toISOString(),
+      Activo: true,
+      Catalogo_Paquete_idPaquete: mapPackageTypeToId(pkg.type)
+    }));
 
     const backendData = {
-      Nombre: patientData.fullName || 'Paciente sin nombre',
-      Numero_Cedula: patientData.idNumber || 'TEMP-' + Date.now(),
-      Fecha_Nacimiento: fechaNacimiento,
+      Nombre: patientData.fullName,
+      Numero_Cedula: patientData.idNumber,
+      Fecha_Nacimiento: patientData.birthDate,
+      Fecha_Ingreso: patientData.admissionDate || new Date().toISOString(),
       Telefono_Contacto_Emergencia: patientData.emergencyContact?.phone || '',
       Nombre_Contacto_Emergencia: patientData.emergencyContact?.name || '',
-      Fecha_Ingreso: new Date().toISOString(),
-      Catalogo_Nivel_Asistencia_idNivel: mapAssistanceLevelToId(patientData.assistanceLevel || 'Asistencia básica'),
-      Activo: true,
-      Medicamentos: patientData.medications?.map((med: any) => ({
-        Nombre_Medicamento: med.name,
-        Dosis: med.dose,
-        Frecuencia: med.frequency,
-        Indicaciones: med.notes || '',
-        Activo: true
-      })) || [],
-      Cuidados: patientData.specialCares?.map((care: any) => ({
-        Detalle: care.detail,
-        Catalogo_Cuidado_Especial_idCuidado: 1
-      })) || [],
-      Paquetes: patientData.packages?.map((pkg: any) => ({
-        Fecha_Asignacion: new Date().toISOString(),
-        Activo: pkg.active,
-        Catalogo_Paquete_idPaquete: 1
-      })) || []
+      Catalogo_Nivel_Asistencia_idNivel: mapAssistanceLevelToId(patientData.assistanceLevel),
+      Activo: patientData.status !== 'inactivo',
+      Medicamentos: medicamentos,
+      Cuidados: cuidados,
+      Paquetes: paquetes
     };
 
-    const response = await pacientesService.create(backendData);
+    console.log('Sending patient data to backend:', backendData);
 
+    const response = await pacientesService.create(backendData as any);
+    
     return {
       id: response.idPaciente.toString(),
+      patientCode: `PAT${response.idPaciente.toString().padStart(4, '0')}`,
       fullName: response.Nombre,
       idNumber: response.Numero_Cedula,
-      patientCode: `PAT${response.idPaciente.toString().padStart(4, '0')}`,
       birthDate: new Date(response.Fecha_Nacimiento).toLocaleDateString('es-CR'),
       age: calculateAge(new Date(response.Fecha_Nacimiento)),
       admissionDate: new Date(response.Fecha_Ingreso).toLocaleDateString('es-CR'),
-      roomNumber: 'No asignada',
+      roomNumber: 'Sin asignar',
       assistanceLevel: mapAssistanceLevel(response.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
       status: response.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
       emergencyContact: {
         name: response.Nombre_Contacto_Emergencia || '',
         phone: response.Telefono_Contacto_Emergencia || ''
       },
-      medications: [],
-      specialCares: [],
-      packages: []
+      medications: response.Medicamentos?.map((med: any) => ({
+        id: med.idPaciente_Medicamento.toString(),
+        name: med.Nombre_Medicamento,
+        dose: med.Dosis,
+        frequency: med.Frecuencia,
+        schedule: '',
+        notes: med.Indicaciones || undefined
+      })) || [],
+      specialCares: response.Cuidados?.map((care: any) => ({
+        id: care.idPaciente_Cuidado.toString(),
+        type: care.Tipo_Cuidado?.Descripcion_Cuidado || 'Cuidado especial',
+        detail: care.Detalle
+      })) || [],
+      packages: response.Paquetes?.map((pkg: any) => ({
+        id: pkg.idPaciente_Paquete.toString(),
+        type: pkg.Paquete?.Nombre_Paquete || 'Paquete adicional',
+        assignedDate: new Date(pkg.Fecha_Asignacion).toLocaleDateString('es-CR'),
+        active: pkg.Activo
+      })) || []
     };
   } catch (error) {
     console.error('Error creating patient:', error);
@@ -175,50 +180,62 @@ export async function createPatient(patientData: any): Promise<Patient> {
   }
 }
 
+/**
+ * Actualizar un paciente existente
+ */
 export async function updatePatient(id: string, patientData: any): Promise<Patient> {
   try {
     const backendData: any = {};
 
-    if (patientData.fullName) {
-      backendData.Nombre = patientData.fullName;
-    }
-
-    if (patientData.birthDate) {
-      const date = new Date(patientData.birthDate);
-      if (!isNaN(date.getTime())) {
-        backendData.Fecha_Nacimiento = date.toISOString();
-      }
-    }
-
-    if (patientData.emergencyContact) {
-      backendData.Telefono_Contacto_Emergencia = patientData.emergencyContact.phone || '';
-      backendData.Nombre_Contacto_Emergencia = patientData.emergencyContact.name || '';
-    }
-
-    if (patientData.status !== undefined) {
-      backendData.Activo = patientData.status === 'activo';
-    }
+    if (patientData.fullName) backendData.Nombre = patientData.fullName;
+    if (patientData.idNumber) backendData.Numero_Cedula = patientData.idNumber;
+    if (patientData.birthDate) backendData.Fecha_Nacimiento = patientData.birthDate;
+    if (patientData.admissionDate) backendData.Fecha_Ingreso = patientData.admissionDate;
+    if (patientData.emergencyContact?.phone) backendData.Telefono_Contacto_Emergencia = patientData.emergencyContact.phone;
+    if (patientData.emergencyContact?.name) backendData.Nombre_Contacto_Emergencia = patientData.emergencyContact.name;
+    if (patientData.assistanceLevel) backendData.Catalogo_Nivel_Asistencia_idNivel = mapAssistanceLevelToId(patientData.assistanceLevel);
 
     const response = await pacientesService.update(parseInt(id), backendData);
+    
+    const reservacionActiva = response.Reservaciones?.find(
+      (r: any) => r.Catalogo_Estado_Reservacion_idEstado === 1 && r.Activo
+    );
+    const roomNumber = reservacionActiva?.Habitacion?.Numero_Habitacion || 'Sin asignar';
 
     return {
       id: response.idPaciente.toString(),
-      fullName: response.Nombre,
-      idNumber: response.Numero_Cedula || response.idPaciente.toString(),
       patientCode: `PAT${response.idPaciente.toString().padStart(4, '0')}`,
+      fullName: response.Nombre,
+      idNumber: response.Numero_Cedula,
       birthDate: new Date(response.Fecha_Nacimiento).toLocaleDateString('es-CR'),
       age: calculateAge(new Date(response.Fecha_Nacimiento)),
       admissionDate: new Date(response.Fecha_Ingreso).toLocaleDateString('es-CR'),
-      roomNumber: 'No asignada',
+      roomNumber: roomNumber,
       assistanceLevel: mapAssistanceLevel(response.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
       status: response.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
       emergencyContact: {
         name: response.Nombre_Contacto_Emergencia || '',
         phone: response.Telefono_Contacto_Emergencia || ''
       },
-      medications: [],
-      specialCares: [],
-      packages: []
+      medications: response.Medicamentos?.map((med: any) => ({
+        id: med.idPaciente_Medicamento.toString(),
+        name: med.Nombre_Medicamento,
+        dose: med.Dosis,
+        frequency: med.Frecuencia,
+        schedule: '',
+        notes: med.Indicaciones || undefined
+      })) || [],
+      specialCares: response.Cuidados?.map((care: any) => ({
+        id: care.idPaciente_Cuidado.toString(),
+        type: care.Tipo_Cuidado?.Descripcion_Cuidado || 'Cuidado especial',
+        detail: care.Detalle
+      })) || [],
+      packages: response.Paquetes?.map((pkg: any) => ({
+        id: pkg.idPaciente_Paquete.toString(),
+        type: pkg.Paquete?.Nombre_Paquete || 'Paquete adicional',
+        assignedDate: new Date(pkg.Fecha_Asignacion).toLocaleDateString('es-CR'),
+        active: pkg.Activo
+      })) || []
     };
   } catch (error) {
     console.error('Error updating patient:', error);
@@ -226,6 +243,9 @@ export async function updatePatient(id: string, patientData: any): Promise<Patie
   }
 }
 
+/**
+ * Eliminar un paciente
+ */
 export async function deletePatient(id: string): Promise<void> {
   try {
     await pacientesService.delete(parseInt(id));
@@ -235,28 +255,35 @@ export async function deletePatient(id: string): Promise<void> {
   }
 }
 
+/**
+ * Cambiar el estado de un paciente
+ */
 export async function updatePatientStatus(id: string, status: PatientStatus): Promise<Patient> {
   try {
-    const response = await api.patch<any>(`/pacientes/${id}/status`, {
-      status: status === 'activo'
+    const response = await api.patch(`/pacientes/${id}/status`, {
+      Activo: status === 'activo'
     });
-
-    const data = response.data;
+    
+    const paciente = response.data;
+    const reservacionActiva = paciente.Reservaciones?.find(
+      (r: any) => r.Catalogo_Estado_Reservacion_idEstado === 1 && r.Activo
+    );
+    const roomNumber = reservacionActiva?.Habitacion?.Numero_Habitacion || 'Sin asignar';
 
     return {
-      id: data.idPaciente.toString(),
-      fullName: data.Nombre,
-      idNumber: data.Numero_Cedula || data.idPaciente.toString(),
-      patientCode: `PAT${data.idPaciente.toString().padStart(4, '0')}`,
-      birthDate: new Date(data.Fecha_Nacimiento).toLocaleDateString('es-CR'),
-      age: calculateAge(new Date(data.Fecha_Nacimiento)),
-      admissionDate: new Date(data.Fecha_Ingreso).toLocaleDateString('es-CR'),
-      roomNumber: 'No asignada',
-      assistanceLevel: mapAssistanceLevel(data.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
-      status: data.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
+      id: paciente.idPaciente.toString(),
+      patientCode: `PAT${paciente.idPaciente.toString().padStart(4, '0')}`,
+      fullName: paciente.Nombre,
+      idNumber: paciente.Numero_Cedula,
+      birthDate: new Date(paciente.Fecha_Nacimiento).toLocaleDateString('es-CR'),
+      age: calculateAge(new Date(paciente.Fecha_Nacimiento)),
+      admissionDate: new Date(paciente.Fecha_Ingreso).toLocaleDateString('es-CR'),
+      roomNumber: roomNumber,
+      assistanceLevel: mapAssistanceLevel(paciente.Nivel_Asistencia?.Descripcion_Nivel || 'Asistencia básica'),
+      status: paciente.Activo ? 'activo' as PatientStatus : 'inactivo' as PatientStatus,
       emergencyContact: {
-        name: data.Nombre_Contacto_Emergencia || '',
-        phone: data.Telefono_Contacto_Emergencia || ''
+        name: paciente.Nombre_Contacto_Emergencia || '',
+        phone: paciente.Telefono_Contacto_Emergencia || ''
       },
       medications: [],
       specialCares: [],
@@ -268,6 +295,29 @@ export async function updatePatientStatus(id: string, status: PatientStatus): Pr
   }
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function calculateAge(birthDate: Date): number {
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+function mapAssistanceLevel(level: string): AssistanceLevel {
+  const mapping: Record<string, AssistanceLevel> = {
+    'Asistencia básica': 'Asistencia básica',
+    'Asistencia para movilidad': 'Asistencia para movilidad',
+    'Asistencia para alimentación': 'Asistencia para alimentación',
+    'Asistencia para baño': 'Asistencia para baño',
+    'Asistencia completa': 'Asistencia completa'
+  };
+  return mapping[level] || 'Asistencia básica';
+}
+
 function mapAssistanceLevelToId(level: string): number {
   const mapping: Record<string, number> = {
     'Asistencia básica': 1,
@@ -277,4 +327,22 @@ function mapAssistanceLevelToId(level: string): number {
     'Asistencia completa': 5
   };
   return mapping[level] || 1;
+}
+
+function mapCareTypeToId(careType: string): number {
+  const mapping: Record<string, number> = {
+    'Alergias': 1,
+    'Cambios de vendajes': 2,
+    'Dietas especiales': 3
+  };
+  return mapping[careType] || 1;
+}
+
+function mapPackageTypeToId(packageType: string): number {
+  const mapping: Record<string, number> = {
+    'Disfrute de juegos': 1,
+    'Visitas a los familiares': 2,
+    'Paseos a sitios con acompañamiento': 3
+  };
+  return mapping[packageType] || 1;
 }

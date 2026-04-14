@@ -1,9 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PacientesService {
   constructor(private prisma: PrismaService) { }
+
+  // Helper para parsear fechas en varios formatos
+  private parseDate(dateValue: any): Date {
+    if (!dateValue) return new Date();
+    
+    // Si ya es un Date válido
+    if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
+      return dateValue;
+    }
+    
+    const dateString = String(dateValue);
+    
+    // Formato DD/MM/YYYY
+    if (dateString.includes('/')) {
+      const [day, month, year] = dateString.split('/');
+      const parsed = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    
+    // Formato ISO o YYYY-MM-DD
+    const isoDate = new Date(dateString);
+    if (!isNaN(isoDate.getTime())) return isoDate;
+    
+    // Fallback
+    return new Date();
+  }
 
   async findAll() {
     return this.prisma.paciente.findMany({
@@ -46,18 +73,16 @@ export class PacientesService {
     try {
       console.log('Creating patient with data:', createPatientDto);
 
-      // Mapear y filtrar solo los campos que existen en el modelo de la base de datos
       const patientData = {
         Nombre: createPatientDto.Nombre,
         Numero_Cedula: createPatientDto.Numero_Cedula,
-        Fecha_Nacimiento: createPatientDto.Fecha_Nacimiento ? new Date(createPatientDto.Fecha_Nacimiento) : new Date(),
-        Fecha_Ingreso: createPatientDto.Fecha_Ingreso ? new Date(createPatientDto.Fecha_Ingreso) : new Date(),
+        Fecha_Nacimiento: this.parseDate(createPatientDto.Fecha_Nacimiento),
+        Fecha_Ingreso: this.parseDate(createPatientDto.Fecha_Ingreso),
         Telefono_Contacto_Emergencia: createPatientDto.Telefono_Contacto_Emergencia || '',
         Nombre_Contacto_Emergencia: createPatientDto.Nombre_Contacto_Emergencia || '',
         Catalogo_Nivel_Asistencia_idNivel: parseInt(createPatientDto.Catalogo_Nivel_Asistencia_idNivel) || 1,
         Activo: createPatientDto.Activo !== undefined ? createPatientDto.Activo : true,
-        // Incluir datos anidados
-        Medicamentos: createPatientDto.Medicamentos ? {
+        Medicamentos: createPatientDto.Medicamentos?.length ? {
           create: createPatientDto.Medicamentos.map((med: any) => ({
             Nombre_Medicamento: med.Nombre_Medicamento,
             Dosis: med.Dosis,
@@ -66,13 +91,13 @@ export class PacientesService {
             Activo: med.Activo
           }))
         } : undefined,
-        Cuidados: createPatientDto.Cuidados ? {
+        Cuidados: createPatientDto.Cuidados?.length ? {
           create: createPatientDto.Cuidados.map((care: any) => ({
             Detalle: care.Detalle,
             Catalogo_Cuidado_Especial_idCuidado: care.Catalogo_Cuidado_Especial_idCuidado
           }))
         } : undefined,
-        Paquetes: createPatientDto.Paquetes ? {
+        Paquetes: createPatientDto.Paquetes?.length ? {
           create: createPatientDto.Paquetes.map((pkg: any) => ({
             Fecha_Asignacion: new Date(pkg.Fecha_Asignacion),
             Activo: pkg.Activo,
@@ -81,7 +106,7 @@ export class PacientesService {
         } : undefined
       };
 
-      const result = await this.prisma.paciente.create({
+      const paciente = await this.prisma.paciente.create({
         data: patientData,
         include: {
           Nivel_Asistencia: true,
@@ -97,53 +122,84 @@ export class PacientesService {
           },
         },
       });
-      return result;
+
+      // Crear usuario automáticamente para el paciente
+      try {
+        const hashedPassword = await bcrypt.hash('123', 10);
+        
+        // Generar username a partir del nombre
+        const nombreParts = paciente.Nombre.toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9\s]/g, '')
+          .split(' ')
+          .filter(p => p.length > 0);
+        
+        let username = nombreParts[0] || 'paciente';
+        
+        // Verificar si el username ya existe
+        const existingUser = await this.prisma.usuario_Paciente.findFirst({
+          where: { Nombre_usuario: username }
+        });
+        
+        if (existingUser) {
+          username = `${username}${Math.floor(Math.random() * 100)}`;
+        }
+
+        const email = `${username}@patitos.cr`;
+
+        await this.prisma.usuario_Paciente.create({
+          data: {
+            Nombre_usuario: username,
+            Contrasena: hashedPassword,
+            Email: email,
+            Cambio_Contrasena: true,
+            Paciente_idPaciente: paciente.idPaciente,
+          },
+        });
+
+        console.log(`Usuario de paciente creado: ${username} con contraseña: 123`);
+      } catch (userError) {
+        console.error('Error creating patient user:', userError);
+        // No fallar si no se puede crear el usuario
+      }
+
+      return paciente;
     } catch (error) {
       console.error('Error creating patient:', error);
 
-      // Manejo específico para error de constraint único
       if (error.code === 'P2002' && error.meta?.target?.includes('Numero_Cedula')) {
-        throw new Error('Ya existe un paciente con este número de cédula');
+        throw new BadRequestException('Ya existe un paciente con este número de cédula');
       }
 
-      throw error;
+      throw new BadRequestException(error.message || 'Error al crear paciente');
     }
   }
 
   async update(id: number, updatePatientDto: any) {
     try {
-      // Construir objeto de datos limpio, convirtiendo fechas
       const updateData: any = {};
 
       if (updatePatientDto.Nombre !== undefined) {
         updateData.Nombre = updatePatientDto.Nombre;
       }
-
       if (updatePatientDto.Numero_Cedula !== undefined) {
         updateData.Numero_Cedula = updatePatientDto.Numero_Cedula;
       }
-
       if (updatePatientDto.Fecha_Nacimiento !== undefined) {
-        // Convertir fecha a formato ISO-8601 DateTime
-        updateData.Fecha_Nacimiento = new Date(updatePatientDto.Fecha_Nacimiento);
+        updateData.Fecha_Nacimiento = this.parseDate(updatePatientDto.Fecha_Nacimiento);
       }
-
       if (updatePatientDto.Fecha_Ingreso !== undefined) {
-        updateData.Fecha_Ingreso = new Date(updatePatientDto.Fecha_Ingreso);
+        updateData.Fecha_Ingreso = this.parseDate(updatePatientDto.Fecha_Ingreso);
       }
-
       if (updatePatientDto.Telefono_Contacto_Emergencia !== undefined) {
         updateData.Telefono_Contacto_Emergencia = updatePatientDto.Telefono_Contacto_Emergencia;
       }
-
       if (updatePatientDto.Nombre_Contacto_Emergencia !== undefined) {
         updateData.Nombre_Contacto_Emergencia = updatePatientDto.Nombre_Contacto_Emergencia;
       }
-
       if (updatePatientDto.Catalogo_Nivel_Asistencia_idNivel !== undefined) {
         updateData.Catalogo_Nivel_Asistencia_idNivel = parseInt(updatePatientDto.Catalogo_Nivel_Asistencia_idNivel);
       }
-
       if (updatePatientDto.Activo !== undefined) {
         updateData.Activo = updatePatientDto.Activo;
       }
@@ -174,8 +230,10 @@ export class PacientesService {
   }
 
   async remove(id: number) {
-    return this.prisma.paciente.delete({
+    // Soft delete
+    return this.prisma.paciente.update({
       where: { idPaciente: id },
+      data: { Activo: false },
     });
   }
 

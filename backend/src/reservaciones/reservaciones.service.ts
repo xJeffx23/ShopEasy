@@ -39,6 +39,25 @@ export class ReservacionesService {
   }
 
   /**
+   * Obtener reservaciones de un paciente específico
+   */
+  async findByPaciente(idPaciente: number) {
+    return this.prisma.reservacion.findMany({
+      where: { Paciente_idPaciente: idPaciente },
+      include: {
+        Habitacion: {
+          include: {
+            Tipo: true
+          }
+        },
+        Tipo_Estancia: true,
+        Estado: true
+      },
+      orderBy: { Fecha_Registro: 'desc' }
+    });
+  }
+
+  /**
    * Obtener disponibilidad de una habitación
    * Retorna: { disponible: boolean, ocupacionActual: number, capacidad: number }
    */
@@ -184,6 +203,87 @@ export class ReservacionesService {
     }
   }
 
+  /**
+   * Crear solicitud de reservación desde el portal de paciente
+   */
+  async crearSolicitudPaciente(idPaciente: number, data: any) {
+    try {
+      console.log('Creating patient reservation request:', { idPaciente, data });
+
+      // Validar que el paciente no tenga otra reservación activa
+      const reservacionExistente = await this.prisma.reservacion.findFirst({
+        where: {
+          Paciente_idPaciente: idPaciente,
+          Activo: true,
+          Catalogo_Estado_Reservacion_idEstado: 1 // Activa
+        }
+      });
+
+      if (reservacionExistente) {
+        throw new BadRequestException(
+          'Ya tienes una reservación activa. Debes esperar a que finalice para solicitar otra.'
+        );
+      }
+
+      // Validar disponibilidad de la habitación
+      const disponibilidad = await this.getDisponibilidadHabitacion(data.Habitacion_idHabitacion);
+
+      if (!disponibilidad.disponible) {
+        throw new BadRequestException(
+          `La habitación ${disponibilidad.numeroHabitacion} no está disponible en este momento.`
+        );
+      }
+
+      // Parsear fechas de forma segura
+      const parseFecha = (fechaStr: string): Date => {
+        if (!fechaStr) return new Date();
+        const [year, month, day] = fechaStr.split('-').map(Number);
+        // Validar que el año sea razonable (entre 2020 y 2100)
+        if (year < 2020 || year > 2100) {
+          throw new BadRequestException(`Año inválido: ${year}. Debe estar entre 2020 y 2100.`);
+        }
+        return new Date(year, month - 1, day, 12, 0, 0);
+      };
+
+      // Crear la reservación con estado "Pendiente" (4) para que el personal la apruebe
+      // O "Activa" (1) si se quiere aprobar automáticamente
+      const reservacionData = {
+        Paciente_idPaciente: idPaciente,
+        Habitacion_idHabitacion: data.Habitacion_idHabitacion,
+        Catalogo_Tipo_Estancia_idEstancia: data.Catalogo_Tipo_Estancia_idEstancia,
+        Catalogo_Estado_Reservacion_idEstado: 1, // Activa (aprobar automáticamente)
+        Empleado_idEmpleado_Registra: 1, // Empleado por defecto (sistema)
+        Fecha_Inicio: parseFecha(data.Fecha_Inicio),
+        Fecha_Fin: data.Fecha_Fin ? parseFecha(data.Fecha_Fin) : null,
+        Fecha_Registro: new Date(),
+        Observaciones: data.Observaciones || 'Reservación solicitada desde portal de paciente',
+        Activo: true
+      };
+
+      const result = await this.prisma.reservacion.create({
+        data: reservacionData,
+        include: {
+          Paciente: true,
+          Habitacion: {
+            include: {
+              Tipo: true
+            }
+          },
+          Tipo_Estancia: true,
+          Estado: true
+        }
+      });
+
+      // Actualizar estado de habitación
+      await this.actualizarEstadoHabitacion(data.Habitacion_idHabitacion);
+
+      return result;
+    } catch (error) {
+      console.error('Error creating patient reservation:', error);
+      throw error;
+    }
+  }
+
   async update(id: number, data: any) {
     try {
       const reservacionAnterior = await this.prisma.reservacion.findUnique({
@@ -240,6 +340,44 @@ export class ReservacionesService {
     return result;
   }
 
+
+  /**
+   * Cancelar reservación desde el portal del paciente
+   */
+  async cancelarReservacionPaciente(idPaciente: number, idReservacion: number) {
+    // Verificar que la reservación existe y pertenece al paciente
+    const reservacion = await this.prisma.reservacion.findFirst({
+      where: {
+        idReservacion: idReservacion,
+        Paciente_idPaciente: idPaciente
+      }
+    });
+
+    if (!reservacion) {
+      throw new BadRequestException("Reservación no encontrada o no te pertenece");
+    }
+
+    // Solo se pueden cancelar reservaciones activas o pendientes
+    if (reservacion.Catalogo_Estado_Reservacion_idEstado !== 1 && 
+        reservacion.Catalogo_Estado_Reservacion_idEstado !== 4) {
+      throw new BadRequestException("Solo se pueden cancelar reservaciones activas o pendientes");
+    }
+
+    // Actualizar estado a Cancelada (3)
+    const result = await this.prisma.reservacion.update({
+      where: { idReservacion: idReservacion },
+      data: { Catalogo_Estado_Reservacion_idEstado: 3 },
+      include: {
+        Habitacion: true,
+        Estado: true
+      }
+    });
+
+    // Actualizar estado de la habitación
+    await this.actualizarEstadoHabitacion(reservacion.Habitacion_idHabitacion);
+
+    return result;
+  }
 
   private async actualizarEstadoHabitacion(habitacionId: number) {
     const habitacion = await this.prisma.habitacion.findUnique({

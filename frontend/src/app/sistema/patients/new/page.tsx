@@ -23,7 +23,8 @@ export default function NewPatientPage() {
         Fecha_Ingreso: new Date().toISOString().split('T')[0],
         Telefono_Contacto_Emergencia: "",
         Nombre_Contacto_Emergencia: "",
-        Catalogo_Nivel_Asistencia_idNivel: 1
+        Catalogo_Nivel_Asistencia_idNivel: 1,
+        Activo: true
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
